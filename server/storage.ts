@@ -1,5 +1,7 @@
 import { type Invoice, type LineItem, type InsertInvoice, type InsertLineItem } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { promises as fs } from "fs";
+import path from "path";
 
 export interface IStorage {
   getInvoice(id: string): Promise<Invoice | undefined>;
@@ -15,26 +17,72 @@ export interface IStorage {
   deleteLineItemsByInvoiceId(invoiceId: string): Promise<void>;
 }
 
-export class MemStorage implements IStorage {
-  private invoices: Map<string, Invoice>;
-  private lineItems: Map<string, LineItem>;
+export class FileStorage implements IStorage {
+  private invoicesPath: string;
+  private lineItemsPath: string;
+  private dataDir: string;
 
   constructor() {
-    this.invoices = new Map();
-    this.lineItems = new Map();
+    this.dataDir = path.join(process.cwd(), 'data');
+    this.invoicesPath = path.join(this.dataDir, 'invoices.json');
+    this.lineItemsPath = path.join(this.dataDir, 'line_items.json');
+    this.ensureDataDirectory();
+  }
+
+  private async ensureDataDirectory(): Promise<void> {
+    try {
+      await fs.mkdir(this.dataDir, { recursive: true });
+    } catch (error) {
+      console.error('Failed to create data directory:', error);
+    }
+  }
+
+  private async loadInvoices(): Promise<Map<string, Invoice>> {
+    try {
+      const data = await fs.readFile(this.invoicesPath, 'utf-8');
+      const invoices = JSON.parse(data) as Invoice[];
+      return new Map(invoices.map(invoice => [invoice.id, invoice]));
+    } catch (error) {
+      // File doesn't exist or is empty, return empty map
+      return new Map();
+    }
+  }
+
+  private async saveInvoices(invoices: Map<string, Invoice>): Promise<void> {
+    const invoiceArray = Array.from(invoices.values());
+    await fs.writeFile(this.invoicesPath, JSON.stringify(invoiceArray, null, 2));
+  }
+
+  private async loadLineItems(): Promise<Map<string, LineItem>> {
+    try {
+      const data = await fs.readFile(this.lineItemsPath, 'utf-8');
+      const lineItems = JSON.parse(data) as LineItem[];
+      return new Map(lineItems.map(item => [item.id, item]));
+    } catch (error) {
+      // File doesn't exist or is empty, return empty map
+      return new Map();
+    }
+  }
+
+  private async saveLineItems(lineItems: Map<string, LineItem>): Promise<void> {
+    const lineItemArray = Array.from(lineItems.values());
+    await fs.writeFile(this.lineItemsPath, JSON.stringify(lineItemArray, null, 2));
   }
 
   async getInvoice(id: string): Promise<Invoice | undefined> {
-    return this.invoices.get(id);
+    const invoices = await this.loadInvoices();
+    return invoices.get(id);
   }
 
   async getInvoices(): Promise<Invoice[]> {
-    return Array.from(this.invoices.values()).sort((a, b) => 
+    const invoices = await this.loadInvoices();
+    return Array.from(invoices.values()).sort((a, b) => 
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
   }
 
   async createInvoice(insertInvoice: InsertInvoice): Promise<Invoice> {
+    const invoices = await this.loadInvoices();
     const id = randomUUID();
     const now = new Date();
     const invoice: Invoice = { 
@@ -57,12 +105,14 @@ export class MemStorage implements IStorage {
       created_at: now,
       updated_at: now 
     };
-    this.invoices.set(id, invoice);
+    invoices.set(id, invoice);
+    await this.saveInvoices(invoices);
     return invoice;
   }
 
   async updateInvoice(id: string, invoice: Partial<InsertInvoice>): Promise<Invoice | undefined> {
-    const existing = this.invoices.get(id);
+    const invoices = await this.loadInvoices();
+    const existing = invoices.get(id);
     if (!existing) return undefined;
     
     const updated: Invoice = { 
@@ -70,25 +120,30 @@ export class MemStorage implements IStorage {
       ...invoice, 
       updated_at: new Date() 
     };
-    this.invoices.set(id, updated);
+    invoices.set(id, updated);
+    await this.saveInvoices(invoices);
     return updated;
   }
 
   async deleteInvoice(id: string): Promise<boolean> {
-    const deleted = this.invoices.delete(id);
+    const invoices = await this.loadInvoices();
+    const deleted = invoices.delete(id);
     if (deleted) {
+      await this.saveInvoices(invoices);
       await this.deleteLineItemsByInvoiceId(id);
     }
     return deleted;
   }
 
   async getLineItemsByInvoiceId(invoiceId: string): Promise<LineItem[]> {
-    return Array.from(this.lineItems.values())
+    const lineItems = await this.loadLineItems();
+    return Array.from(lineItems.values())
       .filter(item => item.invoice_id === invoiceId)
       .sort((a, b) => a.line_number - b.line_number);
   }
 
   async createLineItem(insertLineItem: InsertLineItem): Promise<LineItem> {
+    const lineItems = await this.loadLineItems();
     const id = randomUUID();
     const lineItem: LineItem = {
       id,
@@ -101,31 +156,47 @@ export class MemStorage implements IStorage {
       amount: insertLineItem.amount || 0,
       tax: insertLineItem.tax || 0,
     };
-    this.lineItems.set(id, lineItem);
+    lineItems.set(id, lineItem);
+    await this.saveLineItems(lineItems);
     return lineItem;
   }
 
   async updateLineItem(id: string, lineItem: Partial<InsertLineItem>): Promise<LineItem | undefined> {
-    const existing = this.lineItems.get(id);
+    const lineItems = await this.loadLineItems();
+    const existing = lineItems.get(id);
     if (!existing) return undefined;
     
     const updated: LineItem = { ...existing, ...lineItem };
-    this.lineItems.set(id, updated);
+    lineItems.set(id, updated);
+    await this.saveLineItems(lineItems);
     return updated;
   }
 
   async deleteLineItem(id: string): Promise<boolean> {
-    return this.lineItems.delete(id);
+    const lineItems = await this.loadLineItems();
+    const deleted = lineItems.delete(id);
+    if (deleted) {
+      await this.saveLineItems(lineItems);
+    }
+    return deleted;
   }
 
   async deleteLineItemsByInvoiceId(invoiceId: string): Promise<void> {
-    const items = Array.from(this.lineItems.entries());
+    const lineItems = await this.loadLineItems();
+    const items = Array.from(lineItems.entries());
+    let hasChanges = false;
+    
     for (const [id, item] of items) {
       if (item.invoice_id === invoiceId) {
-        this.lineItems.delete(id);
+        lineItems.delete(id);
+        hasChanges = true;
       }
+    }
+    
+    if (hasChanges) {
+      await this.saveLineItems(lineItems);
     }
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new FileStorage();

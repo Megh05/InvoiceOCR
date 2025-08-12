@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Invoices from "@/pages/invoices";
+import AllInvoices from "@/pages/AllInvoices";
 import Settings from "@/pages/settings";
 import Analytics from "@/pages/analytics";
 
@@ -13,7 +14,8 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/invoices" component={Invoices} />
+      <Route path="/invoices" component={AllInvoices} />
+      <Route path="/process" component={Invoices} />
       <Route path="/settings" component={Settings} />
       <Route path="/analytics" component={Analytics} />
       <Route component={NotFound} />

@@ -217,6 +217,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
         
+        // Save processed invoice to persistent storage
+        try {
+          const savedInvoice = await storage.createInvoice({
+            invoice_number: finalData.invoice_number,
+            invoice_date: finalData.invoice_date,
+            vendor_name: finalData.vendor_name,
+            vendor_address: finalData.vendor_address,
+            bill_to: finalData.bill_to,
+            ship_to: finalData.ship_to,
+            currency: finalData.currency || 'USD',
+            subtotal: finalData.subtotal || 0,
+            tax: finalData.tax || 0,
+            shipping: finalData.shipping || 0,
+            total: finalData.total || 0,
+            raw_ocr_text: rawOcrText,
+            mistral_ocr_text: mistralOcrText,
+            ocr_similarity_score: ocrSimilarityScore,
+            confidence: adjustedConfidence
+          });
+
+          // Save line items
+          if (finalData.line_items && Array.isArray(finalData.line_items)) {
+            for (const item of finalData.line_items) {
+              await storage.createLineItem({
+                invoice_id: savedInvoice.id,
+                line_number: item.line_number || 1,
+                sku: item.sku,
+                description: item.description || '',
+                qty: item.qty || 1,
+                unit_price: item.unit_price || 0,
+                amount: item.amount || 0,
+                tax: item.tax || 0
+              });
+            }
+          }
+
+          console.log(`[storage] Saved invoice ${savedInvoice.id} with ${finalData.line_items?.length || 0} line items`);
+        } catch (storageError) {
+          console.warn('[storage] Failed to save invoice:', storageError);
+        }
+
+
+
         return res.json({
           parsed: finalData,
           confidence: adjustedConfidence,

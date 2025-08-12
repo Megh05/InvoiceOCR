@@ -6,8 +6,13 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
+interface StatusResponse {
+  mistralConfigured: boolean;
+  ocrEnabled: boolean;
+}
+
 function OCRStatus() {
-  const { data: status, isLoading } = useQuery({
+  const { data: status, isLoading } = useQuery<StatusResponse>({
     queryKey: ['/api/settings/status'],
     refetchInterval: 30000, // Refresh every 30 seconds
   });
@@ -35,7 +40,7 @@ export default function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
 
   const navItems = [
-    { href: "/", icon: Plus, label: "New Invoice", active: location === "/" },
+    { href: "/", icon: Plus, label: "Process Invoice", active: location === "/" },
     { href: "/invoices", icon: List, label: "All Invoices", active: location === "/invoices" },
     { href: "/analytics", icon: BarChart, label: "Analytics", active: location === "/analytics" },
     { href: "/settings", icon: Settings, label: "Settings", active: location === "/settings" },
