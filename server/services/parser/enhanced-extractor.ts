@@ -73,7 +73,8 @@ export class EnhancedKeyValueExtractor {
     total_amount: [
       { pattern: /(?:total|amount\s*due|balance\s*due|grand\s*total)\s*:?\s*\$?([0-9,]+\.?\d*)/i, confidence: 0.95, context: 'explicit_total' },
       { pattern: /\$\s*([0-9,]+\.\d{2})\s*(?:\n|$)/g, confidence: 0.7, context: 'currency_amount' },
-      { pattern: /([0-9,]+\.\d{2})\s*$/, confidence: 0.6, context: 'line_end_amount' }
+      { pattern: /([0-9,]+\.\d{2})\s*$/m, confidence: 0.6, context: 'line_end_amount' },
+      { pattern: /(?:^|\n).*?([0-9]+\.\d{2})\s*$/m, confidence: 0.5, context: 'document_end_amount' }
     ],
     
     subtotal: [
@@ -92,6 +93,15 @@ export class EnhancedKeyValueExtractor {
     bill_to: [
       { pattern: /(?:bill\s*to|billed\s*to|customer)\s*:?\s*((?:[^\n]+\n?){1,5})/i, confidence: 0.9, context: 'explicit_label' },
       { pattern: /(?:^|\n)TO\s*:?\s*((?:[^\n]+\n?){1,4})/im, confidence: 0.8, context: 'to_section' }
+    ],
+    
+    line_items: [
+      // Service/product line with date and amount: "DESCRIPTION 1-18-19 25.00"
+      { pattern: /([A-Z][A-Z\s]{10,50})\s+(\d{1,2}-\d{1,2}-\d{2,4})\s+([0-9]+\.\d{2})/gim, confidence: 0.9, context: 'service_with_date' },
+      // Description followed by amount: "Service description 25.00"
+      { pattern: /([A-Z][A-Z\s]{5,40})\s+([0-9]+\.\d{2})/gim, confidence: 0.8, context: 'description_amount' },
+      // Table-like structure with qty and amounts
+      { pattern: /(\d+)\s+([A-Z][A-Z\s]{5,30})\s+([0-9]+\.\d{2})\s+([0-9]+\.\d{2})/gim, confidence: 0.95, context: 'qty_desc_price_total' }
     ]
   };
 
@@ -755,11 +765,70 @@ export class EnhancedKeyValueExtractor {
     }
   }
 
+  private findLineItemMatches(text: string, patternConfig: any): any[] {
+    const items: any[] = [];
+    const { pattern, confidence, context } = patternConfig;
+    
+    let matches = [];
+    let match;
+    
+    // Reset regex global flag
+    pattern.lastIndex = 0;
+    
+    while ((match = pattern.exec(text)) !== null) {
+      let lineItem: any = {
+        line_number: items.length + 1,
+        sku: null,
+        qty: 1,
+        unit_price: 0,
+        amount: 0,
+        tax: 0
+      };
+      
+      switch (context) {
+        case 'service_with_date':
+          // Pattern: "DESCRIPTION 1-18-19 25.00"
+          lineItem.description = match[1].trim();
+          lineItem.amount = parseFloat(match[3]) || 0;
+          lineItem.unit_price = lineItem.amount;
+          break;
+          
+        case 'description_amount':
+          // Pattern: "Service description 25.00"
+          lineItem.description = match[1].trim();
+          lineItem.amount = parseFloat(match[2]) || 0;
+          lineItem.unit_price = lineItem.amount;
+          break;
+          
+        case 'qty_desc_price_total':
+          // Pattern: "1 Service description 25.00 25.00"
+          lineItem.qty = parseInt(match[1]) || 1;
+          lineItem.description = match[2].trim();
+          lineItem.unit_price = parseFloat(match[3]) || 0;
+          lineItem.amount = parseFloat(match[4]) || 0;
+          break;
+      }
+      
+      if (lineItem.description && lineItem.amount > 0) {
+        items.push(lineItem);
+      }
+    }
+    
+    return items;
+  }
+
   private extractLineItems(context: ExtractionContext): any[] {
-    // Implementation for extracting line items from tables
     const items: any[] = [];
     
-    // Look for tabular data in the document
+    // Extract line items using the pattern matching approach
+    const lineItemPatterns = this.fieldPatterns.line_items;
+    
+    for (const patternConfig of lineItemPatterns) {
+      const matches = this.findLineItemMatches(context.originalText, patternConfig);
+      items.push(...matches);
+    }
+    
+    // Look for tabular data in the document  
     for (const table of context.documentStructure.tables) {
       for (const row of table.rows) {
         if (row.length >= 3) {

@@ -99,11 +99,14 @@ export class LLMEnhancerService {
       const cleanContent = content.trim();
       let enhancedResult;
       
+      console.log("[llm-enhancer] Raw LLM response length:", content.length);
+      console.log("[llm-enhancer] First 300 chars of response:", content.substring(0, 300));
+      
       try {
         enhancedResult = JSON.parse(cleanContent);
       } catch (parseError) {
-        console.error("[llm-enhancer] Raw API response:", content);
         console.error("[llm-enhancer] JSON parse error:", parseError);
+        console.error("[llm-enhancer] Raw API response:", content);
         
         // Try to extract JSON from potentially malformed response
         const jsonMatch = cleanContent.match(/\{[\s\S]*\}/);
@@ -117,6 +120,12 @@ export class LLMEnhancerService {
           throw new Error(`No valid JSON found in LLM response: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
         }
       }
+      // Validate enhanced result structure
+      if (!enhancedResult.enhanced_data || typeof enhancedResult.confidence !== 'number') {
+        console.error("[llm-enhancer] Invalid LLM response structure:", enhancedResult);
+        throw new Error("LLM returned invalid response structure");
+      }
+
       console.log(`[llm-enhancer] LLM enhancement completed with confidence ${enhancedResult.confidence}`);
       console.log(`[llm-enhancer] Enhanced invoice_number: "${enhancedResult.enhanced_data?.invoice_number}"`);
       console.log(`[llm-enhancer] Enhanced invoice_date: "${enhancedResult.enhanced_data?.invoice_date}"`);
@@ -163,19 +172,29 @@ CRITICAL FIELD IDENTIFICATION RULES:
    - Look for company names, business names
    - May include suffixes like Inc, LLC, Corp
 
-4. AMOUNTS: Extract all monetary values carefully
-   - Look for "Total:", "Subtotal:", "Tax:", "Amount Due:"
-   - Ensure mathematical consistency (subtotal + tax + shipping = total)
+4. AMOUNTS: Extract all monetary values with mathematical accuracy
+   - Look for "Total:", "Subtotal:", "Tax:", "Amount Due:", line amounts
+   - If only total is found, set subtotal = total, tax = 0, shipping = 0
+   - Ensure mathematical consistency: total = subtotal + tax + shipping
+   - Extract individual line amounts and sum them for subtotal calculation
 
-5. LINE ITEMS: Extract itemized services/products
-   - Include description, quantity, unit price, line total
-   - Parse table-like structures in the OCR text
+5. LINE ITEMS: Extract itemized services/products from tables or lists
+   - Look for patterns like "date - description - amount" or tabular data
+   - Include description, quantity (default 1), unit_price, line total
+   - Parse service charges, facility fees, or product lines
+   - Each line should have at least description and amount
+
+6. MATHEMATICAL VALIDATION:
+   - If subtotal/tax/shipping are all 0 but total > 0, set subtotal = total
+   - Sum all line item amounts to verify subtotal
+   - Ensure total equals subtotal + tax + shipping (±$0.01 tolerance)
 
 VALIDATION CHECKS:
 - Invoice numbers should be codes/IDs, not dates or amounts  
 - Dates must be actual dates in YYYY-MM-DD format
 - Amounts should be positive numbers
-- Total = subtotal + tax + shipping (within rounding tolerance)
+- Line items must have description and amount > 0
+- Mathematical consistency: total = subtotal + tax + shipping
 
 RESPOND WITH VALID JSON ONLY:
 {
@@ -191,7 +210,17 @@ RESPOND WITH VALID JSON ONLY:
     "tax": 0,
     "shipping": 0,
     "total": 0,
-    "line_items": [],
+    "line_items": [
+      {
+        "line_number": 1,
+        "sku": null,
+        "description": "extracted service/product description",
+        "qty": 1,
+        "unit_price": 0,
+        "amount": 0,
+        "tax": 0
+      }
+    ],
     "raw_ocr_text": "${ocrText.replace(/"/g, '\\"').substring(0, 400)}...",
     "mistral_ocr_text": "${ocrText.replace(/"/g, '\\"').substring(0, 400)}...",
     "ocr_similarity_score": 1.0
