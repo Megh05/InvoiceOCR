@@ -5,10 +5,153 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Settings as SettingsIcon, Key, Database, Zap, Shield } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Settings as SettingsIcon, Key, Database, Zap, Shield, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import Layout from "@/components/Layout";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function Settings() {
+  const [apiKey, setApiKey] = useState("");
+  const [connectionStatus, setConnectionStatus] = useState<"idle" | "testing" | "success" | "error">("idle");
+  const [connectionMessage, setConnectionMessage] = useState("");
+  const { toast } = useToast();
+
+  const testConnectionMutation = useMutation({
+    mutationFn: async (key: string) => {
+      const response = await fetch('/api/settings/test-connection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey: key }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Connection test failed');
+      }
+      return response.json();
+    },
+    onMutate: () => {
+      setConnectionStatus("testing");
+      setConnectionMessage("Testing connection...");
+    },
+    onSuccess: (data) => {
+      setConnectionStatus("success");
+      setConnectionMessage(data.message || "Connection successful!");
+      toast({
+        title: "Connection Test Successful",
+        description: "Mistral OCR API is working correctly.",
+      });
+    },
+    onError: (error: Error) => {
+      setConnectionStatus("error");
+      setConnectionMessage(error.message);
+      toast({
+        title: "Connection Test Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const saveSettingsMutation = useMutation({
+    mutationFn: async (settings: { apiKey: string }) => {
+      const response = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to save settings');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Settings Saved",
+        description: "Your configuration has been updated successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Save Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleTestConnection = () => {
+    if (!apiKey.trim()) {
+      toast({
+        title: "API Key Required",
+        description: "Please enter your Mistral OCR API key first.",
+        variant: "destructive",
+      });
+      return;
+    }
+    testConnectionMutation.mutate(apiKey);
+  };
+
+  const handleSaveSettings = () => {
+    if (!apiKey.trim()) {
+      toast({
+        title: "API Key Required",
+        description: "Please enter your Mistral OCR API key first.",
+        variant: "destructive",
+      });
+      return;
+    }
+    saveSettingsMutation.mutate({ apiKey });
+  };
+
+  const getConnectionStatusIcon = () => {
+    switch (connectionStatus) {
+      case "testing":
+        return <Loader2 className="h-4 w-4 animate-spin" />;
+      case "success":
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case "error":
+        return <AlertCircle className="h-4 w-4 text-red-500" />;
+      default:
+        return <div className="w-4 h-4 bg-gray-400 rounded-full" />;
+    }
+  };
+
+  const getConnectionStatusBadge = () => {
+    switch (connectionStatus) {
+      case "testing":
+        return (
+          <Badge variant="secondary" className="flex items-center gap-1">
+            <Loader2 className="w-2 h-2 animate-spin" />
+            Testing...
+          </Badge>
+        );
+      case "success":
+        return (
+          <Badge variant="secondary" className="flex items-center gap-1">
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            Connected
+          </Badge>
+        );
+      case "error":
+        return (
+          <Badge variant="destructive" className="flex items-center gap-1">
+            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+            Error
+          </Badge>
+        );
+      default:
+        return (
+          <Badge variant="outline" className="flex items-center gap-1">
+            <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+            Not tested
+          </Badge>
+        );
+    }
+  };
+
   return (
     <Layout>
       <div className="container mx-auto py-8 px-4">
@@ -34,22 +177,72 @@ export default function Settings() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label htmlFor="mistral-api">Mistral OCR API Key</Label>
                   <div className="flex items-center gap-2">
                     <Input 
                       id="mistral-api"
                       type="password" 
-                      placeholder="••••••••••••••••" 
+                      placeholder="Enter your Mistral OCR API key" 
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
                       className="flex-1"
                     />
-                    <Badge variant="secondary" className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      Connected
-                    </Badge>
+                    {getConnectionStatusBadge()}
                   </div>
+                  
+                  {connectionMessage && (
+                    <div className="flex items-center gap-2 text-sm">
+                      {getConnectionStatusIcon()}
+                      <span className={connectionStatus === "error" ? "text-red-600" : "text-green-600"}>
+                        {connectionMessage}
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleTestConnection}
+                      disabled={!apiKey.trim() || testConnectionMutation.isPending}
+                    >
+                      {testConnectionMutation.isPending ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Testing...
+                        </>
+                      ) : (
+                        "Test Connection"
+                      )}
+                    </Button>
+                    
+                    <Button 
+                      size="sm"
+                      onClick={handleSaveSettings}
+                      disabled={!apiKey.trim() || saveSettingsMutation.isPending}
+                    >
+                      {saveSettingsMutation.isPending ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        "Save API Key"
+                      )}
+                    </Button>
+                  </div>
+                  
                   <p className="text-sm text-muted-foreground">
-                    Required for OCR text extraction. Keep this secure.
+                    Required for OCR text extraction. Keep this secure. Get your API key from{" "}
+                    <a 
+                      href="https://console.mistral.ai/" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline"
+                    >
+                      Mistral Console
+                    </a>
                   </p>
                 </div>
               </CardContent>

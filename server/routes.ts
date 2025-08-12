@@ -203,6 +203,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Settings endpoints
+  app.post("/api/settings", async (req, res) => {
+    try {
+      const { apiKey } = z.object({ apiKey: z.string().min(1) }).parse(req.body);
+      
+      // Update environment variable (note: this only affects current session)
+      process.env.MISTRAL_API_KEY = apiKey;
+      
+      res.json({
+        message: "Settings saved successfully",
+        success: true
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          error: "Invalid settings data",
+          message: error.errors
+        });
+      }
+      
+      console.error("Save settings error:", error);
+      res.status(500).json({
+        error: "Failed to save settings",
+        message: error instanceof Error ? error.message : "Unknown error occurred"
+      });
+    }
+  });
+
+  app.post("/api/settings/test-connection", async (req, res) => {
+    try {
+      const { apiKey } = z.object({ apiKey: z.string().min(1) }).parse(req.body);
+      
+      // Create a temporary OCR service instance with the provided API key
+      const { MistralOCRService } = await import("./services/mistral-ocr");
+      const testOCR = new MistralOCRService(apiKey);
+      
+      // Test with a simple 1x1 pixel PNG image
+      const testBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
+      
+      await testOCR.extractText(undefined, testBase64);
+      
+      res.json({
+        message: "Connection successful! Mistral OCR API is working.",
+        success: true
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          error: "Invalid request data",
+          message: error.errors
+        });
+      }
+      
+      console.error("Test connection error:", error);
+      
+      if (error instanceof Error) {
+        if (error.message.includes("401") || error.message.includes("Invalid")) {
+          return res.status(401).json({
+            error: "Invalid API key",
+            message: "The provided Mistral OCR API key is invalid or unauthorized"
+          });
+        }
+        
+        if (error.message.includes("503") || error.message.includes("unavailable")) {
+          return res.status(503).json({
+            error: "Service unavailable",
+            message: "Mistral OCR service is temporarily unavailable"
+          });
+        }
+      }
+      
+      res.status(500).json({
+        error: "Connection test failed",
+        message: error instanceof Error ? error.message : "Unknown error occurred"
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
