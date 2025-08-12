@@ -221,16 +221,14 @@ export class DeterministicParser {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       
-      if (line.toUpperCase().includes('IN ACCOUNT WITH') || line.toUpperCase() === 'BILL') {
-        // Look for vendor information in the next few lines
-        for (let j = i + 1; j < Math.min(lines.length, i + 4); j++) {
-          const nextLine = lines[j];
-          
-          // Skip addresses and get the first non-address line
-          if (!this.looksLikeAddress(nextLine) && nextLine.length > 5) {
-            const confidence = this.assessVendorNameConfidence(nextLine);
+      if (line.toUpperCase().includes('IN ACCOUNT WITH')) {
+        // The vendor name should be before this section, not after
+        for (let j = Math.max(0, i - 3); j < i; j++) {
+          const prevLine = lines[j];
+          if (prevLine && !this.looksLikeAddress(prevLine) && prevLine.length > 5 && !/^\d+$/.test(prevLine)) {
+            const confidence = this.assessVendorNameConfidence(prevLine);
             if (confidence > 0.3) {
-              return { value: nextLine, confidence };
+              return { value: prevLine, confidence };
             }
           }
         }
@@ -241,14 +239,15 @@ export class DeterministicParser {
     for (let i = 0; i < Math.min(lines.length, 5); i++) {
       const line = lines[i];
       
-      // Skip pure numbers, dates, and common headers
+      // Skip pure numbers, dates, addresses, and common headers
       if (/^\d+$/.test(line) || 
           /^\d{1,2}[\-\/]\d{1,2}[\-\/]\d{2,4}$/.test(line) ||
-          line.toLowerCase().match(/^(statement|date|to|terms|in account with|bill)$/)) {
+          line.toLowerCase().match(/^(statement|date|to|terms|in account with|bill)$/) ||
+          this.looksLikeAddress(line)) {
         continue;
       }
       
-      // Look for business names
+      // Look for business names (skip addresses)
       if (line.length > 3 && !line.toLowerCase().includes('invoice')) {
         const confidence = this.assessVendorNameConfidence(line);
         if (confidence > 0.3) {
@@ -263,15 +262,38 @@ export class DeterministicParser {
   private extractVendorAddress(text: string): { value: string | null; confidence: number } {
     const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
     
-    // Look for address patterns after the first few lines
+    // For statements, look for address after "BILL" section
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      if (line.toUpperCase() === 'BILL') {
+        // Collect address lines after "BILL"
+        const addressLines: string[] = [];
+        for (let j = i + 1; j < Math.min(lines.length, i + 4); j++) {
+          const nextLine = lines[j];
+          if (nextLine && this.looksLikeAddress(nextLine)) {
+            addressLines.push(nextLine);
+          } else if (addressLines.length > 0) {
+            // Stop collecting when we hit a non-address line
+            break;
+          }
+        }
+        
+        if (addressLines.length > 0) {
+          return { value: addressLines.join('\n'), confidence: 0.8 };
+        }
+      }
+    }
+    
+    // Fallback: Look for address patterns in first few lines 
     let addressLines: string[] = [];
     let startCapturing = false;
     
     for (let i = 1; i < Math.min(lines.length, 6); i++) {
       const line = lines[i];
       
-      // Skip invoice-related lines
-      if (line.toLowerCase().includes('invoice')) continue;
+      // Skip invoice-related lines and pure numbers
+      if (line.toLowerCase().includes('invoice') || /^\d+$/.test(line)) continue;
       
       // Look for address indicators
       if (this.looksLikeAddress(line)) {
