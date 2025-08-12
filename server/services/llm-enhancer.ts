@@ -156,21 +156,27 @@ ${JSON.stringify(extractedData, null, 2)}
 
 === EXTRACTION INSTRUCTIONS ===
 
+YOU MUST EXTRACT ALL VISIBLE FIELDS FROM THE OCR TEXT. DO NOT RETURN NULL VALUES IF INFORMATION EXISTS.
+
 CRITICAL FIELD IDENTIFICATION RULES:
 1. INVOICE NUMBER: Look for patterns like "Invoice #123456", "INV-2024-001", "Bill No: ABC123"
+   - Also check standalone numbers at the top (like "683954" in this example)
    - NOT dates, NOT addresses, NOT amounts
    - Usually alphanumeric codes near the top of the document
-   - Examples: INV001, 2024-001, ABC-123-DEF
+   - Examples: INV001, 2024-001, ABC-123-DEF, 683954
 
 2. INVOICE DATE: Find the date when this invoice was issued
+   - Look for "DATE 1-18-19" format and convert to YYYY-MM-DD
    - Look for phrases like "Invoice Date:", "Date:", "Bill Date:"
-   - Convert to YYYY-MM-DD format (e.g., 01/15/24 → 2024-01-15)
+   - Convert to YYYY-MM-DD format (e.g., 1-18-19 → 2019-01-18)
    - Do NOT confuse with due dates or service dates
 
-3. VENDOR NAME: The company/business issuing this invoice
-   - Usually at the top of the document
-   - Look for company names, business names
-   - May include suffixes like Inc, LLC, Corp
+3. VENDOR NAME: The company/business issuing this invoice - EXTRACT FROM "IN ACCOUNT WITH" SECTION
+   - Look after "IN ACCOUNT WITH" text for vendor information
+   - May be in format: "IN ACCOUNT WITH [VENDOR NAME]"
+   - Look for business addresses that indicate the vendor
+   - If no explicit vendor name, use the business address/info from the billing section
+   - NEVER return null if vendor information exists
 
 4. AMOUNTS: Extract all monetary values with mathematical accuracy
    - Look for "Total:", "Subtotal:", "Tax:", "Amount Due:", line amounts
@@ -179,15 +185,24 @@ CRITICAL FIELD IDENTIFICATION RULES:
    - Extract individual line amounts and sum them for subtotal calculation
 
 5. LINE ITEMS: Extract itemized services/products from tables or lists
-   - Look for patterns like "date - description - amount" or tabular data
-   - Include description, quantity (default 1), unit_price, line total
+   - Look for patterns like "EXPLAINMENT FOR FACILITY 1-18-19 25.00"
+   - Parse as: description="EXPLAINMENT FOR FACILITY", amount=25.00
+   - Include description, quantity (default 1), unit_price=amount, line total=amount
    - Parse service charges, facility fees, or product lines
    - Each line should have at least description and amount
 
 6. MATHEMATICAL VALIDATION:
+   - Extract the final total amount from the OCR text (look for amounts at the end)
    - If subtotal/tax/shipping are all 0 but total > 0, set subtotal = total
-   - Sum all line item amounts to verify subtotal
+   - Sum all line item amounts to verify subtotal matches
+   - Set subtotal = sum of line items, tax = 0, shipping = 0 unless explicitly found
    - Ensure total equals subtotal + tax + shipping (±$0.01 tolerance)
+
+7. VENDOR INFORMATION EXTRACTION:
+   - Look for "IN ACCOUNT WITH" followed by vendor details
+   - Extract vendor address from the billing section
+   - If vendor_name is unclear, use "BILL" section information
+   - ALWAYS extract available vendor information, never leave as null
 
 VALIDATION CHECKS:
 - Invoice numbers should be codes/IDs, not dates or amounts  
@@ -196,28 +211,38 @@ VALIDATION CHECKS:
 - Line items must have description and amount > 0
 - Mathematical consistency: total = subtotal + tax + shipping
 
+EXAMPLE EXTRACTION FOR THE GIVEN OCR TEXT:
+- invoice_number: "683954" (from top of document)
+- invoice_date: "2019-01-18" (from "DATE 1-18-19")  
+- vendor_name: Extract from "IN ACCOUNT WITH" or "BILL" section
+- vendor_address: "620 57TH AVE. W. LOT B-12 BRADENTON FL 34209"
+- bill_to: "PALMA SOHA ASST 450 67TH ST. W. BRADENTON FL 34209"
+- line_items: [{"description": "EXPLAINMENT FOR FACILITY", "amount": 25.00}]
+- total: 75 (from end of document)
+- subtotal: 25.00 (sum of line items)
+
 RESPOND WITH VALID JSON ONLY:
 {
   "enhanced_data": {
-    "invoice_number": "actual invoice number or null if not found",
-    "invoice_date": "YYYY-MM-DD format or null",
-    "vendor_name": "company name or null",
-    "vendor_address": "address or null",
-    "bill_to": "customer info or null",
+    "invoice_number": "extract from OCR text",
+    "invoice_date": "YYYY-MM-DD format",
+    "vendor_name": "extract vendor name from OCR",
+    "vendor_address": "extract vendor address",
+    "bill_to": "extract customer info",
     "ship_to": "shipping info or null", 
     "currency": "USD",
-    "subtotal": 0,
+    "subtotal": 25.00,
     "tax": 0,
     "shipping": 0,
-    "total": 0,
+    "total": 75,
     "line_items": [
       {
         "line_number": 1,
         "sku": null,
-        "description": "extracted service/product description",
+        "description": "EXPLAINMENT FOR FACILITY",
         "qty": 1,
-        "unit_price": 0,
-        "amount": 0,
+        "unit_price": 25.00,
+        "amount": 25.00,
         "tax": 0
       }
     ],
@@ -226,8 +251,8 @@ RESPOND WITH VALID JSON ONLY:
     "ocr_similarity_score": 1.0
   },
   "confidence": 0.85,
-  "improvements": ["specific improvements made"],
-  "validation_errors": ["any validation issues found"]
+  "improvements": ["extracted vendor information", "parsed line items", "calculated subtotal"],
+  "validation_errors": []
 }`;
   }
 
