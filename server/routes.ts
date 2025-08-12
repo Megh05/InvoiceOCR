@@ -5,9 +5,27 @@ import { mistralOCR } from "./services/mistral-ocr";
 import { deterministicParser } from "./services/parser/deterministic";
 import { markdownEnhancedParser } from "./services/parser/markdown-enhanced";
 import { enhancedKeyValueExtractor } from "./services/parser/enhanced-extractor";
+import { llmEnhancer } from "./services/llm-enhancer";
+import { invoiceValidator } from "./services/validator";
 import { parseRequestSchema, insertInvoiceSchema } from "@shared/schema";
 import { ConfigService } from "./config";
 import { z } from "zod";
+
+function generateActionMessage(confidence: number, validation: any, usedLLM: boolean, improvements: string[]): string {
+  if (confidence > 0.9 && validation.errors.length === 0) {
+    return usedLLM ? 
+      "LLM enhancement successful! High-confidence extraction completed. Please review before saving." :
+      "High-confidence extraction completed! Data looks accurate - please review before saving.";
+  } else if (confidence > 0.8) {
+    return usedLLM ?
+      "LLM enhancement improved accuracy. Please review the extracted fields before saving." :
+      "Good extraction quality. Please review the extracted fields before saving.";
+  } else {
+    const errorCount = validation.errors.length;
+    const warningCount = validation.warnings.length;
+    return `${usedLLM ? 'LLM-enhanced extraction' : 'Standard extraction'} completed. ${errorCount} validation errors and ${warningCount} warnings found. Please review and correct the extracted data.`;
+  }
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Parse endpoint - MUST use Mistral OCR
@@ -37,18 +55,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
               ocrResponse.markdown
             );
             
+            // Step 1: Validate the extracted data
+            console.log('[parser] Validating extracted data...');
+            const validation = invoiceValidator.validateInvoice(enhancedResult.extracted);
+            let adjustedConfidence = invoiceValidator.adjustConfidenceByValidation(
+              enhancedResult.confidence, 
+              validation
+            );
+            
+            let finalData = enhancedResult.extracted;
+            let improvements: string[] = [];
+            let usedLLM = false;
+            
+            // Step 2: Use LLM enhancement if confidence is low or validation fails
+            const shouldUseLLM = adjustedConfidence < 0.8 || validation.errors.some(e => e.severity === 'critical');
+            
+            if (shouldUseLLM) {
+              try {
+                console.log('[parser] Using LLM enhancement for improved accuracy...');
+                const llmResult = await llmEnhancer.enhanceInvoiceData(
+                  ocrResponse.text,
+                  enhancedResult.extracted,
+                  adjustedConfidence
+                );
+                
+                // Validate LLM results
+                const llmValidation = invoiceValidator.validateInvoice(llmResult.enhanced);
+                const llmConfidence = invoiceValidator.adjustConfidenceByValidation(
+                  llmResult.confidence,
+                  llmValidation
+                );
+                
+                // Use LLM result if it's better
+                if (llmConfidence > adjustedConfidence) {
+                  finalData = llmResult.enhanced;
+                  adjustedConfidence = llmConfidence;
+                  improvements = llmResult.improvements;
+                  usedLLM = true;
+                  console.log(`[parser] LLM enhancement improved confidence from ${enhancedResult.confidence.toFixed(2)} to ${llmConfidence.toFixed(2)}`);
+                }
+              } catch (llmError) {
+                console.warn('[parser] LLM enhancement failed, using original result:', llmError);
+              }
+            }
+            
             return res.json({
-              parsed: enhancedResult.extracted,
-              confidence: enhancedResult.confidence,
+              parsed: finalData,
+              confidence: adjustedConfidence,
               raw_ocr_text: rawOcrText,
               mistral_ocr_text: mistralOcrText,
               ocr_similarity_score: ocrSimilarityScore,
               fallback_used: false,
-              action: enhancedResult.confidence > 0.8 ? 
-                "The enhanced extraction system successfully identified key-value pairs! Please review before saving." :
-                "Enhanced extraction completed. Please review and edit the extracted fields as some may need manual correction.",
+              llm_enhanced: usedLLM,
+              action: generateActionMessage(adjustedConfidence, validation, usedLLM, improvements),
               field_confidences: enhancedResult.field_confidences,
-              extraction_details: enhancedResult.extraction_details
+              extraction_details: enhancedResult.extraction_details,
+              validation_results: validation,
+              improvements: improvements
             });
           } catch (enhancedError) {
             console.warn('[parser] Enhanced extraction failed, falling back to markdown parser:', enhancedError);
@@ -91,23 +154,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Try enhanced extraction first, then fall back to deterministic parser
+      // Try enhanced extraction first with validation and LLM enhancement
       try {
         console.log('[parser] Using enhanced key-value extraction system for text input');
         const enhancedResult = await enhancedKeyValueExtractor.extractKeyValuePairs(rawOcrText);
         
+        // Step 1: Validate the extracted data
+        console.log('[parser] Validating extracted data...');
+        const validation = invoiceValidator.validateInvoice(enhancedResult.extracted);
+        let adjustedConfidence = invoiceValidator.adjustConfidenceByValidation(
+          enhancedResult.confidence, 
+          validation
+        );
+        
+        let finalData = enhancedResult.extracted;
+        let improvements: string[] = [];
+        let usedLLM = false;
+        
+        // Step 2: Use LLM enhancement if confidence is low or validation fails
+        const shouldUseLLM = adjustedConfidence < 0.8 || validation.errors.some(e => e.severity === 'critical');
+        
+        if (shouldUseLLM) {
+          try {
+            console.log('[parser] Using LLM enhancement for improved accuracy...');
+            const llmResult = await llmEnhancer.enhanceInvoiceData(
+              rawOcrText,
+              enhancedResult.extracted,
+              adjustedConfidence
+            );
+            
+            // Validate LLM results
+            const llmValidation = invoiceValidator.validateInvoice(llmResult.enhanced);
+            const llmConfidence = invoiceValidator.adjustConfidenceByValidation(
+              llmResult.confidence,
+              llmValidation
+            );
+            
+            // Use LLM result if it's better
+            if (llmConfidence > adjustedConfidence) {
+              finalData = llmResult.enhanced;
+              adjustedConfidence = llmConfidence;
+              improvements = llmResult.improvements;
+              usedLLM = true;
+              console.log(`[parser] LLM enhancement improved confidence from ${enhancedResult.confidence.toFixed(2)} to ${llmConfidence.toFixed(2)}`);
+            }
+          } catch (llmError) {
+            console.warn('[parser] LLM enhancement failed, using original result:', llmError);
+          }
+        }
+        
         return res.json({
-          parsed: enhancedResult.extracted,
-          confidence: enhancedResult.confidence,
+          parsed: finalData,
+          confidence: adjustedConfidence,
           raw_ocr_text: rawOcrText,
           mistral_ocr_text: mistralOcrText,
           ocr_similarity_score: ocrSimilarityScore,
           fallback_used: false,
-          action: enhancedResult.confidence > 0.8 ? 
-            "Enhanced extraction successful! Please review before saving." :
-            "Enhanced extraction completed. Please review and edit the extracted fields.",
+          llm_enhanced: usedLLM,
+          action: generateActionMessage(adjustedConfidence, validation, usedLLM, improvements),
           field_confidences: enhancedResult.field_confidences,
-          extraction_details: enhancedResult.extraction_details
+          extraction_details: enhancedResult.extraction_details,
+          validation_results: validation,
+          improvements: improvements
         });
       } catch (enhancedError) {
         console.warn('[parser] Enhanced extraction failed, using deterministic parser:', enhancedError);

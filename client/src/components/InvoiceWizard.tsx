@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { WizardState, WizardStep, ParseRequest, CanonicalInvoice } from "@/types/invoice";
+import { WizardState, CanonicalInvoice } from "@/types/invoice";
 import { api } from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
 

@@ -33,11 +33,40 @@ export interface FieldConfidence {
   extraction_method?: string;
 }
 
+export interface ValidationError {
+  field: string;
+  error: string;
+  severity: 'critical' | 'major' | 'minor';
+  suggested_fix?: string;
+}
+
+export interface ValidationWarning {
+  field: string;
+  warning: string;
+  confidence_impact: number;
+}
+
+export interface ValidationResult {
+  isValid: boolean;
+  errors: ValidationError[];
+  warnings: ValidationWarning[];
+  confidence_adjustments: any[];
+}
+
 export interface ParseResult {
   parsed: CanonicalInvoice;
+  confidence: number;
   field_confidences: FieldConfidence[];
   raw_ocr_text: string;
+  mistral_ocr_text: string;
+  ocr_similarity_score: number;
+  fallback_used: boolean;
+  llm_enhanced?: boolean;
+  action?: string;
   template_match?: TemplateMatch;
+  validation_results?: ValidationResult;
+  improvements?: string[];
+  extraction_details?: any;
 }
 
 export interface TemplateMatch {
@@ -58,11 +87,14 @@ export interface InvoiceTemplate {
 }
 
 export interface WizardState {
-  currentStep: number;
-  uploadInput?: string;
-  fileData?: File;
+  step: number;
+  inputType?: 'file' | 'url' | 'text' | null;
+  imageFile?: File | null;
+  imageUrl?: string;
   ocrText?: string;
-  parseResult?: ParseResult;
-  editedInvoice?: CanonicalInvoice;
-  savedInvoice?: any;
+  parseResult?: ParseResult | null;
+  editedInvoice?: CanonicalInvoice | null;
+  savedInvoice?: any | null;
+  isProcessing?: boolean;
+  error?: string | null;
 }

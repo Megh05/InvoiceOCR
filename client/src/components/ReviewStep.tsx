@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { WizardState } from "@/types/invoice";
+import { ValidationResults } from "@/components/ValidationResults";
 import { RotateCcw } from "lucide-react";
 
 interface ReviewStepProps {
@@ -44,6 +45,18 @@ export default function ReviewStep({
           <h3 className="text-xl font-semibold text-gray-900 mb-2">Step 3: Review OCR Text</h3>
           <p className="text-gray-600">Verify and edit the extracted text if needed</p>
         </div>
+
+        {/* Validation Results */}
+        {state.parseResult && (
+          <div className="mb-6">
+            <ValidationResults
+              validation={state.parseResult.validation_results}
+              improvements={state.parseResult.improvements}
+              llmEnhanced={state.parseResult.llm_enhanced}
+              confidence={state.parseResult.confidence}
+            />
+          </div>
+        )}
 
         {/* OCR Results */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
