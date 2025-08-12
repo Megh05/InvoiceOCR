@@ -12,8 +12,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const requestData = parseRequestSchema.parse(req.body);
       
-      let rawOcrText: string;
-      let mistralOcrText: string;
+      let rawOcrText: string = "";
+      let mistralOcrText: string = "";
       let ocrSimilarityScore = 1.0;
 
       // Handle image input - MUST call Mistral OCR
@@ -40,6 +40,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // For text-only testing, use the provided text directly without verification
         mistralOcrText = requestData.ocr_text;
         ocrSimilarityScore = 1.0;
+      }
+      else {
+        return res.status(400).json({
+          error: "Invalid request",
+          message: "Either image_url, image_base64, or ocr_text must be provided"
+        });
       }
 
       // Run deterministic parser

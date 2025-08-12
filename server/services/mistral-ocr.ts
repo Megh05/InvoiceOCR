@@ -19,7 +19,7 @@ export class MistralOCRService {
   constructor(apiKey?: string) {
     this.apiKey = apiKey || process.env.MISTRAL_API_KEY || "";
     if (!this.apiKey) {
-      throw new Error("MISTRAL_API_KEY is required");
+      console.warn("MISTRAL_API_KEY not provided - OCR functionality will be limited");
     }
   }
 
@@ -31,6 +31,15 @@ export class MistralOCRService {
 
     if (!imageUrl && !imageBase64) {
       throw new Error("Either imageUrl or imageBase64 must be provided");
+    }
+
+    if (!this.apiKey) {
+      console.warn(`[${new Date().toISOString()}] [mistral-ocr] MISTRAL_API_KEY not available, returning mock response`);
+      return {
+        text: "Mock OCR response - please provide MISTRAL_API_KEY for real OCR functionality",
+        confidence: 0.0,
+        request_id: requestId
+      };
     }
 
     try {
