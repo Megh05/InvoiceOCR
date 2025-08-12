@@ -125,6 +125,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           action: parsingResult.action || "Used fallback parser. Please review the extracted data.",
           field_confidences: parsingResult.field_confidences
         });
+      }
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({
@@ -302,9 +303,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { apiKey } = z.object({ apiKey: z.string().min(1) }).parse(req.body);
       
-      // Create a temporary OCR service instance with the provided API key
+      // Temporarily update the config with the provided API key for testing
+      await ConfigService.updateMistralApiKey(apiKey);
+      
+      // Create a temporary OCR service instance
       const { MistralOCRService } = await import("./services/mistral-ocr");
-      const testOCR = new MistralOCRService(apiKey);
+      const testOCR = new MistralOCRService();
       
       // Use a public test PDF document that should work with Mistral OCR
       const testUrl = "https://arxiv.org/pdf/2201.04234.pdf";

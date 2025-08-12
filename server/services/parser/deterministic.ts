@@ -131,7 +131,10 @@ export class DeterministicParser {
       tax: totals.tax,
       shipping: totals.shipping,
       total: totals.total,
-      line_items: lineItems.value,
+      line_items: lineItems.value.map(item => ({
+        ...item,
+        sku: item.sku || undefined
+      })),
       raw_ocr_text: ocrText,
       mistral_ocr_text: mistralOcrText,
       ocr_similarity_score: similarityScore,

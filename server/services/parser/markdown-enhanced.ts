@@ -89,7 +89,10 @@ export class MarkdownEnhancedParser {
     const lineItems = this.extractLineItemsFromMarkdown(markdownText) ||
                      this.extractLineItemsFromText(plainText);
     if (lineItems.length > 0) {
-      invoiceData.line_items = lineItems;
+      invoiceData.line_items = lineItems.map(item => ({
+        ...item,
+        sku: item.sku ?? undefined
+      }));
       fieldConfidences.push({
         field: 'line_items',
         value: lineItems,
