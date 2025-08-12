@@ -1,4 +1,5 @@
 import { CanonicalInvoice } from "@shared/schema";
+import { templateRecognitionService } from "../template-recognition";
 
 interface FieldConfidence {
   field: string;
@@ -7,11 +8,20 @@ interface FieldConfidence {
   source: string;
 }
 
+interface TemplateMatch {
+  template_id: string;
+  template_name: string;
+  confidence: number;
+  matched_patterns: string[];
+}
+
 export interface ParsingResult {
   parsed: CanonicalInvoice;
   confidence: number;
   field_confidences: FieldConfidence[];
   fallback_used: boolean;
+  template_match?: TemplateMatch;
+  raw_ocr_text: string;
   action?: string;
 }
 
@@ -20,6 +30,14 @@ export class DeterministicParser {
 
   parse(ocrText: string, mistralOcrText: string, similarityScore: number = 1.0): ParsingResult {
     const fieldConfidences: FieldConfidence[] = [];
+    
+    // First, perform template recognition
+    let templateMatch: TemplateMatch | null = null;
+    try {
+      templateMatch = templateRecognitionService.recognizeTemplate(ocrText);
+    } catch (error) {
+      console.warn("Template recognition failed:", error);
+    }
     
     // Use the primary OCR text for parsing
     const textToParse = ocrText;
@@ -119,11 +137,21 @@ export class DeterministicParser {
       ocr_similarity_score: similarityScore,
     };
 
+    // Auto-categorize based on template match
+    if (templateMatch) {
+      parsed.template_id = templateMatch.template_id;
+      parsed.category = templateRecognitionService.categorizeInvoice(templateMatch, parsed);
+    } else {
+      parsed.category = templateRecognitionService.categorizeInvoice(null, parsed);
+    }
+
     const result: ParsingResult = {
       parsed,
       confidence: overallConfidence,
       field_confidences: fieldConfidences,
       fallback_used: false,
+      template_match: templateMatch || undefined,
+      raw_ocr_text: ocrText,
     };
 
     if (overallConfidence < this.confidenceThreshold) {

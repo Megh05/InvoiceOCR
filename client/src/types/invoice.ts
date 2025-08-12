@@ -1,9 +1,3 @@
-export interface ParseRequest {
-  image_url?: string;
-  image_base64?: string;
-  ocr_text?: string;
-}
-
 export interface LineItem {
   line_number: number;
   sku: string | null;
@@ -15,74 +9,60 @@ export interface LineItem {
 }
 
 export interface CanonicalInvoice {
-  invoice_number: string | null;
-  invoice_date: string | null;
-  vendor_name: string | null;
-  vendor_address: string | null;
-  bill_to: string | null;
-  ship_to: string | null;
-  currency: string | null;
-  subtotal: number;
-  tax: number;
-  shipping: number;
-  total: number;
-  line_items: LineItem[];
-  raw_ocr_text: string;
-  mistral_ocr_text: string;
-  ocr_similarity_score: number;
+  invoice_number?: string;
+  invoice_date?: string;
+  due_date?: string;
+  vendor_name?: string;
+  vendor_address?: string;
+  bill_to?: string;
+  ship_to?: string;
+  currency?: string;
+  subtotal?: number;
+  tax?: number;
+  shipping?: number;
+  total?: number;
+  line_items?: LineItem[];
+  template_id?: string;
+  category?: string;
 }
 
 export interface FieldConfidence {
   field: string;
-  value: any;
   confidence: number;
-  source: string;
+  similarity_score?: number;
+  extraction_method?: string;
 }
 
 export interface ParseResult {
   parsed: CanonicalInvoice;
-  confidence: number;
-  raw_ocr_text: string;
-  mistral_ocr_text: string;
-  ocr_similarity_score: number;
-  fallback_used: boolean;
-  action?: string;
   field_confidences: FieldConfidence[];
-}
-
-export interface Invoice {
-  id: string;
-  invoice_number: string | null;
-  invoice_date: string | null;
-  vendor_name: string | null;
-  vendor_address: string | null;
-  bill_to: string | null;
-  ship_to: string | null;
-  currency: string | null;
-  subtotal: number;
-  tax: number;
-  shipping: number;
-  total: number;
   raw_ocr_text: string;
-  mistral_ocr_text: string;
-  ocr_similarity_score: number;
-  confidence: number;
-  created_at: string;
-  updated_at: string;
-  line_items?: LineItem[];
+  template_match?: TemplateMatch;
 }
 
-export type WizardStep = 1 | 2 | 3 | 4 | 5;
+export interface TemplateMatch {
+  template_id: string;
+  template_name: string;
+  confidence: number;
+  matched_patterns: string[];
+}
+
+export interface InvoiceTemplate {
+  id: string;
+  name: string;
+  category: string;
+  vendor_patterns: string[];
+  field_patterns: Record<string, string[]>;
+  layout_indicators: string[];
+  confidence_threshold: number;
+}
 
 export interface WizardState {
-  step: WizardStep;
-  inputType: 'file' | 'url' | 'text' | null;
-  imageFile: File | null;
-  imageUrl: string;
-  ocrText: string;
-  parseResult: ParseResult | null;
-  editedInvoice: CanonicalInvoice | null;
-  savedInvoice: Invoice | null;
-  isProcessing: boolean;
-  error: string | null;
+  currentStep: number;
+  uploadInput?: string;
+  fileData?: File;
+  ocrText?: string;
+  parseResult?: ParseResult;
+  editedInvoice?: CanonicalInvoice;
+  savedInvoice?: any;
 }

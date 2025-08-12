@@ -87,6 +87,8 @@ export const canonicalInvoiceSchema = z.object({
   raw_ocr_text: z.string(),
   mistral_ocr_text: z.string(),
   ocr_similarity_score: z.number().default(0),
+  template_id: z.string().nullable().optional(),
+  category: z.string().nullable().optional(),
 });
 
 export type CanonicalInvoice = z.infer<typeof canonicalInvoiceSchema>;
