@@ -156,93 +156,102 @@ ${JSON.stringify(extractedData, null, 2)}
 
 === EXTRACTION INSTRUCTIONS ===
 
-YOU MUST EXTRACT ALL VISIBLE FIELDS FROM THE OCR TEXT. DO NOT RETURN NULL VALUES IF INFORMATION EXISTS.
+YOU MUST EXTRACT ALL VISIBLE FIELDS FROM THE OCR TEXT. ANALYZE THE DOCUMENT STRUCTURE AND EXTRACT INFORMATION INTELLIGENTLY.
 
-CRITICAL FIELD IDENTIFICATION RULES:
-1. INVOICE NUMBER: Look for patterns like "Invoice #123456", "INV-2024-001", "Bill No: ABC123"
-   - Also check standalone numbers at the top (like "683954" in this example)
-   - NOT dates, NOT addresses, NOT amounts
-   - Usually alphanumeric codes near the top of the document
-   - Examples: INV001, 2024-001, ABC-123-DEF, 683954
+INTELLIGENT FIELD IDENTIFICATION RULES:
 
-2. INVOICE DATE: Find the date when this invoice was issued
-   - Look for "DATE 1-18-19" format and convert to YYYY-MM-DD
-   - Look for phrases like "Invoice Date:", "Date:", "Bill Date:"
-   - Convert to YYYY-MM-DD format (e.g., 1-18-19 → 2019-01-18)
-   - Do NOT confuse with due dates or service dates
+1. INVOICE NUMBER: 
+   - Look for explicit labels: "Invoice #", "Invoice Number:", "Bill No:", "Document #", "Ref:", "Statement"
+   - Check standalone alphanumeric codes near the top of document
+   - Common formats: INV001, 2024-001, ABC-123-DEF, numeric codes like 683954
+   - NOT dates, NOT addresses, NOT monetary amounts
+   - Usually appears in header section
 
-3. VENDOR NAME: The company/business issuing this invoice - EXTRACT FROM "IN ACCOUNT WITH" SECTION
-   - Look after "IN ACCOUNT WITH" text for vendor information
-   - May be in format: "IN ACCOUNT WITH [VENDOR NAME]"
-   - Look for business addresses that indicate the vendor
-   - If no explicit vendor name, use the business address/info from the billing section
-   - NEVER return null if vendor information exists
+2. INVOICE DATE:
+   - Search for date-related labels: "Date:", "Invoice Date:", "Bill Date:", "Statement Date:"
+   - Recognize various date formats: MM/DD/YY, DD-MM-YY, YYYY-MM-DD, written dates
+   - Convert all dates to YYYY-MM-DD format
+   - Distinguish from due dates, service dates, or payment dates
 
-4. AMOUNTS: Extract all monetary values with mathematical accuracy
-   - Look for "Total:", "Subtotal:", "Tax:", "Amount Due:", line amounts
-   - If only total is found, set subtotal = total, tax = 0, shipping = 0
-   - Ensure mathematical consistency: total = subtotal + tax + shipping
-   - Extract individual line amounts and sum them for subtotal calculation
+3. VENDOR IDENTIFICATION (Business issuing the invoice):
+   - Look for company names at the top of document
+   - Check after labels like: "From:", "Vendor:", "Company:", "Business:"
+   - Look for phrases like "IN ACCOUNT WITH", "BILL FROM", "INVOICE FROM"
+   - Identify by business suffixes: Inc, LLC, Corp, Ltd, Company, Co
+   - May appear in header, letterhead, or billing address section
+   - Extract from the address section that represents the billing entity
 
-5. LINE ITEMS: Extract itemized services/products from tables or lists
-   - Look for patterns like "EXPLAINMENT FOR FACILITY 1-18-19 25.00"
-   - Parse as: description="EXPLAINMENT FOR FACILITY", amount=25.00
-   - Include description, quantity (default 1), unit_price=amount, line total=amount
-   - Parse service charges, facility fees, or product lines
-   - Each line should have at least description and amount
+4. CUSTOMER INFORMATION:
+   - Look for "Bill To:", "Customer:", "Ship To:", "TO:" sections
+   - Extract name, address, and contact information
+   - Distinguish between billing and shipping addresses
 
-6. MATHEMATICAL VALIDATION:
-   - Extract the final total amount from the OCR text (look for amounts at the end)
-   - If subtotal/tax/shipping are all 0 but total > 0, set subtotal = total
-   - Sum all line item amounts to verify subtotal matches
-   - Set subtotal = sum of line items, tax = 0, shipping = 0 unless explicitly found
-   - Ensure total equals subtotal + tax + shipping (±$0.01 tolerance)
+5. AMOUNTS AND FINANCIAL DATA:
+   - Identify total amount (usually labeled "Total:", "Amount Due:", "Balance Due:")
+   - Look for subtotal, tax, shipping, discount labels
+   - Extract line-by-line amounts from itemized sections
+   - Parse currency symbols and number formats (commas, decimals)
+   - Handle various currency notations ($, €, £, etc.)
 
-7. VENDOR INFORMATION EXTRACTION:
-   - Look for "IN ACCOUNT WITH" followed by vendor details
-   - Extract vendor address from the billing section
-   - If vendor_name is unclear, use "BILL" section information
-   - ALWAYS extract available vendor information, never leave as null
+6. LINE ITEMS EXTRACTION:
+   - Identify tabular or list structures containing products/services
+   - Common patterns: Description + Amount, Qty + Description + Price + Total
+   - Look for service descriptions followed by dates and amounts
+   - Extract: description, quantity, unit price, line total, tax per item
+   - Handle various table formats and layouts
+
+7. MATHEMATICAL VALIDATION:
+   - Calculate subtotal from sum of line items if not explicitly stated
+   - Verify total = subtotal + tax + shipping + other charges
+   - If only total exists without breakdown, set subtotal = total
+   - Ensure mathematical consistency within reasonable tolerance
+
+8. ADDRESSES AND CONTACT INFO:
+   - Distinguish between vendor address (bill from) and customer address (bill to)
+   - Extract complete address blocks including street, city, state, zip
+   - Identify phone numbers, email addresses if present
+
+EXTRACTION APPROACH:
+1. Read through the entire OCR text to understand document structure
+2. Identify document type (invoice, statement, receipt, bill)
+3. Locate header section for vendor and invoice details
+4. Find customer/billing information section
+5. Extract itemized services/products section
+6. Identify total amount and any sub-amounts
+7. Calculate missing amounts using mathematical relationships
+8. Ensure all extracted data is logically consistent
 
 VALIDATION CHECKS:
-- Invoice numbers should be codes/IDs, not dates or amounts  
-- Dates must be actual dates in YYYY-MM-DD format
-- Amounts should be positive numbers
-- Line items must have description and amount > 0
-- Mathematical consistency: total = subtotal + tax + shipping
-
-EXAMPLE EXTRACTION FOR THE GIVEN OCR TEXT:
-- invoice_number: "683954" (from top of document)
-- invoice_date: "2019-01-18" (from "DATE 1-18-19")  
-- vendor_name: Extract from "IN ACCOUNT WITH" or "BILL" section
-- vendor_address: "620 57TH AVE. W. LOT B-12 BRADENTON FL 34209"
-- bill_to: "PALMA SOHA ASST 450 67TH ST. W. BRADENTON FL 34209"
-- line_items: [{"description": "EXPLAINMENT FOR FACILITY", "amount": 25.00}]
-- total: 75 (from end of document)
-- subtotal: 25.00 (sum of line items)
+- Invoice numbers should be alphanumeric codes, not dates or amounts
+- Dates must be valid dates in YYYY-MM-DD format
+- Amounts should be positive numbers with proper decimal places
+- Line items must have meaningful descriptions and positive amounts
+- Mathematical consistency: total ≈ subtotal + tax + shipping
+- Vendor and customer information should be complete addresses
+- All extracted text should come from the actual OCR content
 
 RESPOND WITH VALID JSON ONLY:
 {
   "enhanced_data": {
-    "invoice_number": "extract from OCR text",
+    "invoice_number": "extracted invoice/document number",
     "invoice_date": "YYYY-MM-DD format",
-    "vendor_name": "extract vendor name from OCR",
-    "vendor_address": "extract vendor address",
-    "bill_to": "extract customer info",
-    "ship_to": "shipping info or null", 
+    "vendor_name": "company name issuing the invoice",
+    "vendor_address": "complete vendor address",
+    "bill_to": "customer name and address",
+    "ship_to": "shipping address if different from billing",
     "currency": "USD",
-    "subtotal": 25.00,
+    "subtotal": 0,
     "tax": 0,
     "shipping": 0,
-    "total": 75,
+    "total": 0,
     "line_items": [
       {
         "line_number": 1,
-        "sku": null,
-        "description": "EXPLAINMENT FOR FACILITY",
+        "sku": "product code if available",
+        "description": "service or product description",
         "qty": 1,
-        "unit_price": 25.00,
-        "amount": 25.00,
+        "unit_price": 0,
+        "amount": 0,
         "tax": 0
       }
     ],
@@ -251,8 +260,8 @@ RESPOND WITH VALID JSON ONLY:
     "ocr_similarity_score": 1.0
   },
   "confidence": 0.85,
-  "improvements": ["extracted vendor information", "parsed line items", "calculated subtotal"],
-  "validation_errors": []
+  "improvements": ["list specific improvements made to the extraction"],
+  "validation_errors": ["list any validation issues found"]
 }`;
   }
 
