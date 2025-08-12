@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { mistralOCR } from "./services/mistral-ocr";
 import { deterministicParser } from "./services/parser/deterministic";
 import { markdownEnhancedParser } from "./services/parser/markdown-enhanced";
+import { enhancedKeyValueExtractor } from "./services/parser/enhanced-extractor";
 import { parseRequestSchema, insertInvoiceSchema } from "@shared/schema";
 import { ConfigService } from "./config";
 import { z } from "zod";
@@ -28,22 +29,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
           rawOcrText = ocrResponse.text;
           mistralOcrText = ocrResponse.text;
           
-          // If we have markdown, use the enhanced parser
-          if (ocrResponse.markdown) {
-            console.log('[parser] Using markdown-enhanced parser for better extraction');
-            const enhancedResult = markdownEnhancedParser.parse(ocrResponse.markdown, ocrResponse.text);
+          // Use the enhanced key-value extraction system
+          console.log('[parser] Using enhanced key-value extraction system');
+          try {
+            const enhancedResult = await enhancedKeyValueExtractor.extractKeyValuePairs(
+              ocrResponse.text, 
+              ocrResponse.markdown
+            );
+            
             return res.json({
-              parsed: enhancedResult.parsed,
+              parsed: enhancedResult.extracted,
               confidence: enhancedResult.confidence,
               raw_ocr_text: rawOcrText,
               mistral_ocr_text: mistralOcrText,
               ocr_similarity_score: ocrSimilarityScore,
               fallback_used: false,
               action: enhancedResult.confidence > 0.8 ? 
-                "The extracted data looks good! Please review before saving." :
-                "Please review and edit the extracted fields. Some fields may require manual correction due to low confidence scores.",
-              field_confidences: enhancedResult.field_confidences
+                "The enhanced extraction system successfully identified key-value pairs! Please review before saving." :
+                "Enhanced extraction completed. Please review and edit the extracted fields as some may need manual correction.",
+              field_confidences: enhancedResult.field_confidences,
+              extraction_details: enhancedResult.extraction_details
             });
+          } catch (enhancedError) {
+            console.warn('[parser] Enhanced extraction failed, falling back to markdown parser:', enhancedError);
+            
+            // Fallback to markdown parser if enhanced extraction fails
+            if (ocrResponse.markdown) {
+              const markdownResult = markdownEnhancedParser.parse(ocrResponse.markdown, ocrResponse.text);
+              return res.json({
+                parsed: markdownResult.parsed,
+                confidence: markdownResult.confidence,
+                raw_ocr_text: rawOcrText,
+                mistral_ocr_text: mistralOcrText,
+                ocr_similarity_score: ocrSimilarityScore,
+                fallback_used: true,
+                action: "Used fallback parser. Please review and edit the extracted fields.",
+                field_confidences: markdownResult.field_confidences
+              });
+            }
           }
         } catch (error) {
           console.error("Mistral OCR failed:", error);
@@ -68,20 +91,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Run deterministic parser
-      const parsingResult = deterministicParser.parse(rawOcrText, mistralOcrText, ocrSimilarityScore);
-
-      res.json({
-        parsed: parsingResult.parsed,
-        confidence: parsingResult.confidence,
-        raw_ocr_text: rawOcrText,
-        mistral_ocr_text: mistralOcrText,
-        ocr_similarity_score: ocrSimilarityScore,
-        fallback_used: parsingResult.fallback_used,
-        action: parsingResult.action,
-        field_confidences: parsingResult.field_confidences
-      });
-
+      // Try enhanced extraction first, then fall back to deterministic parser
+      try {
+        console.log('[parser] Using enhanced key-value extraction system for text input');
+        const enhancedResult = await enhancedKeyValueExtractor.extractKeyValuePairs(rawOcrText);
+        
+        return res.json({
+          parsed: enhancedResult.extracted,
+          confidence: enhancedResult.confidence,
+          raw_ocr_text: rawOcrText,
+          mistral_ocr_text: mistralOcrText,
+          ocr_similarity_score: ocrSimilarityScore,
+          fallback_used: false,
+          action: enhancedResult.confidence > 0.8 ? 
+            "Enhanced extraction successful! Please review before saving." :
+            "Enhanced extraction completed. Please review and edit the extracted fields.",
+          field_confidences: enhancedResult.field_confidences,
+          extraction_details: enhancedResult.extraction_details
+        });
+      } catch (enhancedError) {
+        console.warn('[parser] Enhanced extraction failed, using deterministic parser:', enhancedError);
+        
+        // Run deterministic parser as fallback
+        const parsingResult = deterministicParser.parse(rawOcrText, mistralOcrText, ocrSimilarityScore);
+        
+        return res.json({
+          parsed: parsingResult.parsed,
+          confidence: parsingResult.confidence,
+          raw_ocr_text: rawOcrText,
+          mistral_ocr_text: mistralOcrText,
+          ocr_similarity_score: ocrSimilarityScore,
+          fallback_used: true,
+          action: parsingResult.action || "Used fallback parser. Please review the extracted data.",
+          field_confidences: parsingResult.field_confidences
+        });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({

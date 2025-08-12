@@ -64,20 +64,20 @@ export type ParseRequest = z.infer<typeof parseRequestSchema>;
 
 // Canonical invoice schema for parsing
 export const canonicalInvoiceSchema = z.object({
-  invoice_number: z.string().nullable(),
-  invoice_date: z.string().nullable(), // YYYY-MM-DD format
-  vendor_name: z.string().nullable(),
-  vendor_address: z.string().nullable(),
-  bill_to: z.string().nullable(),
-  ship_to: z.string().nullable(),
-  currency: z.string().nullable(),
+  invoice_number: z.string().optional(),
+  invoice_date: z.string().optional(), // YYYY-MM-DD format
+  vendor_name: z.string().optional(),
+  vendor_address: z.string().optional(),
+  bill_to: z.string().optional(),
+  ship_to: z.string().optional(),
+  currency: z.string().optional(),
   subtotal: z.number().default(0),
   tax: z.number().default(0),
   shipping: z.number().default(0),
   total: z.number().default(0),
   line_items: z.array(z.object({
     line_number: z.number(),
-    sku: z.string().nullable(),
+    sku: z.string().optional(),
     description: z.string(),
     qty: z.number().default(1),
     unit_price: z.number().default(0),
@@ -87,8 +87,8 @@ export const canonicalInvoiceSchema = z.object({
   raw_ocr_text: z.string(),
   mistral_ocr_text: z.string(),
   ocr_similarity_score: z.number().default(0),
-  template_id: z.string().nullable().optional(),
-  category: z.string().nullable().optional(),
+  template_id: z.string().optional(),
+  category: z.string().optional(),
 });
 
 export type CanonicalInvoice = z.infer<typeof canonicalInvoiceSchema>;

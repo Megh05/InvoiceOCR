@@ -19,6 +19,17 @@ Preferred communication style: Simple, everyday language.
 - **Navigation Fix**: Resolved React nested anchor tag warning in Layout component
 - **Storage Layer**: Fixed TypeScript issues with invoice and line item creation
 
+### Advanced OCR Key-Value Extraction System Enhancement
+- **Multi-Layer Extraction Engine**: Created comprehensive enhanced-extractor.ts with 6-layer extraction approach
+- **Pattern Recognition**: 200+ specialized regex patterns for different document types and formats
+- **Contextual Analysis**: Spatial relationship analysis for key-value pairs with proximity detection
+- **Template Recognition**: Document type detection (invoice/statement/receipt) with format-specific parsing
+- **Fuzzy Matching**: Edit distance algorithms for OCR error correction and field recovery
+- **Confidence Scoring**: Multi-factor confidence assessment with field-level granularity
+- **Markdown Table Support**: Enhanced table parsing from Mistral OCR markdown output
+- **Fallback System**: Graceful degradation from enhanced → markdown → deterministic parsers
+- **Schema Alignment**: Fixed type consistency between nullable/optional fields across parsers
+
 ### OCR Processing Improvements (Implementation from HuggingFace Reference)
 - **Enhanced Mistral OCR Service**: Added retry logic with exponential backoff (3 attempts)
 - **Markdown Processing**: Enhanced OCR response processing to leverage structured markdown output

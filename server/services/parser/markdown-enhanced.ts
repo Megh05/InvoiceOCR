@@ -1,4 +1,5 @@
-import { ParsedInvoice, FieldConfidence } from './deterministic';
+import { CanonicalInvoice } from "@shared/schema";
+import { FieldConfidence } from './deterministic';
 
 /**
  * Enhanced parser that leverages Mistral OCR's markdown output
@@ -6,20 +7,20 @@ import { ParsedInvoice, FieldConfidence } from './deterministic';
  */
 export class MarkdownEnhancedParser {
   parse(markdownText: string, plainText: string): {
-    parsed: ParsedInvoice;
+    parsed: CanonicalInvoice;
     confidence: number;
     field_confidences: FieldConfidence[];
   } {
     const fieldConfidences: FieldConfidence[] = [];
     
     // Use markdown structure for better parsing
-    const invoiceData: Partial<ParsedInvoice> = {
-      invoice_number: null,
-      invoice_date: null,
-      vendor_name: null,
-      vendor_address: null,
-      bill_to: null,
-      ship_to: null,
+    const invoiceData: Partial<CanonicalInvoice> = {
+      invoice_number: undefined,
+      invoice_date: undefined,
+      vendor_name: undefined,
+      vendor_address: undefined,
+      bill_to: undefined,
+      ship_to: undefined,
       currency: 'USD',
       subtotal: 0,
       tax: 0,
@@ -113,7 +114,7 @@ export class MarkdownEnhancedParser {
     const overallConfidence = this.calculateOverallConfidence(fieldConfidences);
 
     return {
-      parsed: invoiceData as ParsedInvoice,
+      parsed: invoiceData as CanonicalInvoice,
       confidence: overallConfidence,
       field_confidences: fieldConfidences
     };

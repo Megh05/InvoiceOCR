@@ -1,7 +1,7 @@
 import { CanonicalInvoice } from "@shared/schema";
 import { templateRecognitionService } from "../template-recognition";
 
-interface FieldConfidence {
+export interface FieldConfidence {
   field: string;
   value: any;
   confidence: number;
@@ -120,13 +120,13 @@ export class DeterministicParser {
     const overallConfidence = this.calculateOverallConfidence(fieldConfidences, similarityScore);
 
     const parsed: CanonicalInvoice = {
-      invoice_number: invoiceNumber.value,
-      invoice_date: invoiceDate.value,
-      vendor_name: vendorName.value,
-      vendor_address: vendorAddress.value,
-      bill_to: billTo.value,
-      ship_to: shipTo.value,
-      currency: currency.value,
+      invoice_number: invoiceNumber.value || undefined,
+      invoice_date: invoiceDate.value || undefined,
+      vendor_name: vendorName.value || undefined,
+      vendor_address: vendorAddress.value || undefined,
+      bill_to: billTo.value || undefined,
+      ship_to: shipTo.value || undefined,
+      currency: currency.value || 'USD',
       subtotal: totals.subtotal,
       tax: totals.tax,
       shipping: totals.shipping,
