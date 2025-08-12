@@ -34,10 +34,25 @@ export class MistralOCRService {
     }
 
     try {
+      let documentUrl: string;
+      
+      if (imageBase64) {
+        // Convert base64 to data URL format expected by Mistral
+        const mimeType = this.detectImageMimeType(imageBase64);
+        documentUrl = `data:${mimeType};base64,${imageBase64}`;
+      } else if (imageUrl) {
+        documentUrl = imageUrl;
+      } else {
+        throw new Error("Either imageUrl or imageBase64 must be provided");
+      }
+
       const payload = {
-        ...(imageUrl && { image_url: imageUrl }),
-        ...(imageBase64 && { image_base64: imageBase64 }),
-        request_id: requestId,
+        model: "mistral-ocr-latest",
+        document: {
+          type: "document_url",
+          document_url: documentUrl,
+        },
+        include_image_base64: false, // We don't need images back, just text
       };
 
       const response = await fetch(this.baseUrl, {
@@ -66,11 +81,20 @@ export class MistralOCRService {
       }
 
       const data = await response.json();
-      console.log(`[${new Date().toISOString()}] [mistral-ocr] OCR request ${requestId} extracted ${data.text?.length || 0} characters`);
+      
+      // Extract text from all pages and concatenate
+      let extractedText = "";
+      if (data.pages && Array.isArray(data.pages)) {
+        extractedText = data.pages
+          .map((page: any) => page.markdown || "")
+          .join("\n\n");
+      }
+      
+      console.log(`[${new Date().toISOString()}] [mistral-ocr] OCR request ${requestId} extracted ${extractedText.length} characters from ${data.pages?.length || 0} pages`);
 
       return {
-        text: data.text || "",
-        confidence: data.confidence || 0,
+        text: extractedText,
+        confidence: 0.9, // Mistral OCR is generally high quality
         request_id: requestId,
       };
 
@@ -101,6 +125,18 @@ export class MistralOCRService {
       similarity_score: similarity,
       request_id: ocrResponse.request_id,
     };
+  }
+
+  private detectImageMimeType(base64String: string): string {
+    // Check for common image format signatures in base64
+    if (base64String.startsWith('iVBORw0KGgo')) return 'image/png';
+    if (base64String.startsWith('/9j/')) return 'image/jpeg';
+    if (base64String.startsWith('R0lGODlh')) return 'image/gif';
+    if (base64String.startsWith('UklGR')) return 'image/webp';
+    if (base64String.startsWith('JVBERi0')) return 'application/pdf';
+    
+    // Default to JPEG for unknown formats
+    return 'image/jpeg';
   }
 
   private calculateSimilarity(text1: string, text2: string): number {
