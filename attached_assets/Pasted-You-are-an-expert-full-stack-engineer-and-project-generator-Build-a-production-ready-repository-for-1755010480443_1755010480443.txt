@@ -1,0 +1,175 @@
+You are an expert full-stack engineer and project generator. Build a production-ready repository for an invoice OCR → structured JSON → editable form workflow. **All parsing flows MUST use MISTRAL OCR only**. Use SQLite (Prisma) for storage. Deliver a fully working repo with frontend, backend, tests, Docker support, and documentation.
+
+HIGHEST-PRIORITY RULE (READ CAREFULLY)
+- For every `POST /api/parse` request where an image is supplied (image_url or image_base64), your backend MUST call Mistral OCR using the provided **API key** (env var `MISTRAL_API_KEY`). The project should use the official Mistral SDK/client or a clearly-documented helper that accepts only the API key; the implementation details of the endpoint are the SDK's responsibility. If the Mistral OCR call fails or the SDK indicates an unreachable service, the parse endpoint must fail with HTTP 503 and an explicit error message. The app will not accept parse requests without calling Mistral OCR.
+- If the client submits `ocr_text` only (no image), the backend must still call Mistral OCR for verification using `MISTRAL_API_KEY` (compare provided text to Mistral's output) and include both in the response. If Mistral OCR cannot be called (API key missing/invalid or call fails), return 400/503 accordingly (document exact behavior in README).
+
+SUMMARY / GOAL
+Create a web app that:
+1. Accepts invoice images/PDFs or pasted OCR text.
+2. ALWAYS uses Mistral OCR to produce `raw_ocr_text` (see rule above).
+3. Converts OCR text into the canonical JSON invoice schema using **deterministic rule-based extraction only** (regex, fuzzy key search, line parsing). No LLM fallback — improve deterministic parser heuristics and document confidence heuristics and fallback UI behavior for manual correction.
+4. Shows a React UI with an explicit **pipeline / step-by-step** flow (see UI requirements below).
+5. Persists invoices into SQLite using Prisma.
+6. Exposes REST API endpoints for parse + invoice CRUD.
+7. Includes Docker (backend + frontend), example env, OpenAPI docs, unit tests, and README.
+
+TECH STACK (required)
+- Frontend: React + TypeScript + Vite, TailwindCSS, Axios.
+- Backend: Node.js + TypeScript + Express, Prisma (SQLite), zod for validation.
+- OCR: **Mistral OCR only**; configure with `MISTRAL_API_KEY` (no LLM).
+- Tests: Jest (backend) + Vitest/React Testing Library (frontend).
+
+REPO LAYOUT (exact)
+project/
+├─ backend/
+│  ├─ src/
+│  │  ├─ controllers/
+│  │  ├─ services/
+│  │  │  ├─ parser/
+│  │  │  │  └─ deterministic.ts
+│  │  │  └─ mistral-ocr.ts   # call Mistral OCR here (mandatory, uses MISTRAL_API_KEY)
+│  │  ├─ models/   (Prisma client wrapper)
+│  │  ├─ routes/
+│  │  └─ index.ts
+│  ├─ prisma/
+│  │  └─ schema.prisma
+│  ├─ tests/
+│  ├─ Dockerfile
+│  ├─ package.json
+│  └─ tsconfig.json
+├─ frontend/
+│  ├─ src/
+│  │  ├─ components/
+│  │  ├─ pages/
+│  │  ├─ services/
+│  │  └─ main.tsx
+│  ├─ Dockerfile
+│  ├─ package.json
+│  └─ tsconfig.json
+├─ docker-compose.yml
+├─ openapi.yaml
+├─ .env.example
+└─ README.md
+
+CANONICAL INVOICE JSON SCHEMA (snake_case; backend validation must use this)
+{
+  "invoice_number": "string | null",
+  "invoice_date": "YYYY-MM-DD | null",
+  "vendor_name": "string | null",
+  "vendor_address": "string | null",
+  "bill_to": "string | null",
+  "ship_to": "string | null",
+  "currency": "string | null",
+  "subtotal": 0.0,
+  "tax": 0.0,
+  "shipping": 0.0,
+  "total": 0.0,
+  "line_items": [
+    {
+      "line_number": 1,
+      "sku": "string | null",
+      "description": "string",
+      "qty": 1,
+      "unit_price": 0.0,
+      "amount": 0.0,
+      "tax": 0.0
+    }
+  ],
+  "raw_ocr_text": "string",
+  "mistral_ocr_text": "string (the text returned by mistral OCR - will equal raw_ocr_text)",
+  "ocr_similarity_score": 0.0
+}
+
+API SPEC (important behaviors)
+1. POST /api/parse
+   - Accepts JSON body: `{ image_url?: string, image_base64?: string, ocr_text?: string }`.
+   - If `image_*` provided: MUST call Mistral OCR (via `services/mistral-ocr.ts` using `MISTRAL_API_KEY`) to obtain `mistral_ocr_text`. Use that as primary `raw_ocr_text`. If OCR fails → return 503 (with message: "Mistral OCR unavailable").
+   - If `ocr_text` provided: still call Mistral OCR to get `mistral_ocr_text` for verification (if `MISTRAL_API_KEY` present). Compute a similarity score and include both texts. If Mistral OCR cannot be invoked, return 400/503 per README.
+   - Run deterministic parser (`services/parser/deterministic.ts`) to extract fields and compute per-field confidence and overall confidence (0-1).
+   - **No LLM fallback.** If confidence < threshold (e.g., 0.85) or required fields missing, return parsed output with low `confidence` and set `fallback_used: false` and include an `action` hint in the response advising UI to prompt user to review and edit fields.
+   - Response: `{ parsed: <schema>, confidence: 0-1, raw_ocr_text: <mistral_ocr_text>, mistral_ocr_text: <string>, ocr_similarity_score?: number, fallback_used: false, action?: string }`.
+2. POST /api/invoices — validate and save to SQLite (Prisma).
+3. GET /api/invoices/:id
+4. PUT /api/invoices/:id
+5. GET /api/invoices — list
+
+BACKEND IMPLEMENTATION NOTES
+- Implement `services/mistral-ocr.ts` that calls Mistral OCR using `MISTRAL_API_KEY`. Use the official SDK or a thin wrapper that accepts only the key (document how to configure the client in README). Retry once on transient errors; log errors; final failure → 503 to client.
+- Implement deterministic parser at `services/parser/deterministic.ts`:
+  - multiple regex patterns for invoice_number/date/total keywords,
+  - fuzzy key matching (Levenshtein or token overlap),
+  - line-based table extraction for line_items,
+  - per-field confidence values (0-1).
+- No LLM or llm.ts file in the repo.
+- Log (console + local rotating logfile) when Mistral OCR is called and include timestamps and request IDs.
+- Use zod to validate request payloads and Prisma models.
+- Provide `backend/test-data/` with example OCR outputs and images to use in tests.
+
+PRISMA (SQLite) NOTES
+- `.env` must include: `DATABASE_URL="file:./dev.db"`
+- Provide `prisma/schema.prisma` mapping Invoice and LineItem to the JSON schema.
+- README should document `npx prisma generate` and `npx prisma migrate dev --name init`.
+
+FRONTEND / UI-UX (pipeline / step-by-step flow)
+The frontend must present the parse workflow as a clear pipeline wizard with these steps:
+
+Step 1 — Upload / Paste
+- UI to upload image (file), paste image base64, provide image URL, or paste OCR text.
+- Validate input and show file preview if image.
+
+Step 2 — Run OCR (server)
+- Clicking "Next / Run OCR" calls `POST /api/parse`. Show a progress indicator while Mistral OCR runs.
+- On success, show raw OCR text returned from Mistral and `ocr_similarity_score` if the user provided their own text.
+- If Mistral OCR fails → show error modal with retry instructions.
+
+Step 3 — Review OCR Text
+- Display Mistral OCR text in an editable textarea with "Accept OCR" and "Request Re-run" options.
+- Allow minor edits to OCR text before re-parsing. If user edits, re-run deterministic parser locally or via `/api/parse` with `ocr_text` to update parsed fields (still call Mistral for verification per rules).
+
+Step 4 — Field Extraction & Edit
+- Show parsed fields mapped into the canonical form: top-level fields + line-item grid.
+- Mark fields with low confidence visually (orange/red badges). Provide inline validation (qty positive, prices numeric).
+- Allow add/edit/delete of line items; recalc subtotal/tax/total in real-time.
+- Include a JSON preview panel that updates live.
+
+Step 5 — Save / Export
+- Save button persists to SQLite via `POST /api/invoices`.
+- Provide Export buttons for:
+  - Download JSON (canonical schema).
+  - Download CSV of line items.
+- Show a confirmation screen with invoice ID and quick actions.
+
+UX notes:
+- Wizard should allow navigation back to previous steps without losing state.
+- Accessibility: keyboard navigable, labels, aria attributes.
+- Visual: clear stage indicators (1 → 2 → 3 → 4 → 5), small animations ok.
+
+ENV VARS (.env.example)
+MISTRAL_API_KEY=               # REQUIRED — API key for Mistral OCR (project must fail if missing)
+DATABASE_URL=file:./dev.db
+PORT=4000
+NODE_ENV=development
+
+DEVOPS & RUN
+- Provide Dockerfile for backend & frontend and docker-compose.yml that mounts `./backend/dev.db` so SQLite persists.
+- README: how to run locally:
+  - `cd backend && npm install && npx prisma generate && npx prisma migrate dev --name init`
+  - `docker-compose up --build`
+  - curl examples for POST /api/parse (include example body with image_base64).
+- README must explicitly state that **Mistral OCR is mandatory** and that the backend requires `MISTRAL_API_KEY`. Explain which SDK/client you used and how the API key is applied.
+
+TESTS & CI
+- Unit tests for deterministic parser (>=80% coverage for parser module).
+- Integration tests for /api/parse that **mock** Mistral OCR responses and assert 503 when Mistral OCR fails.
+- Frontend: at least 3 smoke tests (render pipeline, run parse flow with mocked API, save flow).
+
+ACCEPTANCE CRITERIA
+- The parse endpoint ALWAYS calls Mistral OCR when an image is supplied; Mistral OCR failure returns 503.
+- Deterministic parser runs and returns per-field confidence; when confidence < threshold, UI prompts user for manual correction (no automatic LLM fallback).
+- App persists invoices into SQLite with Prisma and supports listing/retrieving/updating invoices.
+- README documents setup and the mandatory Mistral OCR requirement and which SDK/client is used.
+
+If anything is ambiguous, make a pragmatic choice and document it in README. Prioritize a robust deterministic parser + excellent pipeline UX, and keep Mistral OCR integration resilient and well-logged.
+
+END.
