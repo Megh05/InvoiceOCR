@@ -5,6 +5,19 @@ export interface MistralOCRResponse {
   text: string;
   confidence: number;
   request_id: string;
+  pages?: OCRPage[];
+  markdown?: string;
+}
+
+export interface OCRPage {
+  page_number: number;
+  text: string;
+  markdown?: string;
+  confidence?: number;
+  images?: Array<{
+    id: string;
+    image_base64?: string;
+  }>;
 }
 
 export interface MistralOCRError {
@@ -15,10 +28,43 @@ export interface MistralOCRError {
 
 export class MistralOCRService {
   private baseUrl: string = "https://api.mistral.ai/v1/ocr";
+  private maxRetries: number = 3;
+  private baseDelay: number = 1000; // 1 second
 
   async getApiKey(): Promise<string | undefined> {
     const configKey = await ConfigService.getMistralApiKey();
     return configKey || process.env.MISTRAL_API_KEY || undefined;
+  }
+
+  private async delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  private async retryWithExponentialBackoff<T>(
+    fn: () => Promise<T>,
+    retries: number = this.maxRetries
+  ): Promise<T> {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        return await fn();
+      } catch (error) {
+        if (attempt === retries) {
+          throw error;
+        }
+        
+        // Don't retry on auth errors or client errors
+        if (error instanceof Error) {
+          if (error.message.includes('401') || error.message.includes('Invalid API key')) {
+            throw error;
+          }
+        }
+        
+        const delayMs = this.baseDelay * Math.pow(2, attempt);
+        console.log(`[${new Date().toISOString()}] [mistral-ocr] Attempt ${attempt + 1} failed, retrying in ${delayMs}ms...`);
+        await this.delay(delayMs);
+      }
+    }
+    throw new Error('Max retries exceeded');
   }
 
   async extractText(imageUrl?: string, imageBase64?: string): Promise<MistralOCRResponse> {
@@ -42,69 +88,58 @@ export class MistralOCRService {
     }
 
     try {
-      let documentUrl: string;
-      
-      if (imageBase64) {
-        // Convert base64 to data URL format expected by Mistral
-        const mimeType = this.detectImageMimeType(imageBase64);
-        documentUrl = `data:${mimeType};base64,${imageBase64}`;
-      } else if (imageUrl) {
-        documentUrl = imageUrl;
-      } else {
-        throw new Error("Either imageUrl or imageBase64 must be provided");
-      }
-
-      const payload = {
-        model: "mistral-ocr-latest",
-        document: {
-          type: "document_url",
-          document_url: documentUrl,
-        },
-        include_image_base64: false, // We don't need images back, just text
-      };
-
-      const response = await fetch(this.baseUrl, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const duration = Date.now() - startTime;
-      console.log(`[${new Date().toISOString()}] [mistral-ocr] OCR request ${requestId} completed in ${duration}ms with status ${response.status}`);
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
-        console.error(`[${new Date().toISOString()}] [mistral-ocr] OCR request ${requestId} failed:`, errorData);
+      return await this.retryWithExponentialBackoff(async () => {
+        let documentUrl: string;
         
-        if (response.status === 503) {
-          throw new Error("Mistral OCR service is temporarily unavailable");
-        } else if (response.status === 401) {
-          throw new Error("Invalid Mistral OCR API key");
+        if (imageBase64) {
+          // Convert base64 to data URL format expected by Mistral
+          const mimeType = this.detectImageMimeType(imageBase64);
+          documentUrl = `data:${mimeType};base64,${imageBase64}`;
+        } else if (imageUrl) {
+          documentUrl = imageUrl;
         } else {
-          throw new Error(`Mistral OCR failed: ${errorData.message || "Unknown error"}`);
+          throw new Error("Either imageUrl or imageBase64 must be provided");
         }
-      }
 
-      const data = await response.json();
-      
-      // Extract text from all pages and concatenate
-      let extractedText = "";
-      if (data.pages && Array.isArray(data.pages)) {
-        extractedText = data.pages
-          .map((page: any) => page.markdown || "")
-          .join("\n\n");
-      }
-      
-      console.log(`[${new Date().toISOString()}] [mistral-ocr] OCR request ${requestId} extracted ${extractedText.length} characters from ${data.pages?.length || 0} pages`);
+        const payload = {
+          model: "mistral-ocr-latest",
+          document: {
+            type: "document_url",
+            document_url: documentUrl,
+          },
+          include_image_base64: true, // Include images for better processing
+        };
 
-      return {
-        text: extractedText,
-        confidence: 0.9, // Mistral OCR is generally high quality
-        request_id: requestId,
-      };
+        const response = await fetch(this.baseUrl, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const duration = Date.now() - startTime;
+        console.log(`[${new Date().toISOString()}] [mistral-ocr] OCR request ${requestId} completed in ${duration}ms with status ${response.status}`);
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+          console.error(`[${new Date().toISOString()}] [mistral-ocr] OCR request ${requestId} failed:`, errorData);
+          
+          if (response.status === 503 || response.status === 502) {
+            throw new Error("Mistral OCR service is temporarily unavailable");
+          } else if (response.status === 401) {
+            throw new Error("Invalid Mistral OCR API key");
+          } else if (response.status === 429) {
+            throw new Error("Rate limit exceeded, retrying...");
+          } else {
+            throw new Error(`Mistral OCR failed: ${errorData.message || "Unknown error"}`);
+          }
+        }
+
+        const data = await response.json();
+        return this.processOCRResponse(data, requestId);
+      });
 
     } catch (error) {
       const duration = Date.now() - startTime;
@@ -118,6 +153,73 @@ export class MistralOCRService {
       }
       throw new Error("Unknown error occurred during OCR processing");
     }
+  }
+
+  private processOCRResponse(data: any, requestId: string): MistralOCRResponse {
+    // Enhanced processing based on HuggingFace implementation
+    const pages: OCRPage[] = [];
+    let allText = "";
+    let allMarkdown = "";
+    
+    if (data.pages && Array.isArray(data.pages)) {
+      data.pages.forEach((page: any, index: number) => {
+        // Extract markdown and plain text
+        const markdown = page.markdown || "";
+        let text = page.text || "";
+        
+        // If no plain text, try to extract from markdown
+        if (!text && markdown) {
+          text = this.extractTextFromMarkdown(markdown);
+        }
+        
+        // Process images in markdown
+        let processedMarkdown = markdown;
+        if (page.images && Array.isArray(page.images)) {
+          page.images.forEach((img: any) => {
+            if (img.image_base64) {
+              processedMarkdown = processedMarkdown.replace(
+                new RegExp(`!\\[${img.id}\\]\\(${img.id}\\)`, 'g'),
+                `![${img.id}](data:image/png;base64,${img.image_base64})`
+              );
+            }
+          });
+        }
+        
+        pages.push({
+          page_number: index + 1,
+          text,
+          markdown: processedMarkdown,
+          confidence: 0.9,
+          images: page.images || []
+        });
+        
+        allText += (allText ? "\n\n" : "") + text;
+        allMarkdown += (allMarkdown ? "\n\n" : "") + processedMarkdown;
+      });
+    }
+    
+    console.log(`[${new Date().toISOString()}] [mistral-ocr] OCR request ${requestId} extracted ${allText.length} characters from ${pages.length} pages`);
+
+    return {
+      text: allText || "No text extracted",
+      confidence: pages.length > 0 ? 0.9 : 0.1,
+      request_id: requestId,
+      pages,
+      markdown: allMarkdown
+    };
+  }
+
+  private extractTextFromMarkdown(markdown: string): string {
+    // Simple markdown to text conversion
+    return markdown
+      .replace(/!\[.*?\]\(.*?\)/g, '') // Remove images
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Convert links to text
+      .replace(/#{1,6}\s+/g, '') // Remove headers
+      .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold
+      .replace(/\*(.*?)\*/g, '$1') // Remove italic
+      .replace(/`(.*?)`/g, '$1') // Remove code
+      .replace(/\n\s*\n/g, '\n') // Clean up extra newlines
+      .trim();
   }
 
   async verifyText(providedText: string, imageUrl?: string, imageBase64?: string): Promise<{

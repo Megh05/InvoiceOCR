@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { mistralOCR } from "./services/mistral-ocr";
 import { deterministicParser } from "./services/parser/deterministic";
+import { markdownEnhancedParser } from "./services/parser/markdown-enhanced";
 import { parseRequestSchema, insertInvoiceSchema } from "@shared/schema";
 import { ConfigService } from "./config";
 import { z } from "zod";
@@ -26,6 +27,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
           );
           rawOcrText = ocrResponse.text;
           mistralOcrText = ocrResponse.text;
+          
+          // If we have markdown, use the enhanced parser
+          if (ocrResponse.markdown) {
+            console.log('[parser] Using markdown-enhanced parser for better extraction');
+            const enhancedResult = markdownEnhancedParser.parse(ocrResponse.markdown, ocrResponse.text);
+            return res.json({
+              parsed: enhancedResult.parsed,
+              confidence: enhancedResult.confidence,
+              raw_ocr_text: rawOcrText,
+              mistral_ocr_text: mistralOcrText,
+              ocr_similarity_score: ocrSimilarityScore,
+              fallback_used: false,
+              action: enhancedResult.confidence > 0.8 ? 
+                "The extracted data looks good! Please review before saving." :
+                "Please review and edit the extracted fields. Some fields may require manual correction due to low confidence scores.",
+              field_confidences: enhancedResult.field_confidences
+            });
+          }
         } catch (error) {
           console.error("Mistral OCR failed:", error);
           return res.status(503).json({
