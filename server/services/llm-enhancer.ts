@@ -50,6 +50,9 @@ export class LLMEnhancerService {
     }
 
     console.log(`[llm-enhancer] Starting LLM enhancement for confidence ${confidence}`);
+    console.log(`[llm-enhancer] Input OCR text (first 200 chars): "${ocrText.substring(0, 200)}..."`);
+    console.log(`[llm-enhancer] Current extracted invoice_number: "${extractedData.invoice_number}"`);
+    console.log(`[llm-enhancer] Current extracted vendor_name: "${extractedData.vendor_name}"`);
 
     const prompt = this.buildEnhancementPrompt(ocrText, extractedData);
     
@@ -115,6 +118,10 @@ export class LLMEnhancerService {
         }
       }
       console.log(`[llm-enhancer] LLM enhancement completed with confidence ${enhancedResult.confidence}`);
+      console.log(`[llm-enhancer] Enhanced invoice_number: "${enhancedResult.enhanced_data?.invoice_number}"`);
+      console.log(`[llm-enhancer] Enhanced invoice_date: "${enhancedResult.enhanced_data?.invoice_date}"`);
+      console.log(`[llm-enhancer] Enhanced vendor_name: "${enhancedResult.enhanced_data?.vendor_name}"`);
+      console.log(`[llm-enhancer] Enhanced total: ${enhancedResult.enhanced_data?.total}`);
 
       return {
         enhanced: enhancedResult.enhanced_data,
@@ -130,63 +137,68 @@ export class LLMEnhancerService {
   }
 
   private buildEnhancementPrompt(ocrText: string, extractedData: CanonicalInvoice): string {
-    return `Analyze this OCR text and improve the extracted invoice data. Focus on accuracy and completeness.
+    return `You are an expert invoice data extraction specialist. Analyze this OCR text and extract accurate invoice information. 
 
-OCR TEXT:
+=== OCR TEXT TO ANALYZE ===
 ${ocrText}
 
-CURRENT EXTRACTED DATA:
+=== CURRENT EXTRACTION (may contain errors) ===
 ${JSON.stringify(extractedData, null, 2)}
 
-TASK:
-1. Carefully read the OCR text and identify all invoice fields
-2. Compare with current extracted data and identify errors or missing information
-3. Extract/correct these fields with high accuracy:
-   - invoice_number: Look for invoice #, inv #, document number
-   - invoice_date: Find the invoice/bill date (format: YYYY-MM-DD)
-   - vendor_name: Company/business name providing the service
-   - vendor_address: Full vendor address
-   - bill_to / ship_to: Customer address information
-   - currency: Currency code (USD, EUR, etc.)
-   - subtotal, tax, shipping, total: All monetary amounts
-   - line_items: Service/product lines with qty, unit_price, amount
+=== EXTRACTION INSTRUCTIONS ===
 
-4. Validate that totals are mathematically correct
-5. Ensure dates are in YYYY-MM-DD format
-6. Provide confidence score (0.0-1.0) based on OCR text clarity
+CRITICAL FIELD IDENTIFICATION RULES:
+1. INVOICE NUMBER: Look for patterns like "Invoice #123456", "INV-2024-001", "Bill No: ABC123"
+   - NOT dates, NOT addresses, NOT amounts
+   - Usually alphanumeric codes near the top of the document
+   - Examples: INV001, 2024-001, ABC-123-DEF
 
-RESPONSE FORMAT (JSON only):
+2. INVOICE DATE: Find the date when this invoice was issued
+   - Look for phrases like "Invoice Date:", "Date:", "Bill Date:"
+   - Convert to YYYY-MM-DD format (e.g., 01/15/24 → 2024-01-15)
+   - Do NOT confuse with due dates or service dates
+
+3. VENDOR NAME: The company/business issuing this invoice
+   - Usually at the top of the document
+   - Look for company names, business names
+   - May include suffixes like Inc, LLC, Corp
+
+4. AMOUNTS: Extract all monetary values carefully
+   - Look for "Total:", "Subtotal:", "Tax:", "Amount Due:"
+   - Ensure mathematical consistency (subtotal + tax + shipping = total)
+
+5. LINE ITEMS: Extract itemized services/products
+   - Include description, quantity, unit price, line total
+   - Parse table-like structures in the OCR text
+
+VALIDATION CHECKS:
+- Invoice numbers should be codes/IDs, not dates or amounts  
+- Dates must be actual dates in YYYY-MM-DD format
+- Amounts should be positive numbers
+- Total = subtotal + tax + shipping (within rounding tolerance)
+
+RESPOND WITH VALID JSON ONLY:
 {
   "enhanced_data": {
-    "invoice_number": "string or null",
-    "invoice_date": "YYYY-MM-DD or null",
-    "vendor_name": "string or null",
-    "vendor_address": "string or null", 
-    "bill_to": "string or null",
-    "ship_to": "string or null",
-    "currency": "string",
-    "subtotal": number,
-    "tax": number,
-    "shipping": number,
-    "total": number,
-    "line_items": [
-      {
-        "line_number": number,
-        "sku": "string or null",
-        "description": "string",
-        "qty": number,
-        "unit_price": number,
-        "amount": number,
-        "tax": number
-      }
-    ],
-    "raw_ocr_text": "${ocrText.substring(0, 500)}...",
-    "mistral_ocr_text": "${ocrText.substring(0, 500)}...",
+    "invoice_number": "actual invoice number or null if not found",
+    "invoice_date": "YYYY-MM-DD format or null",
+    "vendor_name": "company name or null",
+    "vendor_address": "address or null",
+    "bill_to": "customer info or null",
+    "ship_to": "shipping info or null", 
+    "currency": "USD",
+    "subtotal": 0,
+    "tax": 0,
+    "shipping": 0,
+    "total": 0,
+    "line_items": [],
+    "raw_ocr_text": "${ocrText.replace(/"/g, '\\"').substring(0, 400)}...",
+    "mistral_ocr_text": "${ocrText.replace(/"/g, '\\"').substring(0, 400)}...",
     "ocr_similarity_score": 1.0
   },
-  "confidence": number,
-  "improvements": ["list of improvements made"],
-  "validation_errors": ["list of validation issues found"]
+  "confidence": 0.85,
+  "improvements": ["specific improvements made"],
+  "validation_errors": ["any validation issues found"]
 }`;
   }
 

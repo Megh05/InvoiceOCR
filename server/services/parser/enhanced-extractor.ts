@@ -42,17 +42,18 @@ export class EnhancedKeyValueExtractor {
   // Comprehensive field patterns for different document types
   private fieldPatterns = {
     invoice_number: [
-      // Traditional invoice patterns
+      // Traditional invoice patterns with explicit labels (high confidence)
       { pattern: /(?:invoice|inv)\s*(?:number|#|no\.?)\s*:?\s*([A-Z0-9\-_#]+)/i, confidence: 0.95, context: 'explicit_label' },
-      { pattern: /(?:^|\n)\s*([A-Z]{2,}\-\d{4,}\-\d{3,})\s*(?:\n|$)/im, confidence: 0.9, context: 'format_match' },
-      { pattern: /(?:^|\n)\s*#?([A-Z0-9]{6,})\s*(?:\n|$)/im, confidence: 0.7, context: 'standalone_code' },
-      
-      // Statement and bill patterns
-      { pattern: /(?:statement|account|ref(?:erence)?)\s*:?\s*([A-Z0-9\-_]+)/i, confidence: 0.85, context: 'statement_ref' },
       { pattern: /(?:bill|document)\s*(?:number|#|no\.?)\s*:?\s*([A-Z0-9\-_]+)/i, confidence: 0.9, context: 'bill_number' },
+      { pattern: /(?:statement|account|ref(?:erence)?)\s*(?:number|#|no\.?)\s*:?\s*([A-Z0-9\-_]+)/i, confidence: 0.85, context: 'statement_ref' },
       
-      // Pattern for numbers in specific positions (top of document)
-      { pattern: /^([A-Z0-9]{4,})\s*$/m, confidence: 0.6, context: 'position_based', position: 'top_5_lines' }
+      // Structured format patterns (medium confidence)
+      { pattern: /(?:^|\n)\s*([A-Z]{2,}\-\d{4,}\-\d{3,})\s*(?:\n|$)/im, confidence: 0.9, context: 'format_match' },
+      { pattern: /(?:^|\n)\s*#([A-Z0-9]{6,})\s*(?:\n|$)/im, confidence: 0.8, context: 'hash_prefixed' },
+      
+      // Standalone alphanumeric codes (lower confidence, must exclude common words)
+      { pattern: /(?:^|\n)\s*([A-Z0-9]{6,})\s*(?:\n|$)/im, confidence: 0.6, context: 'standalone_code', 
+        exclude: /^(DATE|TOTAL|AMOUNT|SUBTOTAL|TAX|BALANCE|DUE|INVOICE|BILL|STATEMENT)$/i }
     ],
     
     invoice_date: [
@@ -212,6 +213,13 @@ export class EnhancedKeyValueExtractor {
     for (const match of matches) {
       if (match && match[1]) {
         const value = this.cleanExtractedValue(match[1], fieldName);
+        
+        // Check exclude pattern if specified
+        if (patternConfig.exclude && patternConfig.exclude.test(value)) {
+          console.log(`[enhanced-extractor] Excluding "${value}" for ${fieldName} due to exclude pattern`);
+          continue;
+        }
+        
         if (this.isValidValue(value, fieldName)) {
           const lineNumber = this.findLineNumber(lines, match[0]);
           
