@@ -38,8 +38,22 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const now = new Date();
     const invoice: Invoice = { 
-      ...insertInvoice, 
       id, 
+      invoice_number: insertInvoice.invoice_number || null,
+      invoice_date: insertInvoice.invoice_date || null,
+      vendor_name: insertInvoice.vendor_name || null,
+      vendor_address: insertInvoice.vendor_address || null,
+      bill_to: insertInvoice.bill_to || null,
+      ship_to: insertInvoice.ship_to || null,
+      currency: insertInvoice.currency || null,
+      subtotal: insertInvoice.subtotal || 0,
+      tax: insertInvoice.tax || 0,
+      shipping: insertInvoice.shipping || 0,
+      total: insertInvoice.total || 0,
+      raw_ocr_text: insertInvoice.raw_ocr_text,
+      mistral_ocr_text: insertInvoice.mistral_ocr_text,
+      ocr_similarity_score: insertInvoice.ocr_similarity_score || 0,
+      confidence: insertInvoice.confidence || 0,
       created_at: now,
       updated_at: now 
     };
@@ -76,7 +90,17 @@ export class MemStorage implements IStorage {
 
   async createLineItem(insertLineItem: InsertLineItem): Promise<LineItem> {
     const id = randomUUID();
-    const lineItem: LineItem = { ...insertLineItem, id };
+    const lineItem: LineItem = {
+      id,
+      invoice_id: insertLineItem.invoice_id,
+      line_number: insertLineItem.line_number,
+      sku: insertLineItem.sku || null,
+      description: insertLineItem.description,
+      qty: insertLineItem.qty || 1,
+      unit_price: insertLineItem.unit_price || 0,
+      amount: insertLineItem.amount || 0,
+      tax: insertLineItem.tax || 0,
+    };
     this.lineItems.set(id, lineItem);
     return lineItem;
   }
@@ -95,7 +119,8 @@ export class MemStorage implements IStorage {
   }
 
   async deleteLineItemsByInvoiceId(invoiceId: string): Promise<void> {
-    for (const [id, item] of this.lineItems.entries()) {
+    const items = Array.from(this.lineItems.entries());
+    for (const [id, item] of items) {
       if (item.invoice_id === invoiceId) {
         this.lineItems.delete(id);
       }

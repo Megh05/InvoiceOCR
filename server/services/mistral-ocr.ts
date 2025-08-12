@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import { ConfigService } from "../config";
 
 export interface MistralOCRResponse {
   text: string;
@@ -13,14 +14,11 @@ export interface MistralOCRError {
 }
 
 export class MistralOCRService {
-  private apiKey: string;
   private baseUrl: string = "https://api.mistral.ai/v1/ocr";
 
-  constructor(apiKey?: string) {
-    this.apiKey = apiKey || process.env.MISTRAL_API_KEY || "";
-    if (!this.apiKey) {
-      console.warn("MISTRAL_API_KEY not provided - OCR functionality will be limited");
-    }
+  async getApiKey(): Promise<string | undefined> {
+    const configKey = await ConfigService.getMistralApiKey();
+    return configKey || process.env.MISTRAL_API_KEY || undefined;
   }
 
   async extractText(imageUrl?: string, imageBase64?: string): Promise<MistralOCRResponse> {
@@ -33,7 +31,8 @@ export class MistralOCRService {
       throw new Error("Either imageUrl or imageBase64 must be provided");
     }
 
-    if (!this.apiKey) {
+    const apiKey = await this.getApiKey();
+    if (!apiKey) {
       console.warn(`[${new Date().toISOString()}] [mistral-ocr] MISTRAL_API_KEY not available, returning mock response`);
       return {
         text: "Mock OCR response - please provide MISTRAL_API_KEY for real OCR functionality",
@@ -67,7 +66,7 @@ export class MistralOCRService {
       const response = await fetch(this.baseUrl, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${this.apiKey}`,
+          "Authorization": `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),

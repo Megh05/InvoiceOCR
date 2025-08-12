@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { mistralOCR } from "./services/mistral-ocr";
 import { deterministicParser } from "./services/parser/deterministic";
 import { parseRequestSchema, insertInvoiceSchema } from "@shared/schema";
+import { ConfigService } from "./config";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -195,12 +196,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Settings endpoints
+  app.get("/api/settings/status", async (req, res) => {
+    try {
+      const status = await ConfigService.getStatus();
+      res.json(status);
+    } catch (error) {
+      console.error("Get settings status error:", error);
+      res.status(500).json({
+        error: "Failed to get settings status",
+        message: error instanceof Error ? error.message : "Unknown error occurred"
+      });
+    }
+  });
+
   app.post("/api/settings", async (req, res) => {
     try {
       const { apiKey } = z.object({ apiKey: z.string().min(1) }).parse(req.body);
       
-      // Update environment variable (note: this only affects current session)
-      process.env.MISTRAL_API_KEY = apiKey;
+      // Save to config file instead of just environment variable
+      await ConfigService.updateMistralApiKey(apiKey);
       
       res.json({
         message: "Settings saved successfully",

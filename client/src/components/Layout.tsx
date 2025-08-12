@@ -1,8 +1,34 @@
 import { Link, useLocation } from "wouter";
 import { Receipt, Plus, List, BarChart, Settings, Bell, User } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 interface LayoutProps {
   children: React.ReactNode;
+}
+
+function OCRStatus() {
+  const { data: status, isLoading } = useQuery({
+    queryKey: ['/api/settings/status'],
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  if (isLoading) {
+    return (
+      <>
+        <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
+        <span>Checking...</span>
+      </>
+    );
+  }
+
+  const isConnected = status?.mistralConfigured && status?.ocrEnabled;
+
+  return (
+    <>
+      <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`}></div>
+      <span>{isConnected ? 'Mistral OCR Connected' : 'API Key Required'}</span>
+    </>
+  );
 }
 
 export default function Layout({ children }: LayoutProps) {
@@ -30,8 +56,8 @@ export default function Layout({ children }: LayoutProps) {
           <nav className="space-y-2">
             {navItems.map((item) => (
               <Link key={item.href} href={item.href}>
-                <a
-                  className={`flex items-center space-x-3 px-3 py-2 rounded-lg font-medium transition-colors ${
+                <div
+                  className={`flex items-center space-x-3 px-3 py-2 rounded-lg font-medium transition-colors cursor-pointer ${
                     item.active
                       ? "bg-blue-50 text-blue-700"
                       : "text-gray-700 hover:bg-gray-50"
@@ -39,7 +65,7 @@ export default function Layout({ children }: LayoutProps) {
                 >
                   <item.icon className="w-4 h-4" />
                   <span>{item.label}</span>
-                </a>
+                </div>
               </Link>
             ))}
           </nav>
@@ -67,8 +93,7 @@ export default function Layout({ children }: LayoutProps) {
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-sm text-gray-500">
-                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                <span>Mistral OCR Connected</span>
+                <OCRStatus />
               </div>
               <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
                 <Bell className="w-5 h-5" />

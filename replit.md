@@ -8,6 +8,17 @@ This is a production-ready web application designed for processing invoice docum
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes (August 12, 2025)
+
+### Migration from Replit Agent to Replit Environment
+- **Database Setup**: Created PostgreSQL database and configured Drizzle ORM
+- **Configuration System**: Added persistent config file storage for API keys
+- **OCR Service Enhancement**: Modified Mistral OCR service to handle missing API keys gracefully
+- **Settings API**: Added `/api/settings/status` endpoint for real-time configuration status
+- **Frontend Status Indicator**: Created dynamic OCR status component that updates every 30 seconds
+- **Navigation Fix**: Resolved React nested anchor tag warning in Layout component
+- **Storage Layer**: Fixed TypeScript issues with invoice and line item creation
+
 ## System Architecture
 
 ### Frontend Architecture
