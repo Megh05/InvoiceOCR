@@ -21,6 +21,7 @@ Preferred communication style: Simple, everyday language.
 - **Storage Layer**: Fixed TypeScript issues with invoice and line item creation
 - **LLM Enhancer Fix**: Improved JSON parsing error handling with better validation
 - **Environment Setup**: All dependencies installed and workflow running successfully
+- **Storage Migration**: Switched from PostgreSQL to in-memory storage (MemStorage) for simplified local development
 
 ### Advanced OCR Key-Value Extraction System Enhancement
 - **Multi-Layer Extraction Engine**: Created comprehensive enhanced-extractor.ts with 6-layer extraction approach
@@ -56,24 +57,25 @@ Preferred communication style: Simple, everyday language.
 
 ### Backend Architecture
 - **Framework**: Express.js with TypeScript for type safety
-- **Database**: PostgreSQL with Drizzle ORM for type-safe database operations
+- **Storage**: In-memory storage (MemStorage) for simplified local development and testing
 - **API Design**: RESTful endpoints with consistent error handling and response formats
 - **Validation**: Zod schemas shared between frontend and backend
 - **File Processing**: Deterministic rule-based parser for invoice field extraction
 - **Architecture Pattern**: Service layer pattern with controllers, services, and models separation
 
-### Database Design
-- **ORM**: Drizzle with PostgreSQL dialect for robust data persistence
-- **Schema**: Two main tables - `invoices` and `line_items` with proper foreign key relationships
+### Storage Design
+- **Implementation**: In-memory storage using Map collections for fast access
+- **Data Structure**: Two main collections - `invoices` and `line_items` with proper relationships
 - **Invoice Fields**: Comprehensive invoice data including vendor info, dates, amounts, and OCR metadata
 - **Confidence Tracking**: Stores confidence scores and similarity metrics for data quality assessment
+- **Persistence**: Data persists during application runtime but resets on restart
 
 ### Processing Pipeline
 - **Step 1 (Upload)**: Multi-input support - file upload, image URL, or direct OCR text input
 - **Step 2 (OCR)**: Enhanced Mistral OCR integration with retry logic and markdown processing
 - **Step 3 (Review)**: User verification of extracted text with edit capabilities
 - **Step 4 (Edit)**: Form-based editing of structured invoice data with confidence indicators
-- **Step 5 (Save)**: Database persistence with export options (JSON/CSV)
+- **Step 5 (Save)**: In-memory storage persistence with export options (JSON/CSV)
 
 ### OCR Enhancement Details
 - **Retry Strategy**: Exponential backoff (1s, 2s, 4s) for improved reliability
@@ -86,14 +88,13 @@ Preferred communication style: Simple, everyday language.
 - **OCR Integration**: Always calls Mistral OCR API, even for text-only inputs (verification mode)
 - **Deterministic Parsing**: Rule-based extraction using regex patterns and fuzzy matching
 - **Confidence Scoring**: Field-level confidence tracking with visual indicators
-- **Validation**: Multi-layer validation from input to database with shared schemas
+- **Validation**: Multi-layer validation from input to storage with shared schemas
 
 ## External Dependencies
 
 ### Core Services
 - **Mistral OCR API**: Primary OCR service for text extraction (requires `MISTRAL_API_KEY`)
-- **PostgreSQL Database**: Data persistence layer (configured via `DATABASE_URL`)
-- **Neon Database**: Serverless PostgreSQL provider (@neondatabase/serverless)
+- **In-Memory Storage**: Local data persistence using MemStorage for simplified development
 
 ### Development & Build Tools
 - **Vite**: Frontend build tool with React plugin and development server
