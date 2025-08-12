@@ -239,10 +239,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { MistralOCRService } = await import("./services/mistral-ocr");
       const testOCR = new MistralOCRService(apiKey);
       
-      // Test with a simple 1x1 pixel PNG image
-      const testBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
+      // Use a public test PDF document that should work with Mistral OCR
+      const testUrl = "https://arxiv.org/pdf/2201.04234.pdf";
       
-      await testOCR.extractText(undefined, testBase64);
+      await testOCR.extractText(testUrl);
       
       res.json({
         message: "Connection successful! Mistral OCR API is working.",
