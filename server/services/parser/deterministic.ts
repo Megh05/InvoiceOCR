@@ -169,6 +169,10 @@ export class DeterministicParser {
       /Invoice\s+No\s+(\d+)/i,
       /Invoice\s+(?:WMACCESS|[A-Z]+)[\s\S]*?(\d{6,})/,
       /(\d{6,})\s+\d{4,}\s+\d{2}\.\d{2}\.\d{4}/,
+      // Statement format - look for reference numbers
+      /^(\d{6})\s*$/m,  // 6-digit number on its own line
+      /^([A-Z0-9]{4,})\s*$/m,  // Alphanumeric codes on their own line
+      /(?:statement|account|ref(?:erence)?)\s*:?\s*([A-Z0-9\-]+)/i,
     ];
 
     for (const pattern of patterns) {
@@ -191,6 +195,9 @@ export class DeterministicParser {
       /(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/,
       /Date\s+(\d{1,2}\.\s*\w+\s+\d{4})/i,
       /(\d{2}\.\d{2}\.\d{4})\s*$/m,
+      // Statement date formats
+      /DATE\s+(\d{1,2}[\-\/]\d{1,2}[\-\/]\d{2,4})/i,
+      /^(\d{1,2}[\-\/]\d{1,2}[\-\/]\d{2,4})\s*$/m,
     ];
 
     for (const pattern of patterns) {
@@ -210,12 +217,43 @@ export class DeterministicParser {
   private extractVendorName(text: string): { value: string | null; confidence: number } {
     const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
     
-    if (lines.length > 0) {
-      // First non-empty line is often the vendor name
-      const firstLine = lines[0];
-      if (firstLine && !firstLine.toLowerCase().includes('invoice') && firstLine.length > 2) {
-        const confidence = this.assessVendorNameConfidence(firstLine);
-        return { value: firstLine, confidence };
+    // For statements, look for vendor info after "IN ACCOUNT WITH" or "BILL"
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      if (line.toUpperCase().includes('IN ACCOUNT WITH') || line.toUpperCase() === 'BILL') {
+        // Look for vendor information in the next few lines
+        for (let j = i + 1; j < Math.min(lines.length, i + 4); j++) {
+          const nextLine = lines[j];
+          
+          // Skip addresses and get the first non-address line
+          if (!this.looksLikeAddress(nextLine) && nextLine.length > 5) {
+            const confidence = this.assessVendorNameConfidence(nextLine);
+            if (confidence > 0.3) {
+              return { value: nextLine, confidence };
+            }
+          }
+        }
+      }
+    }
+    
+    // Fallback: look for company names in first few lines, but skip obvious headers
+    for (let i = 0; i < Math.min(lines.length, 5); i++) {
+      const line = lines[i];
+      
+      // Skip pure numbers, dates, and common headers
+      if (/^\d+$/.test(line) || 
+          /^\d{1,2}[\-\/]\d{1,2}[\-\/]\d{2,4}$/.test(line) ||
+          line.toLowerCase().match(/^(statement|date|to|terms|in account with|bill)$/)) {
+        continue;
+      }
+      
+      // Look for business names
+      if (line.length > 3 && !line.toLowerCase().includes('invoice')) {
+        const confidence = this.assessVendorNameConfidence(line);
+        if (confidence > 0.3) {
+          return { value: line, confidence };
+        }
       }
     }
 
@@ -261,7 +299,36 @@ export class DeterministicParser {
   }
 
   private extractBillTo(text: string): { value: string | null; confidence: number } {
-    return this.extractAddressSection(text, ['bill to', 'billed to', 'customer']);
+    const result = this.extractAddressSection(text, ['bill to', 'billed to', 'customer', 'to']);
+    
+    // If no explicit "bill to" found, look for address patterns after "TO"
+    if (!result.value || result.confidence < 0.5) {
+      const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+      
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].toUpperCase() === 'TO') {
+          const addressLines: string[] = [];
+          
+          // Capture the next few lines as address
+          for (let j = i + 1; j < Math.min(lines.length, i + 5); j++) {
+            const nextLine = lines[j];
+            
+            // Stop at certain keywords
+            if (this.isNewSection(nextLine) || nextLine.toUpperCase() === 'TERMS') break;
+            
+            if (nextLine.trim().length > 0) {
+              addressLines.push(nextLine);
+            }
+          }
+          
+          if (addressLines.length > 0) {
+            return { value: addressLines.join('\n'), confidence: 0.7 };
+          }
+        }
+      }
+    }
+    
+    return result;
   }
 
   private extractShipTo(text: string): { value: string | null; confidence: number } {
@@ -397,6 +464,32 @@ export class DeterministicParser {
       }
     }
 
+    // Look for statement format amounts - often at the end with $ sign
+    const statementAmountPatterns = [
+      /TOTAL AMOUNT\s+\$(\d+\.\d{2})/i,
+      /AMOUNT\s+\$(\d+\.\d{2})/i,
+      /\$(\d+\.\d{2})\s*$/m,  // Dollar amount at end of line
+    ];
+    
+    // For statements, specifically look for the total amount pattern
+    if (keywords.includes('total')) {
+      const totalMatch = text.match(/TOTAL AMOUNT\s+\$(\d+\.\d{2})/i);
+      if (totalMatch) {
+        const amount = parseFloat(totalMatch[1]);
+        return { value: amount, confidence: 0.9 };
+      }
+    }
+
+    for (const pattern of statementAmountPatterns) {
+      const match = text.match(pattern);
+      if (match && match[1]) {
+        const amount = parseFloat(match[1]);
+        if (!isNaN(amount)) {
+          return { value: amount, confidence: 0.8 };
+        }
+      }
+    }
+
     // Look for specific German invoice totals
     const germanTotalPatterns = [
       /Total\s+([0-9,]+,\d{2})\s*€/i,
@@ -439,27 +532,36 @@ export class DeterministicParser {
       tax: number;
     }> = [];
 
-    let inItemsSection = false;
     let lineNumber = 1;
 
+    // Look for statement-style line items (date + description + amount)
     for (const line of lines) {
-      // Detect start of items section - more flexible patterns
-      if (this.isItemsHeader(line) || line.includes('Service Description') || line.includes('Amount')) {
-        inItemsSection = true;
+      // Skip headers and addresses
+      if (this.isStatementHeader(line) || this.looksLikeAddress(line)) {
         continue;
       }
 
-      // Detect end of items section
-      if (inItemsSection && (this.isEndOfItems(line) || line.includes('Total') || line.includes('VAT'))) {
-        break;
+      // Try to parse as statement line item
+      const statementItem = this.parseStatementLine(line, lineNumber);
+      if (statementItem) {
+        items.push(statementItem);
+        lineNumber++;
+        continue;
       }
 
-      if (inItemsSection) {
-        const item = this.parseGermanInvoiceItemLine(line, lineNumber);
-        if (item) {
-          items.push(item);
-          lineNumber++;
-        }
+      // Try German invoice format
+      const germanItem = this.parseGermanInvoiceItemLine(line, lineNumber);
+      if (germanItem) {
+        items.push(germanItem);
+        lineNumber++;
+        continue;
+      }
+
+      // Try general item format
+      const generalItem = this.parseItemLine(line, lineNumber);
+      if (generalItem) {
+        items.push(generalItem);
+        lineNumber++;
       }
     }
 
@@ -618,6 +720,81 @@ export class DeterministicParser {
     return addressIndicators.some(pattern => pattern.test(line));
   }
 
+  private isStatementHeader(line: string): boolean {
+    const headers = ['statement', 'date', 'to', 'terms', 'in account with', 'bill', 'current', 'over 30 days', 'over 60 days'];
+    const lowerLine = line.toLowerCase();
+    return headers.some(header => lowerLine.includes(header)) || 
+           /^\d{6}$/.test(line) || // Pure 6-digit numbers
+           /^\d{1,2}[\-\/]\d{1,2}[\-\/]\d{2,4}$/.test(line); // Pure dates
+  }
+
+  private parseStatementLine(line: string, lineNumber: number): {
+    line_number: number;
+    sku: string | null;
+    description: string;
+    qty: number;
+    unit_price: number;
+    amount: number;
+    tax: number;
+  } | null {
+    // Look for lines with date and amount pattern first
+    // Example: "1-18-19    25.00"
+    const dateAmountPattern = /^(\d{1,2}[\-\/]\d{1,2}[\-\/]\d{2,4})\s+(\d+\.\d{2})\s*$/;
+    const dateAmountMatch = line.match(dateAmountPattern);
+    
+    if (dateAmountMatch) {
+      const amount = parseFloat(dateAmountMatch[2]);
+      const description = `Service charge on ${dateAmountMatch[1]}`;
+      
+      return {
+        line_number: lineNumber,
+        sku: null,
+        description,
+        qty: 1,
+        unit_price: amount,
+        amount,
+        tax: 0,
+      };
+    }
+    
+    // Look for lines with just amount at the end
+    const amountMatch = line.match(/(\d+\.\d{2})\s*$/);
+    if (amountMatch) {
+      const amount = parseFloat(amountMatch[1]);
+      const description = line.replace(/\s*\d+\.\d{2}\s*$/, '').trim();
+      
+      if (description.length > 3 && !this.isStatementHeader(description)) {
+        return {
+          line_number: lineNumber,
+          sku: null,
+          description,
+          qty: 1,
+          unit_price: amount,
+          amount,
+          tax: 0,
+        };
+      }
+    }
+
+    // Look for description-only lines that might be items
+    if (line.length > 5 && !this.isStatementHeader(line) && !this.looksLikeAddress(line)) {
+      // Check if it's a description line for a service
+      if (line.match(/^[A-Z\s]+$/i) && (line.includes('FOR') || line.includes('SERVICE') || line.includes('CHARGE'))) {
+        return {
+          line_number: lineNumber,
+          sku: null,
+          description: line,
+          qty: 1,
+          unit_price: 0,
+          amount: 0,
+          tax: 0,
+        };
+      }
+    }
+
+    return null;
+  }
+
   private isNewSection(line: string): boolean {
     const sectionKeywords = [
       'invoice', 'bill to', 'ship to', 'description', 'qty', 'quantity', 
@@ -639,44 +816,39 @@ export class DeterministicParser {
         // Determine format based on values
         let year, month, day;
         
-        if (part1 > 31 || part1 > 12 && part3 <= 31) {
-          // YYYY-MM-DD or YYYY-DD-MM
+        // If first part is 4 digits, assume YYYY-MM-DD
+        if (part1 > 1900) {
           year = part1;
-          if (part2 <= 12) {
-            month = part2;
-            day = part3;
-          } else {
-            month = part3;
-            day = part2;
-          }
-        } else if (part3 > 31 || (part1 <= 12 && part2 <= 31 && part3 > 31)) {
-          // MM-DD-YYYY or DD-MM-YYYY  
+          month = part2;
+          day = part3;
+        }
+        // If third part is 4 digits, assume MM-DD-YYYY or DD-MM-YYYY
+        else if (part3 > 1900) {
           year = part3;
+          // Assume MM-DD-YYYY if first part <= 12
           if (part1 <= 12) {
             month = part1;
             day = part2;
           } else {
-            month = part2;
+            // DD-MM-YYYY
             day = part1;
+            month = part2;
           }
-        } else {
-          return null;
+        }
+        // Two digit year - assume MM-DD-YY
+        else {
+          month = part1;
+          day = part2;
+          year = part3 <= 30 ? 2000 + part3 : 1900 + part3;
         }
         
-        // Adjust year if it's 2-digit
-        if (year < 100) {
-          year += year < 50 ? 2000 : 1900;
+        // Validate date
+        if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+          return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
         }
-        
-        // Validate ranges
-        if (year < 1900 || year > 2100 || month < 1 || month > 12 || day < 1 || day > 31) {
-          return null;
-        }
-        
-        return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
       }
     } catch (error) {
-      return null;
+      console.warn('Date parsing error:', error);
     }
     
     return null;
