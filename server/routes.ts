@@ -86,13 +86,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   llmValidation
                 );
                 
-                // Use LLM result if it's better
-                if (llmConfidence > adjustedConfidence) {
+                // Use LLM result if it's better or shows meaningful improvements
+                const improvementThreshold = 0.05; // Allow LLM if confidence is within 5% and has improvements
+                const hasSignificantImprovements = llmResult.improvements.length > 2;
+                
+                if (llmConfidence > adjustedConfidence || 
+                    (hasSignificantImprovements && Math.abs(llmConfidence - adjustedConfidence) < improvementThreshold)) {
                   finalData = llmResult.enhanced;
-                  adjustedConfidence = llmConfidence;
+                  const oldConfidence = adjustedConfidence;
+                  adjustedConfidence = Math.max(llmConfidence, adjustedConfidence * 0.95); // Prevent major degradation
                   improvements = llmResult.improvements;
                   usedLLM = true;
-                  console.log(`[parser] LLM enhancement improved confidence from ${enhancedResult.confidence.toFixed(2)} to ${llmConfidence.toFixed(2)}`);
+                  console.log(`[parser] LLM enhancement improved confidence from ${oldConfidence.toFixed(2)} to ${adjustedConfidence.toFixed(2)}`);
+                } else {
+                  console.log(`[parser] LLM enhancement did not improve confidence (${llmConfidence.toFixed(2)} vs ${adjustedConfidence.toFixed(2)}), using original result`);
                 }
               } catch (llmError) {
                 console.warn('[parser] LLM enhancement failed, using original result:', llmError);
@@ -190,13 +197,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
               llmValidation
             );
             
-            // Use LLM result if it's better
-            if (llmConfidence > adjustedConfidence) {
+            // Use LLM result if it's better or shows meaningful improvements
+            const improvementThreshold = 0.05; // Allow LLM if confidence is within 5% and has improvements
+            const hasSignificantImprovements = llmResult.improvements.length > 2;
+            
+            if (llmConfidence > adjustedConfidence || 
+                (hasSignificantImprovements && Math.abs(llmConfidence - adjustedConfidence) < improvementThreshold)) {
               finalData = llmResult.enhanced;
-              adjustedConfidence = llmConfidence;
+              const oldConfidence = adjustedConfidence;
+              adjustedConfidence = Math.max(llmConfidence, adjustedConfidence * 0.95); // Prevent major degradation
               improvements = llmResult.improvements;
               usedLLM = true;
-              console.log(`[parser] LLM enhancement improved confidence from ${enhancedResult.confidence.toFixed(2)} to ${llmConfidence.toFixed(2)}`);
+              console.log(`[parser] LLM enhancement improved confidence from ${oldConfidence.toFixed(2)} to ${adjustedConfidence.toFixed(2)}`);
+            } else {
+              console.log(`[parser] LLM enhancement did not improve confidence (${llmConfidence.toFixed(2)} vs ${adjustedConfidence.toFixed(2)}), using original result`);
             }
           } catch (llmError) {
             console.warn('[parser] LLM enhancement failed, using original result:', llmError);

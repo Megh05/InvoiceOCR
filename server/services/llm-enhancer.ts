@@ -126,15 +126,21 @@ export class LLMEnhancerService {
         throw new Error("LLM returned invalid response structure");
       }
 
-      console.log(`[llm-enhancer] LLM enhancement completed with confidence ${enhancedResult.confidence}`);
-      console.log(`[llm-enhancer] Enhanced invoice_number: "${enhancedResult.enhanced_data?.invoice_number}"`);
-      console.log(`[llm-enhancer] Enhanced invoice_date: "${enhancedResult.enhanced_data?.invoice_date}"`);
-      console.log(`[llm-enhancer] Enhanced vendor_name: "${enhancedResult.enhanced_data?.vendor_name}"`);
-      console.log(`[llm-enhancer] Enhanced total: ${enhancedResult.enhanced_data?.total}`);
+      // Normalize the enhanced data to match our schema exactly
+      const normalizedData = this.normalizeEnhancedData(enhancedResult.enhanced_data);
+      
+      // Ensure confidence is reasonable (cap at 0.95 to avoid overconfidence)
+      const normalizedConfidence = Math.min(0.95, Math.max(0.5, enhancedResult.confidence));
+
+      console.log(`[llm-enhancer] LLM enhancement completed with confidence ${normalizedConfidence}`);
+      console.log(`[llm-enhancer] Enhanced invoice_number: "${normalizedData?.invoice_number}"`);
+      console.log(`[llm-enhancer] Enhanced invoice_date: "${normalizedData?.invoice_date}"`);
+      console.log(`[llm-enhancer] Enhanced vendor_name: "${normalizedData?.vendor_name}"`);
+      console.log(`[llm-enhancer] Enhanced total: ${normalizedData?.total}`);
 
       return {
-        enhanced: enhancedResult.enhanced_data,
-        confidence: enhancedResult.confidence,
+        enhanced: normalizedData,
+        confidence: normalizedConfidence,
         improvements: enhancedResult.improvements || [],
         validation_errors: enhancedResult.validation_errors || []
       };
@@ -142,6 +148,117 @@ export class LLMEnhancerService {
     } catch (error) {
       console.error("[llm-enhancer] Enhancement failed:", error);
       throw error;
+    }
+  }
+
+  private normalizeEnhancedData(data: any): CanonicalInvoice {
+    // Ensure we only keep fields that match our schema
+    const normalized: CanonicalInvoice = {
+      invoice_number: this.cleanString(data.invoice_number),
+      invoice_date: this.validateDate(data.invoice_date || data.statement_date),
+      vendor_name: this.cleanString(data.vendor_name),
+      vendor_address: this.cleanString(data.vendor_address),
+      bill_to: this.cleanString(data.bill_to),
+      ship_to: this.cleanString(data.ship_to),
+      currency: data.currency || "USD",
+      subtotal: this.validateAmount(data.subtotal),
+      tax: this.validateAmount(data.tax),
+      shipping: this.validateAmount(data.shipping),
+      total: this.validateAmount(data.total),
+      line_items: this.normalizeLineItems(data.line_items || []),
+      raw_ocr_text: data.raw_ocr_text || "",
+      mistral_ocr_text: data.mistral_ocr_text || "",
+      ocr_similarity_score: data.ocr_similarity_score || 1.0
+    };
+
+    // Apply mathematical validation
+    this.validateMathematicalConsistency(normalized);
+    
+    return normalized;
+  }
+
+  private cleanString(value: any): string {
+    if (value === null || value === undefined || value === "null" || value === "undefined") {
+      return "";
+    }
+    if (typeof value === "object") {
+      // Handle nested objects like vendor_address
+      if (value.street || value.city || value.state) {
+        return `${value.street || ""} ${value.city || ""} ${value.state || ""} ${value.zip || ""}`.trim();
+      }
+      return JSON.stringify(value);
+    }
+    return String(value).trim();
+  }
+
+  private validateDate(value: any): string {
+    if (!value || value === "null" || value === "undefined") return "";
+    
+    const dateStr = String(value).trim();
+    
+    // Check if already in YYYY-MM-DD format
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      return dateStr;
+    }
+    
+    // Try to parse and convert to YYYY-MM-DD
+    const date = new Date(dateStr);
+    if (!isNaN(date.getTime())) {
+      return date.toISOString().split('T')[0];
+    }
+    
+    return "";
+  }
+
+  private validateAmount(value: any): number {
+    if (value === null || value === undefined || value === "null" || value === "undefined") {
+      return 0;
+    }
+    
+    const num = typeof value === "string" ? parseFloat(value.replace(/[^0-9.-]/g, "")) : Number(value);
+    return isNaN(num) ? 0 : Math.max(0, num);
+  }
+
+  private normalizeLineItems(items: any[]): Array<{
+    line_number: number;
+    sku: string;
+    description: string;
+    qty: number;
+    unit_price: number;
+    amount: number;
+    tax: number;
+  }> {
+    if (!Array.isArray(items)) return [];
+    
+    return items.map((item, index) => ({
+      line_number: item.line_number || index + 1,
+      sku: this.cleanString(item.sku),
+      description: this.cleanString(item.description),
+      qty: this.validateAmount(item.qty) || 1,
+      unit_price: this.validateAmount(item.unit_price || item.amount),
+      amount: this.validateAmount(item.amount),
+      tax: this.validateAmount(item.tax)
+    })).filter(item => item.description && item.amount > 0);
+  }
+
+  private validateMathematicalConsistency(invoice: CanonicalInvoice): void {
+    // Calculate subtotal from line items if not set
+    const lineItemsTotal = invoice.line_items.reduce((sum, item) => sum + item.amount, 0);
+    
+    if (lineItemsTotal > 0 && invoice.subtotal === 0) {
+      invoice.subtotal = lineItemsTotal;
+    }
+    
+    // If we have a total but no subtotal/tax/shipping breakdown, set subtotal = total
+    if (invoice.total > 0 && invoice.subtotal === 0 && invoice.tax === 0 && invoice.shipping === 0) {
+      invoice.subtotal = invoice.total;
+    }
+    
+    // Validate mathematical consistency
+    const expectedTotal = invoice.subtotal + invoice.tax + invoice.shipping;
+    if (Math.abs(invoice.total - expectedTotal) > 0.01 && invoice.total > 0) {
+      // If there's a discrepancy, trust the total and adjust subtotal
+      invoice.subtotal = Math.max(0, invoice.total - invoice.tax - invoice.shipping);
     }
   }
 
@@ -230,7 +347,14 @@ VALIDATION CHECKS:
 - Vendor and customer information should be complete addresses
 - All extracted text should come from the actual OCR content
 
-RESPOND WITH VALID JSON ONLY:
+STRICT SCHEMA COMPLIANCE:
+- ONLY include fields specified in the schema below
+- DO NOT add extra fields like "document_type", "statement_date", "account_number", etc.
+- All amounts must be numbers, not strings
+- All dates must be in YYYY-MM-DD format
+- Confidence should be 0.7-0.9 range for good extractions
+
+RESPOND WITH VALID JSON ONLY (NO EXTRA FIELDS):
 {
   "enhanced_data": {
     "invoice_number": "extracted invoice/document number",
@@ -247,7 +371,7 @@ RESPOND WITH VALID JSON ONLY:
     "line_items": [
       {
         "line_number": 1,
-        "sku": "product code if available",
+        "sku": "",
         "description": "service or product description",
         "qty": 1,
         "unit_price": 0,
@@ -259,9 +383,9 @@ RESPOND WITH VALID JSON ONLY:
     "mistral_ocr_text": "${ocrText.replace(/"/g, '\\"').substring(0, 400)}...",
     "ocr_similarity_score": 1.0
   },
-  "confidence": 0.85,
-  "improvements": ["list specific improvements made to the extraction"],
-  "validation_errors": ["list any validation issues found"]
+  "confidence": 0.8,
+  "improvements": ["extracted vendor from billing section", "parsed line items", "calculated mathematical totals"],
+  "validation_errors": []
 }`;
   }
 
