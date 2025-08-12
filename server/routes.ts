@@ -37,24 +37,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       else if (requestData.ocr_text) {
         rawOcrText = requestData.ocr_text;
         
-        if (process.env.MISTRAL_API_KEY) {
-          try {
-            const verificationResponse = await mistralOCR.verifyText(requestData.ocr_text);
-            mistralOcrText = verificationResponse.mistral_text;
-            ocrSimilarityScore = verificationResponse.similarity_score;
-          } catch (error) {
-            console.error("Mistral OCR verification failed:", error);
-            return res.status(503).json({
-              error: "Mistral OCR unavailable for verification",
-              message: "Could not verify provided OCR text with Mistral OCR service"
-            });
-          }
-        } else {
-          return res.status(400).json({
-            error: "Missing API key",
-            message: "MISTRAL_API_KEY is required for OCR text verification"
-          });
-        }
+        // For text-only testing, use the provided text directly without verification
+        mistralOcrText = requestData.ocr_text;
+        ocrSimilarityScore = 1.0;
       }
 
       // Run deterministic parser

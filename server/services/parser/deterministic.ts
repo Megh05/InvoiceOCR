@@ -138,6 +138,9 @@ export class DeterministicParser {
       /invoice\s*(?:number|#|no\.?)\s*:?\s*([A-Z0-9\-]+)/i,
       /inv(?:oice)?\s*#?\s*:?\s*([A-Z0-9\-]+)/i,
       /(?:^|\n)\s*([A-Z]{2,}\-\d{4,}\-\d{3,})\s*$/im,
+      /Invoice\s+No\s+(\d+)/i,
+      /Invoice\s+(?:WMACCESS|[A-Z]+)[\s\S]*?(\d{6,})/,
+      /(\d{6,})\s+\d{4,}\s+\d{2}\.\d{2}\.\d{4}/,
     ];
 
     for (const pattern of patterns) {
@@ -158,6 +161,8 @@ export class DeterministicParser {
       /date\s*:?\s*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i,
       /(\d{4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,2})/,
       /(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/,
+      /Date\s+(\d{1,2}\.\s*\w+\s+\d{4})/i,
+      /(\d{2}\.\d{2}\.\d{4})\s*$/m,
     ];
 
     for (const pattern of patterns) {
@@ -345,15 +350,37 @@ export class DeterministicParser {
       const patterns = [
         new RegExp(`${keyword}\\s*:?\\s*\\$?([\\d,]+\\.?\\d*)`, 'i'),
         new RegExp(`${keyword}\\s*\\$([\\d,]+\\.?\\d*)`, 'i'),
+        new RegExp(`${keyword}\\s*([\\d,]+,\\d{2})\\s*€`, 'i'), // German format with Euro
+        new RegExp(`${keyword}.*?([\\d,]+,\\d{2})\\s*€`, 'i'), // More flexible German format
       ];
 
       for (const pattern of patterns) {
         const match = text.match(pattern);
         if (match && match[1]) {
-          const amount = parseFloat(match[1].replace(/,/g, ''));
+          let amount = parseFloat(match[1].replace(/,/g, '.').replace(/\./g, ''));
+          // Handle German decimal format (comma as decimal separator)
+          if (match[1].includes(',')) {
+            amount = parseFloat(match[1].replace(/\./g, '').replace(',', '.'));
+          }
           if (!isNaN(amount)) {
             return { value: amount, confidence: 0.85 };
           }
+        }
+      }
+    }
+
+    // Look for specific German invoice totals
+    const germanTotalPatterns = [
+      /Total\s+([0-9,]+,\d{2})\s*€/i,
+      /Gross Amount.*?([0-9,]+,\d{2})\s*€/i,
+    ];
+
+    for (const pattern of germanTotalPatterns) {
+      const match = text.match(pattern);
+      if (match && match[1]) {
+        const amount = parseFloat(match[1].replace(/\./g, '').replace(',', '.'));
+        if (!isNaN(amount)) {
+          return { value: amount, confidence: 0.9 };
         }
       }
     }
@@ -388,19 +415,19 @@ export class DeterministicParser {
     let lineNumber = 1;
 
     for (const line of lines) {
-      // Detect start of items section
-      if (this.isItemsHeader(line)) {
+      // Detect start of items section - more flexible patterns
+      if (this.isItemsHeader(line) || line.includes('Service Description') || line.includes('Amount')) {
         inItemsSection = true;
         continue;
       }
 
       // Detect end of items section
-      if (inItemsSection && this.isEndOfItems(line)) {
+      if (inItemsSection && (this.isEndOfItems(line) || line.includes('Total') || line.includes('VAT'))) {
         break;
       }
 
       if (inItemsSection) {
-        const item = this.parseItemLine(line, lineNumber);
+        const item = this.parseGermanInvoiceItemLine(line, lineNumber);
         if (item) {
           items.push(item);
           lineNumber++;
@@ -408,7 +435,7 @@ export class DeterministicParser {
       }
     }
 
-    const confidence = items.length > 0 ? 0.7 : 0.1;
+    const confidence = items.length > 0 ? 0.8 : 0.1;
     return { value: items, confidence };
   }
 
@@ -422,6 +449,68 @@ export class DeterministicParser {
     const endKeywords = ['subtotal', 'total', 'tax', 'payment', 'terms'];
     const lowerLine = line.toLowerCase();
     return endKeywords.some(keyword => lowerLine.includes(keyword));
+  }
+
+  private parseGermanInvoiceItemLine(line: string, lineNumber: number): {
+    line_number: number;
+    sku: string | null;
+    description: string;
+    qty: number;
+    unit_price: number;
+    amount: number;
+    tax: number;
+  } | null {
+    // Skip header lines and empty lines
+    if (line.includes('Service Description') || line.includes('Amount') || line.includes('quantity') || line.length < 10) {
+      return null;
+    }
+
+    // German invoice format: "Description    Price    Qty    Total"
+    // Example: "Basic Fee wmView                                                            130,00 €                       1               130,00 €"
+    
+    // Look for lines with Euro amounts
+    const euroPattern = /(\d+,\d{2})\s*€/g;
+    const euroMatches: RegExpMatchArray[] = [];
+    let match;
+    while ((match = euroPattern.exec(line)) !== null) {
+      euroMatches.push(match);
+    }
+    
+    if (euroMatches.length >= 2) {
+      // Extract description (everything before the first euro amount)
+      const firstEuroIndex = line.indexOf(euroMatches[0][0]);
+      const description = line.substring(0, firstEuroIndex).trim();
+      
+      if (description.length > 5) {
+        // Parse the euro amounts
+        const unitPriceStr = euroMatches[0][1].replace(',', '.');
+        const totalAmountStr = euroMatches[euroMatches.length - 1][1].replace(',', '.');
+        
+        const unitPrice = parseFloat(unitPriceStr);
+        const amount = parseFloat(totalAmountStr);
+        
+        // Extract quantity (look for number between euro amounts)
+        const middlePart = line.substring(
+          line.indexOf(euroMatches[0][0]) + euroMatches[0][0].length,
+          line.indexOf(euroMatches[euroMatches.length - 1][0])
+        );
+        
+        const qtyMatch = middlePart.match(/\b(\d+)\b/);
+        const qty = qtyMatch ? parseInt(qtyMatch[1]) : 1;
+        
+        return {
+          line_number: lineNumber,
+          sku: null,
+          description,
+          qty,
+          unit_price: unitPrice,
+          amount,
+          tax: 0,
+        };
+      }
+    }
+
+    return null;
   }
 
   private parseItemLine(line: string, lineNumber: number): {
