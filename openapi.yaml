@@ -1,0 +1,636 @@
+openapi: 3.0.3
+info:
+  title: Invoice OCR Processing API
+  description: |
+    A production-ready REST API for invoice OCR processing using Mistral OCR.
+    
+    This API provides endpoints for:
+    - Parsing invoice images/PDFs or OCR text using Mistral OCR
+    - Managing invoices with CRUD operations
+    - Extracting structured data from invoice documents
+    
+    **Important**: All parsing operations require a valid `MISTRAL_API_KEY` environment variable.
+    The API will return 503 errors when Mistral OCR is unavailable.
+  version: 1.0.0
+  contact:
+    name: Invoice OCR API Support
+    email: support@invoiceocr.com
+
+servers:
+  - url: http://localhost:5000
+    description: Development server
+  - url: https://api.invoiceocr.com
+    description: Production server
+
+tags:
+  - name: Parse
+    description: Invoice parsing operations using Mistral OCR
+  - name: Invoices
+    description: Invoice CRUD operations
+
+paths:
+  /api/parse:
+    post:
+      tags: [Parse]
+      summary: Parse invoice using Mistral OCR
+      description: |
+        Parse an invoice document or OCR text using Mistral OCR service.
+        
+        **MANDATORY**: This endpoint ALWAYS calls Mistral OCR:
+        - For images: Extracts text using Mistral OCR
+        - For OCR text: Verifies text against Mistral OCR for accuracy
+        
+        Returns structured invoice data using deterministic rule-based parsing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParseRequest'
+            examples:
+              image_url:
+                summary: Parse from image URL
+                value:
+                  image_url: "https://example.com/invoice.pdf"
+              image_base64:
+                summary: Parse from base64 image
+                value:
+                  image_base64: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
+              ocr_text:
+                summary: Verify existing OCR text
+                value:
+                  ocr_text: "INVOICE\nINV-2024-001\nABC Company Ltd.\nTotal: $100.00"
+      responses:
+        '200':
+          description: Successfully parsed invoice
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParseResponse'
+        '400':
+          description: Invalid request or missing API key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalid_request:
+                  value:
+                    error: "Invalid request"
+                    message: "At least one of image_url, image_base64, or ocr_text must be provided"
+                missing_api_key:
+                  value:
+                    error: "Missing API key"
+                    message: "MISTRAL_API_KEY is required for OCR text verification"
+        '503':
+          description: Mistral OCR service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Mistral OCR unavailable"
+                message: "Mistral OCR service is temporarily unavailable"
+
+  /api/invoices:
+    get:
+      tags: [Invoices]
+      summary: List all invoices
+      description: Retrieve all processed invoices, sorted by creation date (newest first)
+      responses:
+        '200':
+          description: List of invoices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Invoice'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags: [Invoices]
+      summary: Create a new invoice
+      description: Save a parsed invoice to the database
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInvoiceRequest'
+      responses:
+        '201':
+          description: Invoice created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '400':
+          description: Invalid invoice data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/invoices/{id}:
+    get:
+      tags: [Invoices]
+      summary: Get invoice by ID
+      description: Retrieve a specific invoice with its line items
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Invoice ID
+      responses:
+        '200':
+          description: Invoice details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceWithLineItems'
+        '404':
+          description: Invoice not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      tags: [Invoices]
+      summary: Update invoice
+      description: Update an existing invoice
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Invoice ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInvoiceRequest'
+      responses:
+        '200':
+          description: Invoice updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '400':
+          description: Invalid invoice data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Invoice not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags: [Invoices]
+      summary: Delete invoice
+      description: Delete an invoice and all its line items
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Invoice ID
+      responses:
+        '204':
+          description: Invoice deleted successfully
+        '404':
+          description: Invoice not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    ParseRequest:
+      type: object
+      properties:
+        image_url:
+          type: string
+          format: uri
+          description: URL to invoice image/PDF
+          example: "https://example.com/invoice.pdf"
+        image_base64:
+          type: string
+          description: Base64 encoded invoice image
+          example: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
+        ocr_text:
+          type: string
+          description: Pre-extracted OCR text for verification
+          example: "INVOICE\nINV-2024-001\nABC Company Ltd.\nTotal: $100.00"
+      anyOf:
+        - required: [image_url]
+        - required: [image_base64]
+        - required: [ocr_text]
+
+    ParseResponse:
+      type: object
+      required:
+        - parsed
+        - confidence
+        - raw_ocr_text
+        - mistral_ocr_text
+        - ocr_similarity_score
+        - fallback_used
+        - field_confidences
+      properties:
+        parsed:
+          $ref: '#/components/schemas/CanonicalInvoice'
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Overall parsing confidence score
+          example: 0.87
+        raw_ocr_text:
+          type: string
+          description: Primary OCR text used for parsing
+          example: "INVOICE\nINV-2024-001\nABC Company Ltd.\nTotal: $100.00"
+        mistral_ocr_text:
+          type: string
+          description: Text returned by Mistral OCR
+          example: "INVOICE\nINV-2024-001\nABC Company Ltd.\nTotal: $100.00"
+        ocr_similarity_score:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Similarity between provided text and Mistral OCR result
+          example: 0.95
+        fallback_used:
+          type: boolean
+          description: Whether LLM fallback was used (always false for deterministic parsing)
+          example: false
+        action:
+          type: string
+          description: Recommended action when confidence is low
+          example: "Please review and edit the extracted fields. Some fields may require manual correction due to low confidence scores."
+        field_confidences:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldConfidence'
+
+    CanonicalInvoice:
+      type: object
+      required:
+        - subtotal
+        - tax
+        - shipping
+        - total
+        - line_items
+        - raw_ocr_text
+        - mistral_ocr_text
+        - ocr_similarity_score
+      properties:
+        invoice_number:
+          type: string
+          nullable: true
+          example: "INV-2024-001"
+        invoice_date:
+          type: string
+          nullable: true
+          format: date
+          description: Invoice date in YYYY-MM-DD format
+          example: "2024-03-15"
+        vendor_name:
+          type: string
+          nullable: true
+          example: "ABC Company Ltd."
+        vendor_address:
+          type: string
+          nullable: true
+          example: "123 Business St.\nNew York, NY 10001"
+        bill_to:
+          type: string
+          nullable: true
+          example: "XYZ Corporation\n456 Corporate Ave.\nLos Angeles, CA 90210"
+        ship_to:
+          type: string
+          nullable: true
+          example: "Same as billing address"
+        currency:
+          type: string
+          nullable: true
+          example: "USD"
+        subtotal:
+          type: number
+          minimum: 0
+          example: 100.00
+        tax:
+          type: number
+          minimum: 0
+          example: 8.50
+        shipping:
+          type: number
+          minimum: 0
+          example: 0.00
+        total:
+          type: number
+          minimum: 0
+          example: 108.50
+        line_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineItem'
+        raw_ocr_text:
+          type: string
+          description: Primary OCR text used for parsing
+        mistral_ocr_text:
+          type: string
+          description: Text returned by Mistral OCR
+        ocr_similarity_score:
+          type: number
+          minimum: 0
+          maximum: 1
+
+    LineItem:
+      type: object
+      required:
+        - line_number
+        - description
+        - qty
+        - unit_price
+        - amount
+        - tax
+      properties:
+        line_number:
+          type: integer
+          minimum: 1
+          example: 1
+        sku:
+          type: string
+          nullable: true
+          example: "PROD-001"
+        description:
+          type: string
+          example: "Premium Service Package"
+        qty:
+          type: integer
+          minimum: 1
+          example: 1
+        unit_price:
+          type: number
+          minimum: 0
+          example: 100.00
+        amount:
+          type: number
+          minimum: 0
+          example: 100.00
+        tax:
+          type: number
+          minimum: 0
+          example: 0.00
+
+    FieldConfidence:
+      type: object
+      required:
+        - field
+        - value
+        - confidence
+        - source
+      properties:
+        field:
+          type: string
+          description: Field name
+          example: "invoice_number"
+        value:
+          description: Extracted field value
+          example: "INV-2024-001"
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Field extraction confidence
+          example: 0.95
+        source:
+          type: string
+          description: Extraction method used
+          example: "regex_pattern"
+
+    Invoice:
+      type: object
+      required:
+        - id
+        - subtotal
+        - tax
+        - shipping
+        - total
+        - raw_ocr_text
+        - mistral_ocr_text
+        - confidence
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          description: Unique invoice identifier
+          example: "clp1234567890"
+        invoice_number:
+          type: string
+          nullable: true
+          example: "INV-2024-001"
+        invoice_date:
+          type: string
+          nullable: true
+          format: date
+          example: "2024-03-15"
+        vendor_name:
+          type: string
+          nullable: true
+          example: "ABC Company Ltd."
+        vendor_address:
+          type: string
+          nullable: true
+          example: "123 Business St.\nNew York, NY 10001"
+        bill_to:
+          type: string
+          nullable: true
+          example: "XYZ Corporation"
+        ship_to:
+          type: string
+          nullable: true
+          example: "Same as billing"
+        currency:
+          type: string
+          nullable: true
+          example: "USD"
+        subtotal:
+          type: number
+          minimum: 0
+          example: 100.00
+        tax:
+          type: number
+          minimum: 0
+          example: 8.50
+        shipping:
+          type: number
+          minimum: 0
+          example: 0.00
+        total:
+          type: number
+          minimum: 0
+          example: 108.50
+        raw_ocr_text:
+          type: string
+          description: Original OCR text
+        mistral_ocr_text:
+          type: string
+          description: Mistral OCR extracted text
+        ocr_similarity_score:
+          type: number
+          nullable: true
+          minimum: 0
+          maximum: 1
+          example: 0.95
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Overall parsing confidence
+          example: 0.87
+        created_at:
+          type: string
+          format: date-time
+          example: "2024-03-15T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2024-03-15T10:30:00Z"
+
+    InvoiceWithLineItems:
+      allOf:
+        - $ref: '#/components/schemas/Invoice'
+        - type: object
+          properties:
+            line_items:
+              type: array
+              items:
+                $ref: '#/components/schemas/LineItemWithId'
+
+    LineItemWithId:
+      allOf:
+        - $ref: '#/components/schemas/LineItem'
+        - type: object
+          required:
+            - id
+            - invoice_id
+          properties:
+            id:
+              type: string
+              description: Unique line item identifier
+            invoice_id:
+              type: string
+              description: Parent invoice ID
+
+    CreateInvoiceRequest:
+      allOf:
+        - $ref: '#/components/schemas/CanonicalInvoice'
+        - type: object
+          properties:
+            confidence:
+              type: number
+              minimum: 0
+              maximum: 1
+              description: Overall parsing confidence
+              example: 0.87
+
+    UpdateInvoiceRequest:
+      type: object
+      properties:
+        invoice_number:
+          type: string
+          nullable: true
+        invoice_date:
+          type: string
+          nullable: true
+          format: date
+        vendor_name:
+          type: string
+          nullable: true
+        vendor_address:
+          type: string
+          nullable: true
+        bill_to:
+          type: string
+          nullable: true
+        ship_to:
+          type: string
+          nullable: true
+        currency:
+          type: string
+          nullable: true
+        subtotal:
+          type: number
+          minimum: 0
+        tax:
+          type: number
+          minimum: 0
+        shipping:
+          type: number
+          minimum: 0
+        total:
+          type: number
+          minimum: 0
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error type
+          example: "Invalid request"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "At least one of image_url, image_base64, or ocr_text must be provided"

@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # Backend service
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=production
+      - PORT=8000
+      - DATABASE_URL=file:/app/data/dev.db
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - db-init
+    networks:
+      - invoice-network
+
+  # Frontend service
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - VITE_API_URL=http://backend:8000
+    depends_on:
+      - backend
+    networks:
+      - invoice-network
+
+  # Database initialization service
+  db-init:
+    image: node:18-alpine
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+      - ./data:/app/data
+    environment:
+      - DATABASE_URL=file:/app/data/dev.db
+    command: >
+      sh -c "
+        npm install &&
+        npx prisma generate &&
+        npx prisma migrate deploy
+      "
+    networks:
+      - invoice-network
+
+networks:
+  invoice-network:
+    driver: bridge
+
+volumes:
+  db-data:
+    driver: local
