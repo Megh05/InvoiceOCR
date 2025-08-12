@@ -92,7 +92,28 @@ export class LLMEnhancerService {
         throw new Error("Empty response from Mistral API");
       }
 
-      const enhancedResult = JSON.parse(content);
+      // Clean and validate JSON before parsing
+      const cleanContent = content.trim();
+      let enhancedResult;
+      
+      try {
+        enhancedResult = JSON.parse(cleanContent);
+      } catch (parseError) {
+        console.error("[llm-enhancer] Raw API response:", content);
+        console.error("[llm-enhancer] JSON parse error:", parseError);
+        
+        // Try to extract JSON from potentially malformed response
+        const jsonMatch = cleanContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          try {
+            enhancedResult = JSON.parse(jsonMatch[0]);
+          } catch (secondParseError) {
+            throw new Error(`Failed to parse LLM response as JSON: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
+          }
+        } else {
+          throw new Error(`No valid JSON found in LLM response: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
+        }
+      }
       console.log(`[llm-enhancer] LLM enhancement completed with confidence ${enhancedResult.confidence}`);
 
       return {
