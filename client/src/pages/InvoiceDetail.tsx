@@ -71,6 +71,40 @@ export default function InvoiceDetail() {
     return "Low";
   };
 
+  const handleExport = () => {
+    if (!invoice) return;
+
+    const exportData = {
+      invoice_details: {
+        id: invoice.id,
+        invoice_number: invoice.invoice_number,
+        invoice_date: invoice.invoice_date,
+        vendor_name: invoice.vendor_name,
+        vendor_address: invoice.vendor_address,
+        bill_to: invoice.bill_to,
+        ship_to: invoice.ship_to,
+        currency: invoice.currency,
+        subtotal: invoice.subtotal,
+        tax: invoice.tax,
+        shipping: invoice.shipping,
+        total: invoice.total,
+        confidence: invoice.confidence,
+        created_at: invoice.created_at
+      },
+      line_items: invoice.line_items || [],
+      raw_ocr_text: invoice.raw_ocr_text,
+      exported_at: new Date().toISOString()
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `invoice-${invoice.invoice_number || invoice.id}-${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (isLoading) {
     return (
       <Layout>
@@ -134,7 +168,7 @@ export default function InvoiceDetail() {
             <Badge variant={getConfidenceBadgeVariant(invoice.confidence)}>
               {getConfidenceLabel(invoice.confidence)} Confidence ({Math.round(invoice.confidence * 100)}%)
             </Badge>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={handleExport}>
               <Download className="mr-2 h-4 w-4" />
               Export
             </Button>
