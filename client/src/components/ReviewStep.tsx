@@ -23,7 +23,7 @@ export default function ReviewStep({
   onPrevious
 }: ReviewStepProps) {
   const [editedText, setEditedText] = useState(state.parseResult?.raw_ocr_text || "");
-  const [viewMode, setViewMode] = useState<'pdf' | 'ocr'>('ocr');
+  const [viewMode, setViewMode] = useState<'pdf' | 'ocr'>('pdf');
 
   const handleTextChange = (text: string) => {
     setEditedText(text);
