@@ -73,6 +73,16 @@ export default function AllInvoices() {
     window.location.href = `/invoices/${invoiceId}`;
   };
 
+  const handleExport = (invoiceId: string, format: 'json' | 'csv' | 'pdf') => {
+    const exportUrl = `/api/invoices/${invoiceId}/export/${format}`;
+    const downloadLink = document.createElement('a');
+    downloadLink.href = exportUrl;
+    downloadLink.download = `invoice-${invoiceId}.${format === 'pdf' ? 'html' : format}`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  };
+
   const handleExportCSV = () => {
     if (!invoices || invoices.length === 0) return;
 
@@ -383,14 +393,50 @@ export default function AllInvoices() {
                         {Math.round(invoice.confidence * 100)}% confidence
                       </Badge>
                       
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleViewDetails(invoice.id)}
-                      >
-                        <Eye className="mr-2 h-4 w-4" />
-                        View Details
-                      </Button>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleViewDetails(invoice.id)}
+                          data-testid={`button-view-${invoice.id}`}
+                        >
+                          <Eye className="mr-2 h-4 w-4" />
+                          View Details
+                        </Button>
+                        
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" data-testid={`button-export-${invoice.id}`}>
+                              <Download className="mr-2 h-4 w-4" />
+                              Export
+                              <ChevronDown className="ml-2 h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem 
+                              onClick={() => handleExport(invoice.id, 'json')}
+                              data-testid={`export-json-${invoice.id}`}
+                            >
+                              <FileText className="w-4 h-4 mr-2" />
+                              Export as JSON
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleExport(invoice.id, 'csv')}
+                              data-testid={`export-csv-${invoice.id}`}
+                            >
+                              <FileText className="w-4 h-4 mr-2" />
+                              Export as CSV
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleExport(invoice.id, 'pdf')}
+                              data-testid={`export-pdf-${invoice.id}`}
+                            >
+                              <FileText className="w-4 h-4 mr-2" />
+                              Export as PDF
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </div>
                   </div>
                   

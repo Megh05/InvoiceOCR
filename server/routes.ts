@@ -629,6 +629,216 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Export individual invoice endpoints
+  app.get("/api/invoices/:id/export/json", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const invoice = await storage.getInvoice(id);
+      
+      if (!invoice) {
+        return res.status(404).json({ error: "Invoice not found" });
+      }
+
+      const lineItems = await storage.getLineItemsByInvoiceId(invoice.id);
+      const fullInvoice = { ...invoice, line_items: lineItems };
+
+      // Set headers for JSON download
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Content-Disposition', `attachment; filename="invoice-${invoice.invoice_number || id}.json"`);
+      
+      res.json(fullInvoice);
+    } catch (error) {
+      console.error("Error exporting invoice as JSON:", error);
+      res.status(500).json({ error: "Failed to export invoice" });
+    }
+  });
+
+  app.get("/api/invoices/:id/export/csv", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const invoice = await storage.getInvoice(id);
+      
+      if (!invoice) {
+        return res.status(404).json({ error: "Invoice not found" });
+      }
+
+      const lineItems = await storage.getLineItemsByInvoiceId(invoice.id);
+
+      // Generate CSV content
+      let csvContent = "Field,Value\n";
+      csvContent += `Invoice Number,"${invoice.invoice_number || 'N/A'}"\n`;
+      csvContent += `Invoice Date,"${invoice.invoice_date || 'N/A'}"\n`;
+      csvContent += `Vendor Name,"${invoice.vendor_name || 'N/A'}"\n`;
+      csvContent += `Vendor Address,"${(invoice.vendor_address || '').replace(/"/g, '""')}"\n`;
+      csvContent += `Bill To,"${(invoice.bill_to || '').replace(/"/g, '""')}"\n`;
+      csvContent += `Ship To,"${(invoice.ship_to || '').replace(/"/g, '""')}"\n`;
+      csvContent += `Currency,"${invoice.currency || 'USD'}"\n`;
+      csvContent += `Subtotal,${invoice.subtotal || 0}\n`;
+      csvContent += `Tax,${invoice.tax || 0}\n`;
+      csvContent += `Shipping,${invoice.shipping || 0}\n`;
+      csvContent += `Total,${invoice.total || 0}\n`;
+      csvContent += `Confidence,${invoice.confidence || 0}\n`;
+      csvContent += `Created At,"${invoice.created_at || 'N/A'}"\n\n`;
+
+      // Add line items section
+      if (lineItems && lineItems.length > 0) {
+        csvContent += "Line Items\n";
+        csvContent += "Line Number,SKU,Description,Quantity,Unit Price,Amount,Tax\n";
+        
+        lineItems.forEach(item => {
+          csvContent += `${item.line_number || 0},"${item.sku || ''}","${(item.description || '').replace(/"/g, '""')}",${item.qty || 0},${item.unit_price || 0},${item.amount || 0},${item.tax || 0}\n`;
+        });
+      }
+
+      // Set headers for CSV download
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="invoice-${invoice.invoice_number || id}.csv"`);
+      
+      res.send(csvContent);
+    } catch (error) {
+      console.error("Error exporting invoice as CSV:", error);
+      res.status(500).json({ error: "Failed to export invoice" });
+    }
+  });
+
+  app.get("/api/invoices/:id/export/pdf", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const invoice = await storage.getInvoice(id);
+      
+      if (!invoice) {
+        return res.status(404).json({ error: "Invoice not found" });
+      }
+
+      const lineItems = await storage.getLineItemsByInvoiceId(invoice.id);
+
+      // Generate simple HTML content that can be used for PDF generation
+      const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice ${invoice.invoice_number || id}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; color: #333; }
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
+        .invoice-info { display: flex; justify-content: space-between; margin-bottom: 30px; }
+        .vendor-info, .bill-info { width: 45%; }
+        .section-title { font-weight: bold; margin-bottom: 10px; font-size: 14px; color: #666; }
+        .line-items { margin: 30px 0; }
+        .line-items table { width: 100%; border-collapse: collapse; }
+        .line-items th, .line-items td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .line-items th { background-color: #f5f5f5; font-weight: bold; }
+        .totals { float: right; width: 300px; margin-top: 20px; }
+        .totals table { width: 100%; }
+        .totals td { padding: 5px 10px; border-bottom: 1px solid #eee; }
+        .total-row { font-weight: bold; border-top: 2px solid #333; }
+        .confidence { margin-top: 30px; padding: 10px; background-color: #f8f9fa; border-radius: 4px; clear: both; }
+        @media print {
+            body { margin: 20px; }
+            .confidence { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>INVOICE</h1>
+        <h2>${invoice.invoice_number || 'N/A'}</h2>
+    </div>
+    
+    <div class="invoice-info">
+        <div class="vendor-info">
+            <div class="section-title">FROM:</div>
+            <div><strong>${invoice.vendor_name || 'N/A'}</strong></div>
+            <div>${(invoice.vendor_address || '').replace(/\n/g, '<br>')}</div>
+        </div>
+        
+        <div class="bill-info">
+            <div class="section-title">BILL TO:</div>
+            <div>${(invoice.bill_to || '').replace(/\n/g, '<br>')}</div>
+            <br>
+            <div><strong>Invoice Date:</strong> ${invoice.invoice_date || 'N/A'}</div>
+            <div><strong>Currency:</strong> ${invoice.currency || 'USD'}</div>
+        </div>
+    </div>
+    
+    ${invoice.ship_to ? `
+    <div style="margin-bottom: 30px;">
+        <div class="section-title">SHIP TO:</div>
+        <div>${invoice.ship_to.replace(/\n/g, '<br>')}</div>
+    </div>
+    ` : ''}
+    
+    <div class="line-items">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>SKU</th>
+                    <th>Description</th>
+                    <th>Qty</th>
+                    <th>Unit Price</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${lineItems && lineItems.length > 0 ? 
+                  lineItems.map(item => `
+                    <tr>
+                        <td>${item.line_number || ''}</td>
+                        <td>${item.sku || ''}</td>
+                        <td>${item.description || ''}</td>
+                        <td>${item.qty || 0}</td>
+                        <td>$${(item.unit_price || 0).toFixed(2)}</td>
+                        <td>$${(item.amount || 0).toFixed(2)}</td>
+                    </tr>
+                  `).join('') : 
+                  '<tr><td colspan="6" style="text-align: center; color: #666;">No line items</td></tr>'
+                }
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="totals">
+        <table>
+            <tr>
+                <td>Subtotal:</td>
+                <td style="text-align: right;">$${(invoice.subtotal || 0).toFixed(2)}</td>
+            </tr>
+            <tr>
+                <td>Tax:</td>
+                <td style="text-align: right;">$${(invoice.tax || 0).toFixed(2)}</td>
+            </tr>
+            <tr>
+                <td>Shipping:</td>
+                <td style="text-align: right;">$${(invoice.shipping || 0).toFixed(2)}</td>
+            </tr>
+            <tr class="total-row">
+                <td><strong>Total:</strong></td>
+                <td style="text-align: right;"><strong>$${(invoice.total || 0).toFixed(2)}</strong></td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="confidence">
+        <strong>OCR Confidence:</strong> ${Math.round((invoice.confidence || 0) * 100)}%
+        <br>
+        <strong>Extracted on:</strong> ${invoice.created_at ? new Date(invoice.created_at).toLocaleString() : 'N/A'}
+    </div>
+</body>
+</html>`;
+
+      // Set headers for HTML download (can be printed to PDF by browser)
+      res.setHeader('Content-Type', 'text/html');
+      res.setHeader('Content-Disposition', `attachment; filename="invoice-${invoice.invoice_number || id}.html"`);
+      
+      res.send(htmlContent);
+    } catch (error) {
+      console.error("Error exporting invoice as PDF:", error);
+      res.status(500).json({ error: "Failed to export invoice" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

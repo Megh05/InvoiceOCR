@@ -3,7 +3,8 @@ import { useParams, Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, Eye, Edit, FileText, Building, Calendar, DollarSign } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ArrowLeft, Download, Eye, Edit, FileText, Building, Calendar, DollarSign, ChevronDown } from "lucide-react";
 import Layout from "@/components/Layout";
 
 interface Invoice {
@@ -71,38 +72,17 @@ export default function InvoiceDetail() {
     return "Low";
   };
 
-  const handleExport = () => {
+  const handleExport = (format: 'json' | 'csv' | 'pdf') => {
     if (!invoice) return;
-
-    const exportData = {
-      invoice_details: {
-        id: invoice.id,
-        invoice_number: invoice.invoice_number,
-        invoice_date: invoice.invoice_date,
-        vendor_name: invoice.vendor_name,
-        vendor_address: invoice.vendor_address,
-        bill_to: invoice.bill_to,
-        ship_to: invoice.ship_to,
-        currency: invoice.currency,
-        subtotal: invoice.subtotal,
-        tax: invoice.tax,
-        shipping: invoice.shipping,
-        total: invoice.total,
-        confidence: invoice.confidence,
-        created_at: invoice.created_at
-      },
-      line_items: invoice.line_items || [],
-      raw_ocr_text: invoice.raw_ocr_text,
-      exported_at: new Date().toISOString()
-    };
-
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `invoice-${invoice.invoice_number || invoice.id}-${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
+    
+    // Create download link
+    const exportUrl = `/api/invoices/${invoice.id}/export/${format}`;
+    const downloadLink = document.createElement('a');
+    downloadLink.href = exportUrl;
+    downloadLink.download = `invoice-${invoice.invoice_number || invoice.id}.${format === 'pdf' ? 'html' : format}`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
   };
 
   if (isLoading) {
@@ -168,10 +148,29 @@ export default function InvoiceDetail() {
             <Badge variant={getConfidenceBadgeVariant(invoice.confidence)}>
               {getConfidenceLabel(invoice.confidence)} Confidence ({Math.round(invoice.confidence * 100)}%)
             </Badge>
-            <Button variant="outline" size="sm" onClick={handleExport}>
-              <Download className="mr-2 h-4 w-4" />
-              Export
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" data-testid="button-export">
+                  <Download className="mr-2 h-4 w-4" />
+                  Export
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleExport('json')} data-testid="export-json">
+                  <FileText className="w-4 h-4 mr-2" />
+                  Export as JSON
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExport('csv')} data-testid="export-csv">
+                  <FileText className="w-4 h-4 mr-2" />
+                  Export as CSV
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExport('pdf')} data-testid="export-pdf">
+                  <FileText className="w-4 h-4 mr-2" />
+                  Export as PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
