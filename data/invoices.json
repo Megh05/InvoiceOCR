@@ -1,0 +1,22 @@
+[
+  {
+    "id": "01793f52-ab45-497a-94cc-4eb2b35fbf2f",
+    "invoice_number": "01353297",
+    "invoice_date": "2019-01-21",
+    "vendor_name": "Unknown",
+    "vendor_address": "Not specified",
+    "bill_to": "VALUE POINT TECHSOL 1501 BALDY AVE POCATELLO, ID 83201",
+    "ship_to": "VALUE POINT TECHSOL 1501 BALDY AVE POCATELLO, ID 83201",
+    "currency": "USD",
+    "subtotal": 15.5,
+    "tax": 0,
+    "shipping": 28.5,
+    "total": 50,
+    "raw_ocr_text": "Invoice\n01353297\nBill to: VALUE POINT TECHSOL 1501 BALDY AVE POCATELLO, ID 83201\nShip to: VALUE POINT TECHSOL 1501 BALDY AVE POCATELLO, ID 83201\n|  Ship Date: | 01/21/19  |\n| --- | --- |\n|  Cust PO #: |   |\n|  Salesman: | FOX ( )  |\n|  Terms: | NET 21 DAYS  |\n|  Route: | 060 / 00026247  |\n|  Page: | 1 of 1  |\n|  Item Number | Ordered Qty | Shipped Qty | Description | UOM | Unit Price | Extended Price  |\n| --- | --- | --- | --- | --- | --- | --- |\n|  02611 | 1 | 1 | CELERY | 3 CT | EACH | 4.00  |\n|  05830 | 1 | 1 | LETTUCE ICEBERG | 3 CT | BAG | 5.50  |\n|  02012 | 2 | 2 | BROCCOLI FLORETS | 3 LB | BAG | 6.00  |\n|  11001 | 1 | 1 | DELIVERY CHARGE |  |  | 28.50  |",
+    "mistral_ocr_text": "Invoice\n01353297\nBill to: VALUE POINT TECHSOL 1501 BALDY AVE POCATELLO, ID 83201\nShip to: VALUE POINT TECHSOL 1501 BALDY AVE POCATELLO, ID 83201\n|  Ship Date: | 01/21/19  |\n| --- | --- |\n|  Cust PO #: |   |\n|  Salesman: | FOX ( )  |\n|  Terms: | NET 21 DAYS  |\n|  Route: | 060 / 00026247  |\n|  Page: | 1 of 1  |\n|  Item Number | Ordered Qty | Shipped Qty | Description | UOM | Unit Price | Extended Price  |\n| --- | --- | --- | --- | --- | --- | --- |\n|  02611 | 1 | 1 | CELERY | 3 CT | EACH | 4.00  |\n|  05830 | 1 | 1 | LETTUCE ICEBERG | 3 CT | BAG | 5.50  |\n|  02012 | 2 | 2 | BROCCOLI FLORETS | 3 LB | BAG | 6.00  |\n|  11001 | 1 | 1 | DELIVERY CHARGE |  |  | 28.50  |",
+    "ocr_similarity_score": 1,
+    "confidence": 0,
+    "created_at": "2025-08-19T17:54:06.283Z",
+    "updated_at": "2025-08-19T17:54:06.283Z"
+  }
+]

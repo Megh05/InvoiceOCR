@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Invoices from "@/pages/invoices";
 import AllInvoices from "@/pages/AllInvoices";
+import InvoiceDetail from "@/pages/InvoiceDetail";
 import Settings from "@/pages/settings";
 import Analytics from "@/pages/analytics";
 
@@ -15,6 +16,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/invoices" component={AllInvoices} />
+      <Route path="/invoices/:id" component={InvoiceDetail} />
       <Route path="/process" component={Invoices} />
       <Route path="/settings" component={Settings} />
       <Route path="/analytics" component={Analytics} />

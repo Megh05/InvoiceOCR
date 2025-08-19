@@ -10,6 +10,7 @@ import { invoiceValidator } from "./services/validator";
 import { parseRequestSchema, insertInvoiceSchema } from "@shared/schema";
 import { ConfigService } from "./config";
 import { z } from "zod";
+import { format, parseISO, startOfMonth, endOfMonth } from "date-fns";
 
 function generateActionMessage(confidence: number, validation: any, usedLLM: boolean, improvements: string[]): string {
   if (confidence > 0.9 && validation.errors.length === 0) {
@@ -28,6 +29,127 @@ function generateActionMessage(confidence: number, validation: any, usedLLM: boo
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Analytics endpoint - provide real data from invoices
+  app.get("/api/analytics", async (req, res) => {
+    try {
+      const invoices = await storage.getAllInvoices();
+      const lineItems = await storage.getAllLineItems();
+      
+      // Calculate basic statistics
+      const totalInvoices = invoices.length;
+      const totalAmount = invoices.reduce((sum, inv) => sum + inv.total, 0);
+      const averageAmount = totalInvoices > 0 ? totalAmount / totalInvoices : 0;
+      
+      // Group by categories (simplified categorization)
+      const categories = invoices.reduce((acc, inv) => {
+        const category = inv.category || 'Uncategorized';
+        if (!acc[category]) {
+          acc[category] = { count: 0, total_amount: 0 };
+        }
+        acc[category].count++;
+        acc[category].total_amount += inv.total;
+        return acc;
+      }, {} as Record<string, { count: number; total_amount: number }>);
+      
+      const categoryArray = Object.entries(categories).map(([category, data]) => ({
+        category,
+        count: data.count,
+        total_amount: data.total_amount,
+        percentage: totalInvoices > 0 ? Math.round((data.count / totalInvoices) * 100) : 0
+      }));
+      
+      // Template analysis
+      const templates = invoices.reduce((acc, inv) => {
+        const templateName = inv.template_id || 'Unknown Template';
+        if (!acc[templateName]) {
+          acc[templateName] = { count: 0, confidence_sum: 0 };
+        }
+        acc[templateName].count++;
+        acc[templateName].confidence_sum += inv.confidence;
+        return acc;
+      }, {} as Record<string, { count: number; confidence_sum: number }>);
+      
+      const templateArray = Object.entries(templates).map(([template_name, data]) => ({
+        template_name,
+        count: data.count,
+        confidence_avg: data.count > 0 ? data.confidence_sum / data.count : 0
+      }));
+      
+      // Monthly trends (last 6 months)
+      const now = new Date();
+      const monthlyData: Record<string, { count: number; amount: number }> = {};
+      
+      for (let i = 5; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const monthKey = format(date, 'MMM yyyy');
+        monthlyData[monthKey] = { count: 0, amount: 0 };
+      }
+      
+      invoices.forEach(inv => {
+        if (inv.created_at) {
+          const invDate = new Date(inv.created_at);
+          const monthKey = format(invDate, 'MMM yyyy');
+          if (monthlyData[monthKey]) {
+            monthlyData[monthKey].count++;
+            monthlyData[monthKey].amount += inv.total;
+          }
+        }
+      });
+      
+      const monthlyTrends = Object.entries(monthlyData).map(([month, data]) => ({
+        month,
+        count: data.count,
+        amount: data.amount
+      }));
+      
+      // Top vendors
+      const vendors = invoices.reduce((acc, inv) => {
+        const vendorName = inv.vendor_name || 'Unknown Vendor';
+        if (!acc[vendorName]) {
+          acc[vendorName] = { count: 0, total_amount: 0 };
+        }
+        acc[vendorName].count++;
+        acc[vendorName].total_amount += inv.total;
+        return acc;
+      }, {} as Record<string, { count: number; total_amount: number }>);
+      
+      const topVendors = Object.entries(vendors)
+        .map(([vendor_name, data]) => ({
+          vendor_name,
+          count: data.count,
+          total_amount: data.total_amount
+        }))
+        .sort((a, b) => b.total_amount - a.total_amount)
+        .slice(0, 10);
+      
+      // Recognition statistics
+      const templateRecognized = invoices.filter(inv => inv.template_id && inv.template_id !== 'unknown').length;
+      const autoCategorized = invoices.filter(inv => inv.category && inv.category !== 'Uncategorized').length;
+      const highConfidence = invoices.filter(inv => inv.confidence >= 0.8).length;
+      
+      const analytics = {
+        total_invoices: totalInvoices,
+        total_amount: Math.round(totalAmount * 100) / 100,
+        average_amount: Math.round(averageAmount * 100) / 100,
+        categories: categoryArray,
+        templates: templateArray,
+        monthly_trends: monthlyTrends,
+        top_vendors: topVendors,
+        recognition_stats: {
+          template_recognized: templateRecognized,
+          auto_categorized: autoCategorized,
+          high_confidence: highConfidence,
+          total_processed: totalInvoices
+        }
+      };
+      
+      res.json(analytics);
+    } catch (error) {
+      console.error('[analytics] Failed to generate analytics:', error);
+      res.status(500).json({ message: 'Failed to generate analytics' });
+    }
+  });
+
   // Parse endpoint - MUST use Mistral OCR
   app.post("/api/parse", async (req, res) => {
     try {

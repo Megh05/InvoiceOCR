@@ -1,0 +1,46 @@
+[
+  {
+    "id": "da6a87b7-ec9b-454f-9f54-8bdd75d24fdd",
+    "invoice_id": "01793f52-ab45-497a-94cc-4eb2b35fbf2f",
+    "line_number": 1,
+    "sku": "02611",
+    "description": "CELERY",
+    "qty": 1,
+    "unit_price": 4,
+    "amount": 4,
+    "tax": 0
+  },
+  {
+    "id": "1e836d01-dd66-4907-8064-0850110ecc41",
+    "invoice_id": "01793f52-ab45-497a-94cc-4eb2b35fbf2f",
+    "line_number": 2,
+    "sku": "05830",
+    "description": "LETTUCE ICEBERG",
+    "qty": 1,
+    "unit_price": 5.5,
+    "amount": 5.5,
+    "tax": 0
+  },
+  {
+    "id": "b918539a-e9f7-4eed-a7ce-0956c27e95c5",
+    "invoice_id": "01793f52-ab45-497a-94cc-4eb2b35fbf2f",
+    "line_number": 3,
+    "sku": "02012",
+    "description": "BROCCOLI FLORETS",
+    "qty": 2,
+    "unit_price": 6,
+    "amount": 12,
+    "tax": 0
+  },
+  {
+    "id": "bbace652-ac9d-4dd3-a56f-df0c134001a9",
+    "invoice_id": "01793f52-ab45-497a-94cc-4eb2b35fbf2f",
+    "line_number": 4,
+    "sku": "11001",
+    "description": "DELIVERY CHARGE",
+    "qty": 1,
+    "unit_price": 28.5,
+    "amount": 28.5,
+    "tax": 0
+  }
+]
