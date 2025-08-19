@@ -56,11 +56,16 @@ export default function UploadStep({
   };
 
   const canProceed = () => {
-    return (
-      (state.inputType === 'file' && state.imageFile) ||
-      (state.inputType === 'url' && state.imageUrl?.trim()) ||
-      (state.inputType === 'text' && state.ocrText?.trim())
-    );
+    if (state.inputType === 'file') {
+      return Boolean(state.imageFile);
+    }
+    if (state.inputType === 'url') {
+      return Boolean(state.imageUrl?.trim() && state.imageUrl.length > 0);
+    }
+    if (state.inputType === 'text') {
+      return Boolean(state.ocrText?.trim() && state.ocrText.length > 0);
+    }
+    return false;
   };
 
   return (
@@ -122,10 +127,11 @@ export default function UploadStep({
             <Input
               type="url"
               placeholder="https://example.com/invoice.jpg"
-              value={state.imageUrl}
+              value={state.imageUrl || ''}
               onChange={(e) => onUrlChange(e.target.value)}
               className="text-sm"
               onClick={(e) => e.stopPropagation()}
+              data-testid="input-image-url"
             />
           </div>
 
