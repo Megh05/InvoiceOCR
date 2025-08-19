@@ -10,7 +10,6 @@ import { invoiceValidator } from "./services/validator";
 import { parseRequestSchema, insertInvoiceSchema } from "@shared/schema";
 import { ConfigService } from "./config";
 import { z } from "zod";
-import { format, parseISO, startOfMonth, endOfMonth } from "date-fns";
 
 function generateActionMessage(confidence: number, validation: any, usedLLM: boolean, improvements: string[]): string {
   if (confidence > 0.9 && validation.errors.length === 0) {
@@ -32,44 +31,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Analytics endpoint - provide real data from invoices
   app.get("/api/analytics", async (req, res) => {
     try {
-      const invoices = await storage.getAllInvoices();
-      const lineItems = await storage.getAllLineItems();
+      const invoices = await storage.getInvoices();
       
       // Calculate basic statistics
       const totalInvoices = invoices.length;
-      const totalAmount = invoices.reduce((sum, inv) => sum + inv.total, 0);
+      const totalAmount = invoices.reduce((sum: number, inv) => sum + inv.total, 0);
       const averageAmount = totalInvoices > 0 ? totalAmount / totalInvoices : 0;
       
-      // Group by categories (simplified categorization)
-      const categories = invoices.reduce((acc, inv) => {
-        const category = inv.category || 'Uncategorized';
-        if (!acc[category]) {
-          acc[category] = { count: 0, total_amount: 0 };
+      // Group by vendor (since we don't have categories in the schema)
+      const vendors = invoices.reduce((acc: Record<string, { count: number; total_amount: number }>, inv) => {
+        const vendorName = inv.vendor_name || 'Unknown Vendor';
+        if (!acc[vendorName]) {
+          acc[vendorName] = { count: 0, total_amount: 0 };
         }
-        acc[category].count++;
-        acc[category].total_amount += inv.total;
+        acc[vendorName].count++;
+        acc[vendorName].total_amount += inv.total;
         return acc;
-      }, {} as Record<string, { count: number; total_amount: number }>);
+      }, {});
       
-      const categoryArray = Object.entries(categories).map(([category, data]) => ({
+      const categoryArray = Object.entries(vendors).map(([category, data]) => ({
         category,
         count: data.count,
         total_amount: data.total_amount,
         percentage: totalInvoices > 0 ? Math.round((data.count / totalInvoices) * 100) : 0
       }));
       
-      // Template analysis
-      const templates = invoices.reduce((acc, inv) => {
-        const templateName = inv.template_id || 'Unknown Template';
-        if (!acc[templateName]) {
-          acc[templateName] = { count: 0, confidence_sum: 0 };
-        }
-        acc[templateName].count++;
-        acc[templateName].confidence_sum += inv.confidence;
-        return acc;
-      }, {} as Record<string, { count: number; confidence_sum: number }>);
+      // Template analysis based on confidence levels
+      const confidenceLevels = {
+        'High Confidence (90%+)': { count: 0, confidence_sum: 0 },
+        'Medium Confidence (70-89%)': { count: 0, confidence_sum: 0 },
+        'Low Confidence (<70%)': { count: 0, confidence_sum: 0 }
+      };
       
-      const templateArray = Object.entries(templates).map(([template_name, data]) => ({
+      invoices.forEach(inv => {
+        if (inv.confidence >= 0.9) {
+          confidenceLevels['High Confidence (90%+)'].count++;
+          confidenceLevels['High Confidence (90%+)'].confidence_sum += inv.confidence;
+        } else if (inv.confidence >= 0.7) {
+          confidenceLevels['Medium Confidence (70-89%)'].count++;
+          confidenceLevels['Medium Confidence (70-89%)'].confidence_sum += inv.confidence;
+        } else {
+          confidenceLevels['Low Confidence (<70%)'].count++;
+          confidenceLevels['Low Confidence (<70%)'].confidence_sum += inv.confidence;
+        }
+      });
+      
+      const templateArray = Object.entries(confidenceLevels).map(([template_name, data]) => ({
         template_name,
         count: data.count,
         confidence_avg: data.count > 0 ? data.confidence_sum / data.count : 0
@@ -79,16 +86,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const now = new Date();
       const monthlyData: Record<string, { count: number; amount: number }> = {};
       
+      // Create month labels
       for (let i = 5; i >= 0; i--) {
         const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const monthKey = format(date, 'MMM yyyy');
+        const monthKey = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
         monthlyData[monthKey] = { count: 0, amount: 0 };
       }
       
       invoices.forEach(inv => {
         if (inv.created_at) {
           const invDate = new Date(inv.created_at);
-          const monthKey = format(invDate, 'MMM yyyy');
+          const monthKey = invDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
           if (monthlyData[monthKey]) {
             monthlyData[monthKey].count++;
             monthlyData[monthKey].amount += inv.total;
@@ -103,16 +111,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }));
       
       // Top vendors
-      const vendors = invoices.reduce((acc, inv) => {
-        const vendorName = inv.vendor_name || 'Unknown Vendor';
-        if (!acc[vendorName]) {
-          acc[vendorName] = { count: 0, total_amount: 0 };
-        }
-        acc[vendorName].count++;
-        acc[vendorName].total_amount += inv.total;
-        return acc;
-      }, {} as Record<string, { count: number; total_amount: number }>);
-      
       const topVendors = Object.entries(vendors)
         .map(([vendor_name, data]) => ({
           vendor_name,
@@ -123,9 +121,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .slice(0, 10);
       
       // Recognition statistics
-      const templateRecognized = invoices.filter(inv => inv.template_id && inv.template_id !== 'unknown').length;
-      const autoCategorized = invoices.filter(inv => inv.category && inv.category !== 'Uncategorized').length;
       const highConfidence = invoices.filter(inv => inv.confidence >= 0.8).length;
+      const mediumConfidence = invoices.filter(inv => inv.confidence >= 0.6 && inv.confidence < 0.8).length;
       
       const analytics = {
         total_invoices: totalInvoices,
@@ -136,8 +133,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         monthly_trends: monthlyTrends,
         top_vendors: topVendors,
         recognition_stats: {
-          template_recognized: templateRecognized,
-          auto_categorized: autoCategorized,
+          template_recognized: highConfidence,
+          auto_categorized: mediumConfidence,
           high_confidence: highConfidence,
           total_processed: totalInvoices
         }

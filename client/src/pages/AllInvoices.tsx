@@ -3,7 +3,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, DollarSign, FileText, Building2, Eye, Download } from "lucide-react";
+import { Calendar, DollarSign, FileText, Building2, Eye, Download, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
 import Layout from "@/components/Layout";
 
@@ -102,6 +108,120 @@ export default function AllInvoices() {
     URL.revokeObjectURL(url);
   };
 
+  const handleExportJSON = () => {
+    if (!invoices || invoices.length === 0) return;
+
+    const jsonData = {
+      exported_at: new Date().toISOString(),
+      total_invoices: invoices.length,
+      invoices: invoices.map(invoice => ({
+        id: invoice.id,
+        invoice_number: invoice.invoice_number,
+        invoice_date: invoice.invoice_date,
+        vendor_name: invoice.vendor_name,
+        vendor_address: invoice.vendor_address,
+        bill_to: invoice.bill_to,
+        currency: invoice.currency,
+        subtotal: invoice.subtotal,
+        tax: invoice.tax,
+        shipping: invoice.shipping,
+        total: invoice.total,
+        confidence: invoice.confidence,
+        created_at: invoice.created_at
+      }))
+    };
+
+    const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `invoices-${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportPDF = () => {
+    if (!invoices || invoices.length === 0) return;
+
+    // Create a printable HTML page
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Invoice Report - ${new Date().toLocaleDateString()}</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
+          h1 { color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 10px; }
+          .summary { background: #f8fafc; padding: 15px; border-radius: 5px; margin: 20px 0; }
+          .invoice-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          .invoice-table th, .invoice-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          .invoice-table th { background-color: #f2f2f2; font-weight: bold; }
+          .invoice-table tr:nth-child(even) { background-color: #f9f9f9; }
+          .confidence { padding: 2px 6px; border-radius: 3px; font-size: 12px; }
+          .confidence.high { background-color: #dcfce7; color: #166534; }
+          .confidence.medium { background-color: #fef3c7; color: #92400e; }
+          .confidence.low { background-color: #fee2e2; color: #991b1b; }
+          @media print { body { margin: 0; } }
+        </style>
+      </head>
+      <body>
+        <h1>Invoice Report</h1>
+        <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+        
+        <div class="summary">
+          <h3>Summary</h3>
+          <p><strong>Total Invoices:</strong> ${invoices.length}</p>
+          <p><strong>Total Amount:</strong> ${formatCurrency(invoices.reduce((sum, inv) => sum + inv.total, 0))}</p>
+          <p><strong>Average Amount:</strong> ${formatCurrency(invoices.length > 0 ? invoices.reduce((sum, inv) => sum + inv.total, 0) / invoices.length : 0)}</p>
+          <p><strong>High Confidence Rate:</strong> ${Math.round((invoices.filter(inv => inv.confidence >= 0.8).length / invoices.length) * 100)}%</p>
+        </div>
+        
+        <table class="invoice-table">
+          <thead>
+            <tr>
+              <th>Invoice #</th>
+              <th>Date</th>
+              <th>Vendor</th>
+              <th>Total</th>
+              <th>Currency</th>
+              <th>Confidence</th>
+              <th>Processed</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${invoices.map(invoice => {
+              const confidenceClass = invoice.confidence >= 0.9 ? 'high' : invoice.confidence >= 0.7 ? 'medium' : 'low';
+              return `
+                <tr>
+                  <td>${invoice.invoice_number || invoice.id.slice(0, 8)}</td>
+                  <td>${formatDate(invoice.invoice_date)}</td>
+                  <td>${invoice.vendor_name || 'Unknown'}</td>
+                  <td>${formatCurrency(invoice.total, invoice.currency || 'USD')}</td>
+                  <td>${invoice.currency || 'USD'}</td>
+                  <td><span class="confidence ${confidenceClass}">${Math.round(invoice.confidence * 100)}%</span></td>
+                  <td>${formatDate(invoice.created_at)}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+    
+    // Wait for content to load, then print
+    printWindow.onload = () => {
+      printWindow.print();
+      printWindow.close();
+    };
+  };
+
   if (error) {
     return (
       <Layout>
@@ -130,14 +250,32 @@ export default function AllInvoices() {
             </p>
           </div>
           <div className="flex items-center space-x-3">
-            <Button 
-              variant="outline" 
-              onClick={handleExportCSV}
-              disabled={!invoices || invoices.length === 0}
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Export CSV
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  disabled={!invoices || invoices.length === 0}
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Export
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={handleExportCSV}>
+                  <FileText className="mr-2 h-4 w-4" />
+                  Export as CSV
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportJSON}>
+                  <FileText className="mr-2 h-4 w-4" />
+                  Export as JSON
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportPDF}>
+                  <FileText className="mr-2 h-4 w-4" />
+                  Export as PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
