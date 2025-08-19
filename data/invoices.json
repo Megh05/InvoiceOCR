@@ -198,5 +198,25 @@
     "confidence": 0,
     "created_at": "2025-08-19T19:15:05.953Z",
     "updated_at": "2025-08-19T19:15:05.953Z"
+  },
+  {
+    "id": "3f507762-04eb-4e85-84d0-007e676d3363",
+    "invoice_number": "4015303075",
+    "invoice_date": "2019-01-21",
+    "vendor_name": "Cintas Corporation",
+    "vendor_address": "P.O. BOX 80005 CHICAGO, IL 60600-1005",
+    "bill_to": "Value Point Systems",
+    "ship_to": "Value Point Systems, 8030 E Girard Ave, Denver, CO 80231-4410",
+    "currency": "USD",
+    "subtotal": 67.63,
+    "tax": 6.29,
+    "shipping": 8.1,
+    "total": 82.02,
+    "raw_ocr_text": "",
+    "mistral_ocr_text": "",
+    "ocr_similarity_score": 1,
+    "confidence": 0,
+    "created_at": "2025-08-19T22:12:09.806Z",
+    "updated_at": "2025-08-19T22:12:09.806Z"
   }
 ]

@@ -58,8 +58,8 @@ export default function UploadStep({
   const canProceed = () => {
     return (
       (state.inputType === 'file' && state.imageFile) ||
-      (state.inputType === 'url' && state.imageUrl.trim()) ||
-      (state.inputType === 'text' && state.ocrText.trim())
+      (state.inputType === 'url' && state.imageUrl?.trim()) ||
+      (state.inputType === 'text' && state.ocrText?.trim())
     );
   };
 
@@ -93,7 +93,7 @@ export default function UploadStep({
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Upload className="w-6 h-6 text-blue-500" />
             </div>
-            <h4 className="font-medium text-gray-900 mb-2">Upload Image</h4>
+            <h4 className="font-medium text-gray-900 mb-2">Upload PDF/Image</h4>
             <p className="text-sm text-gray-600 mb-4">Drop files here or click to browse</p>
             <p className="text-xs text-gray-500">Supports: JPG, PNG, PDF</p>
             <input

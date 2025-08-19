@@ -229,5 +229,115 @@
     "unit_price": 4,
     "amount": 4,
     "tax": 0
+  },
+  {
+    "id": "d8e73a54-4379-436c-ad93-bafa744dc41d",
+    "invoice_id": "3f507762-04eb-4e85-84d0-007e676d3363",
+    "line_number": 1,
+    "sku": "X64449",
+    "description": "CHEF COAT/CH/VENTED/WHITE/SS-RGOOL",
+    "qty": 11,
+    "unit_price": 0.672,
+    "amount": 7.39,
+    "tax": 0
+  },
+  {
+    "id": "e4ac1388-d177-443d-8dd4-fc012cdaeaaf",
+    "invoice_id": "3f507762-04eb-4e85-84d0-007e676d3363",
+    "line_number": 2,
+    "sku": "X64449",
+    "description": "CHEF COAT/CH/VENTED/WHITE/SS-RGOOL",
+    "qty": 11,
+    "unit_price": 0.672,
+    "amount": 7.39,
+    "tax": 0
+  },
+  {
+    "id": "34ae050d-951b-4d49-847e-2967d2d73f62",
+    "invoice_id": "3f507762-04eb-4e85-84d0-007e676d3363",
+    "line_number": 3,
+    "sku": "X64449",
+    "description": "CHEF COAT/CH/VENTED/WHITE/SS-RGOOL",
+    "qty": 11,
+    "unit_price": 0.672,
+    "amount": 7.39,
+    "tax": 0
+  },
+  {
+    "id": "9300750c-f168-4c5e-8791-822af5d004c3",
+    "invoice_id": "3f507762-04eb-4e85-84d0-007e676d3363",
+    "line_number": 4,
+    "sku": "X64251",
+    "description": "CHEFSHIRT/CH/VENTED/U/BLACK/SS-RG2XL",
+    "qty": 4,
+    "unit_price": 0.588,
+    "amount": 2.35,
+    "tax": 0
+  },
+  {
+    "id": "e9d2cd88-7d79-4f88-836c-14c35a97b8d0",
+    "invoice_id": "3f507762-04eb-4e85-84d0-007e676d3363",
+    "line_number": 5,
+    "sku": "X64251",
+    "description": "CHEFSHIRT/CH/VENTED/U/BLACK/SS-RGOOL",
+    "qty": 11,
+    "unit_price": 0.588,
+    "amount": 6.47,
+    "tax": 0
+  },
+  {
+    "id": "18930d7c-4e45-4483-8af2-4da560ac5dc3",
+    "invoice_id": "3f507762-04eb-4e85-84d0-007e676d3363",
+    "line_number": 6,
+    "sku": "X64251",
+    "description": "CHEFSHIRT/CH/VENTED/U/BLACK/SS-RGOOL",
+    "qty": 11,
+    "unit_price": 0.588,
+    "amount": 6.47,
+    "tax": 0
+  },
+  {
+    "id": "f848d6b9-10ca-4280-9e7e-aa94113019ca",
+    "invoice_id": "3f507762-04eb-4e85-84d0-007e676d3363",
+    "line_number": 7,
+    "sku": "X64449",
+    "description": "CHEF COAT/CH/VENTED/WHITE/SS-RGOOL",
+    "qty": 11,
+    "unit_price": 0.672,
+    "amount": 7.39,
+    "tax": 0
+  },
+  {
+    "id": "720235d3-7a7c-4480-ad20-d83b18b2a86d",
+    "invoice_id": "3f507762-04eb-4e85-84d0-007e676d3363",
+    "line_number": 8,
+    "sku": "X64449",
+    "description": "CHEF COAT/CH/VENTED/BLACK/LS-OGLLS",
+    "qty": 11,
+    "unit_price": 0.672,
+    "amount": 7.39,
+    "tax": 0
+  },
+  {
+    "id": "7baf0707-32e1-4660-bc6f-ec1be23d8e34",
+    "invoice_id": "3f507762-04eb-4e85-84d0-007e676d3363",
+    "line_number": 9,
+    "sku": "UNIFORM ADVANTAGE",
+    "description": "UNIFORM ADVANTAGE",
+    "qty": 1,
+    "unit_price": 11.12,
+    "amount": 11.12,
+    "tax": 0
+  },
+  {
+    "id": "b21fa624-c985-4aa5-9de8-f257858502ba",
+    "invoice_id": "3f507762-04eb-4e85-84d0-007e676d3363",
+    "line_number": 10,
+    "sku": "PREP ADVANTAGE",
+    "description": "PREP ADVANTAGE",
+    "qty": 1,
+    "unit_price": 4.27,
+    "amount": 4.27,
+    "tax": 0
   }
 ]
