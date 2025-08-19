@@ -29,7 +29,9 @@ Preferred communication style: Simple, everyday language.
 - **Improved User Experience**: Added verification loader and progress indicators to Step 2 (OCR & AI Verification)
 - **Time-Saving Approach**: LLM verifies and corrects data before user review, reducing manual editing required
 - **Better Prompting**: Created specialized verification prompt focused on accuracy checking and error correction
-- **Enhanced UI Feedback**: Updated OCR step to show LLM verification status with clear progress indicators
+- **Sequential Loading Experience**: Created realistic two-stage loading - OCR extraction first, then AI verification
+- **Enhanced UI Feedback**: Updated OCR step with dynamic progress indicators that change in real-time
+- **Visual Progress States**: Clear visual feedback showing current processing stage (OCR → AI verification)
 
 ### Advanced OCR Key-Value Extraction System Enhancement
 - **Multi-Layer Extraction Engine**: Created comprehensive enhanced-extractor.ts with 6-layer extraction approach

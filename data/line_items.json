@@ -75,5 +75,82 @@
     "unit_price": 2500,
     "amount": 2500,
     "tax": 0
+  },
+  {
+    "id": "1867f4b0-3f27-4e04-9734-a16644f1ed8f",
+    "invoice_id": "0cc64095-c43c-4633-aafb-e114467c158b",
+    "line_number": 1,
+    "sku": "02611",
+    "description": "CELERY",
+    "qty": 1,
+    "unit_price": 4,
+    "amount": 4,
+    "tax": 0
+  },
+  {
+    "id": "73dcfc79-5bcf-445f-ad3e-7e21cbe50fb0",
+    "invoice_id": "0cc64095-c43c-4633-aafb-e114467c158b",
+    "line_number": 2,
+    "sku": "05830",
+    "description": "LETTUCE ICEBERG",
+    "qty": 1,
+    "unit_price": 5.5,
+    "amount": 5.5,
+    "tax": 0
+  },
+  {
+    "id": "addc7ac0-5bf3-4f9f-952e-bb74b9b18946",
+    "invoice_id": "0cc64095-c43c-4633-aafb-e114467c158b",
+    "line_number": 3,
+    "sku": "02012",
+    "description": "BROCCOLI FLORETS",
+    "qty": 2,
+    "unit_price": 3,
+    "amount": 6,
+    "tax": 0
+  },
+  {
+    "id": "c1197c4d-799f-45d2-85bd-0840d5f82744",
+    "invoice_id": "0cc64095-c43c-4633-aafb-e114467c158b",
+    "line_number": 4,
+    "sku": "11001",
+    "description": "DELIVERY CHARGE",
+    "qty": 1,
+    "unit_price": 28.5,
+    "amount": 28.5,
+    "tax": 0
+  },
+  {
+    "id": "994a9fd9-ff84-4936-b83e-ae19914f9425",
+    "invoice_id": "7334522e-1d16-46ac-b04f-7591c9ee6008",
+    "line_number": 1,
+    "sku": "C2169",
+    "description": "QS-GE Range Cord, 4 Ft., 3-Prong, 40 Amp",
+    "qty": 1,
+    "unit_price": 13.54,
+    "amount": 13.54,
+    "tax": 0
+  },
+  {
+    "id": "910bbb2d-9f04-4b50-86ae-faef00438751",
+    "invoice_id": "7334522e-1d16-46ac-b04f-7591c9ee6008",
+    "line_number": 2,
+    "sku": "C2210",
+    "description": "QS - GE 11.6 Cu. Ft. Top-Freezer Refrigerator, Pocket",
+    "qty": 1,
+    "unit_price": 508.84,
+    "amount": 508.84,
+    "tax": 0
+  },
+  {
+    "id": "e071a37f-e929-465b-a4e9-19b83377710a",
+    "invoice_id": "7334522e-1d16-46ac-b04f-7591c9ee6008",
+    "line_number": 3,
+    "sku": "H8474",
+    "description": "GE Profile Dishwasher, 18/W, 3-Cycle, SS Tub, ADA, White",
+    "qty": 1,
+    "unit_price": 467.99,
+    "amount": 467.99,
+    "tax": 0
   }
 ]
