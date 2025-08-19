@@ -42,5 +42,27 @@
     "unit_price": 28.5,
     "amount": 28.5,
     "tax": 0
+  },
+  {
+    "id": "894046d5-b1a7-4de9-89d4-bcab61258a44",
+    "invoice_id": "8bf2c3f6-bc9d-4dec-b952-3ec365a7598c",
+    "line_number": 1,
+    "sku": null,
+    "description": "Consulting services",
+    "qty": 1,
+    "unit_price": 1500,
+    "amount": 1500,
+    "tax": 0
+  },
+  {
+    "id": "8cef85c7-9709-45a6-a19c-ef0ee4d6ddb7",
+    "invoice_id": "6decce93-9b12-4532-abe7-eb31a1160a80",
+    "line_number": 1,
+    "sku": null,
+    "description": "Consulting work",
+    "qty": 1,
+    "unit_price": 2500,
+    "amount": 2500,
+    "tax": 0
   }
 ]
