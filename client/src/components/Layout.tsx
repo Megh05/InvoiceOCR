@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Receipt, Plus, List, BarChart, Settings, Bell, User } from "lucide-react";
+import { Receipt, Plus, List, BarChart, Settings } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 interface LayoutProps {
@@ -99,12 +99,6 @@ export default function Layout({ children }: LayoutProps) {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-sm text-gray-500">
                 <OCRStatus />
-              </div>
-              <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
-                <Bell className="w-5 h-5" />
-              </button>
-              <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white text-sm font-medium">
-                <User className="w-4 h-4" />
               </div>
             </div>
           </div>
