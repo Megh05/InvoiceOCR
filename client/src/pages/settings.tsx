@@ -154,29 +154,43 @@ export default function Settings() {
 
   return (
     <Layout>
-      <div className="container mx-auto py-8 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center gap-3 mb-8">
-            <SettingsIcon className="h-8 w-8 text-primary" />
-            <div>
-              <h1 className="text-3xl font-bold">Settings</h1>
-              <p className="text-muted-foreground">Manage your application configuration and preferences</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <div className="max-w-6xl mx-auto p-6">
+          {/* Enhanced Header */}
+          <div className="relative mb-12">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-3xl blur-3xl"></div>
+            <div className="relative bg-white/80 backdrop-blur-sm border border-white/20 rounded-3xl p-8 shadow-xl">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl shadow-lg">
+                  <SettingsIcon className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                    Settings
+                  </h1>
+                  <p className="text-gray-600 text-lg">Manage your application configuration and preferences</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="grid gap-6">
-            {/* API Configuration */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Key className="h-5 w-5" />
-                  API Configuration
-                </CardTitle>
-                <CardDescription>
-                  Configure external service integrations
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+          <div className="grid gap-8">
+            {/* Enhanced API Configuration */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-3xl blur-xl"></div>
+              <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
+                <CardHeader className="pb-6">
+                  <CardTitle className="flex items-center gap-3 text-2xl font-bold text-gray-800">
+                    <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-md">
+                      <Key className="h-6 w-6 text-white" />
+                    </div>
+                    API Configuration
+                  </CardTitle>
+                  <CardDescription className="text-lg text-gray-600">
+                    Configure external service integrations for enhanced functionality
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
                 <div className="space-y-3">
                   <Label htmlFor="mistral-api">Mistral OCR API Key</Label>
                   <div className="flex items-center gap-2">
@@ -246,19 +260,24 @@ export default function Settings() {
                   </p>
                 </div>
               </CardContent>
-            </Card>
+              </Card>
+            </div>
 
-            {/* Processing Settings */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="h-5 w-5" />
-                  Processing Settings
-                </CardTitle>
-                <CardDescription>
-                  Configure invoice processing behavior
-                </CardDescription>
-              </CardHeader>
+            {/* Enhanced Processing Settings */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-3xl blur-xl"></div>
+              <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
+                <CardHeader className="pb-6">
+                  <CardTitle className="flex items-center gap-3 text-2xl font-bold text-gray-800">
+                    <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl shadow-md">
+                      <Zap className="h-6 w-6 text-white" />
+                    </div>
+                    Processing Settings
+                  </CardTitle>
+                  <CardDescription className="text-lg text-gray-600">
+                    Configure invoice processing behavior and thresholds
+                  </CardDescription>
+                </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -302,19 +321,24 @@ export default function Settings() {
                   <Switch id="fallback-parsing" defaultChecked />
                 </div>
               </CardContent>
-            </Card>
+              </Card>
+            </div>
 
-            {/* Data Management */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Database className="h-5 w-5" />
-                  Data Management
-                </CardTitle>
-                <CardDescription>
-                  Manage your invoice data and storage
-                </CardDescription>
-              </CardHeader>
+            {/* Enhanced Data Management */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-teal-500/10 rounded-3xl blur-xl"></div>
+              <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
+                <CardHeader className="pb-6">
+                  <CardTitle className="flex items-center gap-3 text-2xl font-bold text-gray-800">
+                    <div className="p-2 bg-gradient-to-r from-green-500 to-teal-600 rounded-xl shadow-md">
+                      <Database className="h-6 w-6 text-white" />
+                    </div>
+                    Data Management
+                  </CardTitle>
+                  <CardDescription className="text-lg text-gray-600">
+                    Manage your invoice data, exports, and storage options
+                  </CardDescription>
+                </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -333,19 +357,24 @@ export default function Settings() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+              </Card>
+            </div>
 
-            {/* Security */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Shield className="h-5 w-5" />
-                  Security
-                </CardTitle>
-                <CardDescription>
-                  Security and privacy settings
-                </CardDescription>
-              </CardHeader>
+            {/* Enhanced Security */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-3xl blur-xl"></div>
+              <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
+                <CardHeader className="pb-6">
+                  <CardTitle className="flex items-center gap-3 text-2xl font-bold text-gray-800">
+                    <div className="p-2 bg-gradient-to-r from-red-500 to-orange-600 rounded-xl shadow-md">
+                      <Shield className="h-6 w-6 text-white" />
+                    </div>
+                    Security
+                  </CardTitle>
+                  <CardDescription className="text-lg text-gray-600">
+                    Security, privacy settings, and data retention controls
+                  </CardDescription>
+                </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -375,12 +404,27 @@ export default function Settings() {
                   />
                 </div>
               </CardContent>
-            </Card>
+              </Card>
+            </div>
 
-            {/* Save Settings */}
-            <div className="flex justify-end gap-2">
-              <Button variant="outline">Reset to Defaults</Button>
-              <Button>Save Settings</Button>
+            {/* Enhanced Save Settings */}
+            <div className="relative pt-6">
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-500/10 to-slate-500/10 rounded-3xl blur-xl"></div>
+              <div className="relative bg-white/80 backdrop-blur-sm border border-white/40 rounded-3xl p-6 shadow-lg">
+                <div className="flex justify-end gap-4">
+                  <Button 
+                    variant="outline" 
+                    className="bg-white/80 backdrop-blur-sm hover:bg-gray-50 transition-all duration-300 rounded-xl px-6 py-3"
+                  >
+                    Reset to Defaults
+                  </Button>
+                  <Button 
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                  >
+                    Save Settings
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

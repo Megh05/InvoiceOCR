@@ -47,65 +47,58 @@ export default function Layout({ children }: LayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      {/* Sidebar */}
-      <div className="w-64 bg-white shadow-sm border-r border-gray-200 fixed h-full z-10">
-        <div className="p-6">
-          <div className="flex items-center space-x-2 mb-8">
-            <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-              <Receipt className="w-4 h-4 text-white" />
+    <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Enhanced Sidebar */}
+      <div className="w-64 fixed h-full z-10">
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-indigo-500/10 backdrop-blur-xl"></div>
+        <div className="relative bg-white/80 backdrop-blur-sm border-r border-white/40 shadow-2xl h-full">
+          <div className="p-6">
+            <div className="flex items-center space-x-3 mb-8">
+              <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+                <Receipt className="w-6 h-6 text-white" />
+              </div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                InvoiceOCR
+              </h1>
             </div>
-            <h1 className="text-xl font-semibold text-gray-900">InvoiceOCR</h1>
-          </div>
           
-          <nav className="space-y-2">
-            {navItems.map((item) => (
-              <Link key={item.href} href={item.href}>
-                <div
-                  className={`flex items-center space-x-3 px-3 py-2 rounded-lg font-medium transition-colors cursor-pointer ${
-                    item.active
-                      ? "bg-blue-50 text-blue-700"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  <item.icon className="w-4 h-4" />
-                  <span>{item.label}</span>
-                </div>
-              </Link>
-            ))}
+            <nav className="space-y-3">
+              {navItems.map((item) => (
+                <Link key={item.href} href={item.href}>
+                  <div
+                    className={`group flex items-center space-x-3 px-4 py-3 rounded-2xl font-semibold transition-all duration-300 cursor-pointer ${
+                      item.active
+                        ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg scale-105"
+                        : "text-gray-700 hover:bg-white/60 hover:shadow-md hover:scale-102"
+                    }`}
+                  >
+                    <item.icon className={`w-5 h-5 transition-transform duration-300 ${item.active ? 'text-white' : 'group-hover:scale-110'}`} />
+                    <span className="text-sm">{item.label}</span>
+                  </div>
+                </Link>
+              ))}
           </nav>
+          </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 ml-64">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900">
-                {location === "/" && "Process New Invoice"}
-                {location === "/invoices" && "All Invoices"}
-                {location === "/analytics" && "Analytics"}
-                {location === "/settings" && "Settings"}
-              </h2>
-              <p className="text-gray-600 mt-1">
-                {location === "/" && "Upload and extract structured data from invoice documents"}
-                {location === "/invoices" && "View and manage all processed invoices"}
-                {location === "/analytics" && "View processing analytics and reports"}
-                {location === "/settings" && "Configure application settings"}
-              </p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-sm text-gray-500">
-                <OCRStatus />
+      {/* Enhanced Main Content */}
+      <div className="flex-1 ml-64 min-h-screen">
+        {/* Enhanced OCR Status Bar */}
+        <div className="bg-white/60 backdrop-blur-sm border-b border-white/40 px-6 py-3">
+          <div className="flex items-center justify-end">
+            <div className="flex items-center space-x-3 text-sm">
+              <div className="px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-white/40 shadow-sm">
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <OCRStatus />
+                </div>
               </div>
             </div>
           </div>
-        </header>
+        </div>
 
         {/* Page Content */}
-        <main className="p-6">
+        <main className="relative">
           {children}
         </main>
       </div>
