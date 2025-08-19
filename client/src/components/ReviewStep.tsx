@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { WizardState } from "@/types/invoice";
 import { ValidationResults } from "@/components/ValidationResults";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, FileText, File } from "lucide-react";
 
 interface ReviewStepProps {
   state: WizardState;
@@ -22,6 +23,7 @@ export default function ReviewStep({
   onPrevious
 }: ReviewStepProps) {
   const [editedText, setEditedText] = useState(state.parseResult?.raw_ocr_text || "");
+  const [viewMode, setViewMode] = useState<'pdf' | 'ocr'>('ocr');
 
   const handleTextChange = (text: string) => {
     setEditedText(text);
@@ -60,43 +62,115 @@ export default function ReviewStep({
 
         {/* OCR Results */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Original Image Preview */}
+          {/* Left Panel - Document View with Dropdown */}
           <div>
-            <h4 className="font-medium text-gray-900 mb-3">Original Document</h4>
-            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-              {state.imageFile ? (
-                <div className="text-center py-8">
-                  <p className="text-sm text-gray-600">{state.imageFile.name}</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {(state.imageFile.size / 1024).toFixed(1)} KB
-                  </p>
-                </div>
-              ) : state.imageUrl ? (
-                <div className="text-center py-8">
-                  <p className="text-sm text-gray-600">Image from URL</p>
-                  <p className="text-xs text-gray-500 mt-1 truncate">{state.imageUrl}</p>
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="font-medium text-gray-900">Document View</h4>
+              <Select value={viewMode} onValueChange={(value: 'pdf' | 'ocr') => setViewMode(value)}>
+                <SelectTrigger className="w-32" data-testid="select-view-mode">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pdf" data-testid="option-pdf-view">
+                    <div className="flex items-center">
+                      <File className="w-4 h-4 mr-2" />
+                      PDF View
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="ocr" data-testid="option-ocr-text">
+                    <div className="flex items-center">
+                      <FileText className="w-4 h-4 mr-2" />
+                      OCR Text
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 h-80 overflow-auto">
+              {viewMode === 'pdf' ? (
+                // PDF/Image View
+                <div>
+                  {state.imageFile ? (
+                    <div className="h-full flex flex-col">
+                      <div className="text-center mb-4">
+                        <p className="text-sm text-gray-600 font-medium">{state.imageFile.name}</p>
+                        <p className="text-xs text-gray-500">
+                          {(state.imageFile.size / 1024).toFixed(1)} KB
+                        </p>
+                      </div>
+                      {state.imageFile.type.startsWith('image/') ? (
+                        <img 
+                          src={URL.createObjectURL(state.imageFile)} 
+                          alt="Document preview" 
+                          className="max-w-full h-auto rounded border"
+                          data-testid="img-document-preview"
+                        />
+                      ) : (
+                        <div className="text-center py-12">
+                          <File className="w-12 h-12 mx-auto text-gray-400 mb-2" />
+                          <p className="text-sm text-gray-600">PDF file uploaded</p>
+                          <p className="text-xs text-gray-500 mt-1">Preview not available for PDF files</p>
+                        </div>
+                      )}
+                    </div>
+                  ) : state.imageUrl ? (
+                    <div className="h-full flex flex-col">
+                      <div className="text-center mb-4">
+                        <p className="text-sm text-gray-600 font-medium">Image from URL</p>
+                        <p className="text-xs text-gray-500 truncate">{state.imageUrl}</p>
+                      </div>
+                      <img 
+                        src={state.imageUrl} 
+                        alt="Document from URL" 
+                        className="max-w-full h-auto rounded border"
+                        data-testid="img-document-from-url"
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <FileText className="w-12 h-12 mx-auto text-gray-400 mb-2" />
+                      <p className="text-sm text-gray-600">No document file available</p>
+                      <p className="text-xs text-gray-500 mt-1">Text was entered directly</p>
+                    </div>
+                  )}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <p className="text-sm text-gray-600">OCR Text Input</p>
+                // OCR Text View
+                <div className="h-full">
+                  <div className="text-center mb-4">
+                    <p className="text-sm text-gray-600 font-medium">Raw OCR Output</p>
+                    {state.parseResult && (
+                      <p className="text-xs text-gray-500">
+                        Confidence: {Math.round(state.parseResult.confidence * 100)}%
+                      </p>
+                    )}
+                  </div>
+                  <div className="bg-white border rounded p-3 h-56 overflow-auto">
+                    <pre className="text-xs font-mono text-gray-700 whitespace-pre-wrap" data-testid="text-raw-ocr">
+                      {state.parseResult?.raw_ocr_text || state.ocrText || "No OCR text available"}
+                    </pre>
+                  </div>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Extracted Text */}
+          {/* Right Panel - Editable Text */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h4 className="font-medium text-gray-900">Extracted Text</h4>
+              <h4 className="font-medium text-gray-900">Edit Extracted Text</h4>
               <div className="flex items-center space-x-2">
                 {state.parseResult && getConfidenceBadge(state.parseResult.confidence)}
               </div>
             </div>
             <Textarea
-              rows={12}
-              className="font-mono text-sm"
+              rows={17}
+              className="font-mono text-sm resize-none"
               value={editedText}
               onChange={(e) => handleTextChange(e.target.value)}
+              placeholder="Extracted text will appear here for editing..."
+              data-testid="textarea-edit-ocr"
             />
 
             {/* OCR Similarity Score */}
