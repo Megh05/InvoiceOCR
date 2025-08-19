@@ -87,7 +87,7 @@ export default function ReviewStep({
               </Select>
             </div>
             
-            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 h-80 overflow-auto">
+            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 h-96 overflow-auto">
               {viewMode === 'pdf' ? (
                 // PDF/Image View
                 <div>
@@ -111,7 +111,7 @@ export default function ReviewStep({
                           <object
                             data={URL.createObjectURL(state.imageFile)}
                             type="application/pdf"
-                            className="w-full h-64 rounded border"
+                            className="w-full h-80 rounded border"
                             data-testid="pdf-viewer"
                           >
                             <div className="text-center py-12">
