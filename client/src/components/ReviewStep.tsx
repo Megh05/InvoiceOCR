@@ -106,11 +106,36 @@ export default function ReviewStep({
                           className="max-w-full h-auto rounded border"
                           data-testid="img-document-preview"
                         />
+                      ) : state.imageFile.type === 'application/pdf' ? (
+                        <div className="h-full flex flex-col">
+                          <object
+                            data={URL.createObjectURL(state.imageFile)}
+                            type="application/pdf"
+                            className="w-full h-64 rounded border"
+                            data-testid="pdf-viewer"
+                          >
+                            <div className="text-center py-12">
+                              <File className="w-12 h-12 mx-auto text-gray-400 mb-2" />
+                              <p className="text-sm text-gray-600">PDF file uploaded</p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                <a 
+                                  href={URL.createObjectURL(state.imageFile)} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:text-blue-800 underline"
+                                  data-testid="link-open-pdf"
+                                >
+                                  Click here to open PDF in new tab
+                                </a>
+                              </p>
+                            </div>
+                          </object>
+                        </div>
                       ) : (
                         <div className="text-center py-12">
                           <File className="w-12 h-12 mx-auto text-gray-400 mb-2" />
-                          <p className="text-sm text-gray-600">PDF file uploaded</p>
-                          <p className="text-xs text-gray-500 mt-1">Preview not available for PDF files</p>
+                          <p className="text-sm text-gray-600">Document file uploaded</p>
+                          <p className="text-xs text-gray-500 mt-1">Preview not available for this file type</p>
                         </div>
                       )}
                     </div>

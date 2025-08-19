@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (August 19, 2025)
 
+### Review Page Enhancement - Document Viewer with Dropdown (August 19, 2025)
+- **Dual View System**: Added dropdown selector to switch between "PDF View" and "OCR Text" modes
+- **PDF Viewer Integration**: Embedded PDF viewer using HTML object element for in-page viewing
+- **Fallback Link**: Added "Click to open PDF in new tab" option when embedded viewer isn't supported
+- **Enhanced Layout**: Improved left/right panel layout with proper spacing and visual hierarchy
+- **Better UX**: Users can now view original document alongside editable text for easier verification
+
 ### Migration from Replit Agent to Replit Environment (COMPLETED)
 - **Database Setup**: Created PostgreSQL database and configured Drizzle ORM
 - **Database Schema**: Successfully pushed database schema with Drizzle Kit
