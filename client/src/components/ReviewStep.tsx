@@ -87,7 +87,7 @@ export default function ReviewStep({
               </Select>
             </div>
             
-            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 h-96 overflow-auto">
+            <div className="border border-gray-200 rounded-lg p-2 bg-gray-50 h-[600px] overflow-auto">
               {viewMode === 'pdf' ? (
                 // PDF/Image View
                 <div>
@@ -111,7 +111,7 @@ export default function ReviewStep({
                           <object
                             data={URL.createObjectURL(state.imageFile)}
                             type="application/pdf"
-                            className="w-full h-80 rounded border"
+                            className="w-full h-[560px] rounded border"
                             data-testid="pdf-viewer"
                           >
                             <div className="text-center py-12">
@@ -190,8 +190,7 @@ export default function ReviewStep({
               </div>
             </div>
             <Textarea
-              rows={17}
-              className="font-mono text-sm resize-none"
+              className="font-mono text-sm resize-none h-[560px]"
               value={editedText}
               onChange={(e) => handleTextChange(e.target.value)}
               placeholder="Extracted text will appear here for editing..."
