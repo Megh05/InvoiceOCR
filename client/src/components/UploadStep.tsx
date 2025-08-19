@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Upload, Link, Keyboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,17 @@ export default function UploadStep({
 }: UploadStepProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [localUrl, setLocalUrl] = useState(state.imageUrl || '');
+  const [localText, setLocalText] = useState(state.ocrText || '');
+
+  // Sync local state with parent state
+  useEffect(() => {
+    setLocalUrl(state.imageUrl || '');
+  }, [state.imageUrl]);
+
+  useEffect(() => {
+    setLocalText(state.ocrText || '');
+  }, [state.ocrText]);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -60,10 +71,10 @@ export default function UploadStep({
       return Boolean(state.imageFile);
     }
     if (state.inputType === 'url') {
-      return Boolean(state.imageUrl?.trim() && state.imageUrl.length > 0);
+      return Boolean(localUrl.trim() && localUrl.length > 0);
     }
     if (state.inputType === 'text') {
-      return Boolean(state.ocrText?.trim() && state.ocrText.length > 0);
+      return Boolean(localText.trim() && localText.length > 0);
     }
     return false;
   };
@@ -127,8 +138,11 @@ export default function UploadStep({
             <Input
               type="url"
               placeholder="https://example.com/invoice.jpg"
-              value={state.imageUrl || ''}
-              onChange={(e) => onUrlChange(e.target.value)}
+              value={localUrl}
+              onChange={(e) => {
+                setLocalUrl(e.target.value);
+                onUrlChange(e.target.value);
+              }}
               className="text-sm"
               onClick={(e) => e.stopPropagation()}
               data-testid="input-image-url"
@@ -190,8 +204,11 @@ export default function UploadStep({
               rows={8}
               className="font-mono text-sm"
               placeholder="Paste the extracted text from your invoice here..."
-              value={state.ocrText}
-              onChange={(e) => onTextChange(e.target.value)}
+              value={localText}
+              onChange={(e) => {
+                setLocalText(e.target.value);
+                onTextChange(e.target.value);
+              }}
             />
             <p className="text-xs text-gray-500 mt-2">
               Note: This text will be verified against Mistral OCR for accuracy
