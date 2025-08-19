@@ -81,24 +81,26 @@ export default function UploadStep({
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-        <div className="text-center mb-8">
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            Step 1: Upload Invoice or Paste OCR Text
-          </h3>
-          <p className="text-gray-600">Choose your preferred method to input invoice data</p>
-        </div>
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-3xl blur-3xl"></div>
+        <div className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl p-12 shadow-xl">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-4">
+              Upload Invoice or Paste OCR Text
+            </h3>
+            <p className="text-gray-600 text-lg">Choose your preferred method to input invoice data for processing</p>
+          </div>
 
-        {/* Upload Options */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {/* Enhanced Upload Options */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {/* Image Upload */}
           <div
-            className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ${
+            className={`relative group border-2 border-dashed rounded-3xl p-8 text-center transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
               state.inputType === 'file'
-                ? "border-blue-400 bg-blue-50"
+                ? "border-blue-400 bg-gradient-to-br from-blue-50/80 to-indigo-50/80 shadow-lg"
                 : dragActive
-                ? "border-blue-400"
-                : "border-gray-300 hover:border-blue-400"
+                ? "border-blue-400 bg-blue-50/50"
+                : "border-gray-200 hover:border-blue-400 hover:bg-gradient-to-br hover:from-blue-50/50 hover:to-indigo-50/50"
             }`}
             onClick={() => fileInputRef.current?.click()}
             onDragEnter={handleDrag}
@@ -106,12 +108,12 @@ export default function UploadStep({
             onDragOver={handleDrag}
             onDrop={handleDrop}
           >
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Upload className="w-6 h-6 text-blue-500" />
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-all duration-300">
+              <Upload className="w-8 h-8 text-blue-600" />
             </div>
-            <h4 className="font-medium text-gray-900 mb-2">Upload PDF/Image</h4>
-            <p className="text-sm text-gray-600 mb-4">Drop files here or click to browse</p>
-            <p className="text-xs text-gray-500">Supports: JPG, PNG, PDF</p>
+            <h4 className="font-bold text-gray-900 mb-3 text-lg">Upload PDF/Image</h4>
+            <p className="text-sm text-gray-600 mb-2">Drop files here or click to browse</p>
+            <p className="text-xs text-blue-600 font-medium">Supports: JPG, PNG, PDF</p>
             <input
               ref={fileInputRef}
               type="file"
@@ -123,18 +125,18 @@ export default function UploadStep({
 
           {/* Image URL */}
           <div
-            className={`border-2 rounded-lg p-6 text-center transition-colors cursor-pointer ${
+            className={`relative group border-2 rounded-3xl p-8 text-center transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
               state.inputType === 'url'
-                ? "border-blue-400 bg-blue-50"
-                : "border-gray-200 hover:border-blue-400"
+                ? "border-green-400 bg-gradient-to-br from-green-50/80 to-emerald-50/80 shadow-lg"
+                : "border-gray-200 hover:border-green-400 hover:bg-gradient-to-br hover:from-green-50/50 hover:to-emerald-50/50"
             }`}
             onClick={() => onInputTypeChange('url')}
           >
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Link className="w-6 h-6 text-green-500" />
+            <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-all duration-300">
+              <Link className="w-8 h-8 text-green-600" />
             </div>
-            <h4 className="font-medium text-gray-900 mb-2">Image URL</h4>
-            <p className="text-sm text-gray-600 mb-4">Paste a link to your image</p>
+            <h4 className="font-bold text-gray-900 mb-3 text-lg">Image URL</h4>
+            <p className="text-sm text-gray-600 mb-6">Paste a direct link to your invoice image</p>
             <Input
               type="url"
               placeholder="https://example.com/invoice.jpg"
@@ -151,19 +153,19 @@ export default function UploadStep({
 
           {/* OCR Text */}
           <div
-            className={`border-2 rounded-lg p-6 text-center transition-colors cursor-pointer ${
+            className={`relative group border-2 rounded-3xl p-8 text-center transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
               state.inputType === 'text'
-                ? "border-blue-400 bg-blue-50"
-                : "border-gray-200 hover:border-blue-400"
+                ? "border-purple-400 bg-gradient-to-br from-purple-50/80 to-violet-50/80 shadow-lg"
+                : "border-gray-200 hover:border-purple-400 hover:bg-gradient-to-br hover:from-purple-50/50 hover:to-violet-50/50"
             }`}
             onClick={() => onInputTypeChange('text')}
           >
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Keyboard className="w-6 h-6 text-purple-500" />
+            <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-violet-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-all duration-300">
+              <Keyboard className="w-8 h-8 text-purple-600" />
             </div>
-            <h4 className="font-medium text-gray-900 mb-2">Paste OCR Text</h4>
-            <p className="text-sm text-gray-600 mb-4">Already have extracted text?</p>
-            <p className="text-xs text-gray-500">Will verify with Mistral OCR</p>
+            <h4 className="font-bold text-gray-900 mb-3 text-lg">Paste OCR Text</h4>
+            <p className="text-sm text-gray-600 mb-2">Already have extracted text?</p>
+            <p className="text-xs text-purple-600 font-medium">Will verify with Mistral OCR</p>
           </div>
         </div>
 
@@ -224,6 +226,7 @@ export default function UploadStep({
           <Button onClick={onNext} disabled={!canProceed() || state.isProcessing}>
             Next: Run OCR
           </Button>
+        </div>
         </div>
       </div>
     </div>

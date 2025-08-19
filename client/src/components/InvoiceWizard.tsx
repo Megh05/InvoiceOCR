@@ -232,7 +232,7 @@ export default function InvoiceWizard() {
   }, [handleProcessAnother]);
 
   return (
-    <div>
+    <div className="max-w-7xl mx-auto p-6 space-y-8">
       <StepIndicator currentStep={state.step} totalSteps={TOTAL_STEPS} />
       
       {state.step === 1 && (
