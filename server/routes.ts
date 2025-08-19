@@ -174,55 +174,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
               ocrResponse.markdown
             );
             
-            // Step 1: Validate the extracted data
-            console.log('[parser] Validating extracted data...');
-            const validation = invoiceValidator.validateInvoice(enhancedResult.extracted);
-            let adjustedConfidence = invoiceValidator.adjustConfidenceByValidation(
-              enhancedResult.confidence, 
-              validation
-            );
+            // Step 1: Initial validation of extracted data
+            console.log('[parser] Performing initial validation...');
+            const initialValidation = invoiceValidator.validateInvoice(enhancedResult.extracted);
             
             let finalData = enhancedResult.extracted;
             let improvements: string[] = [];
             let usedLLM = false;
+            let adjustedConfidence = enhancedResult.confidence;
             
-            // Step 2: Use LLM enhancement if confidence is low or validation fails
-            const shouldUseLLM = adjustedConfidence < 0.8 || validation.errors.some(e => e.severity === 'critical');
-            
-            if (shouldUseLLM) {
-              try {
-                console.log('[parser] Using LLM enhancement for improved accuracy...');
-                const llmResult = await llmEnhancer.enhanceInvoiceData(
-                  ocrResponse.text,
-                  enhancedResult.extracted,
-                  adjustedConfidence
-                );
-                
-                // Validate LLM results
-                const llmValidation = invoiceValidator.validateInvoice(llmResult.enhanced);
-                const llmConfidence = invoiceValidator.adjustConfidenceByValidation(
-                  llmResult.confidence,
-                  llmValidation
-                );
-                
-                // Use LLM result if it's better or shows meaningful improvements
-                const improvementThreshold = 0.05; // Allow LLM if confidence is within 5% and has improvements
-                const hasSignificantImprovements = llmResult.improvements.length > 2;
-                
-                if (llmConfidence > adjustedConfidence || 
-                    (hasSignificantImprovements && Math.abs(llmConfidence - adjustedConfidence) < improvementThreshold)) {
-                  finalData = llmResult.enhanced;
-                  const oldConfidence = adjustedConfidence;
-                  adjustedConfidence = Math.max(llmConfidence, adjustedConfidence * 0.95); // Prevent major degradation
-                  improvements = llmResult.improvements;
-                  usedLLM = true;
-                  console.log(`[parser] LLM enhancement improved confidence from ${oldConfidence.toFixed(2)} to ${adjustedConfidence.toFixed(2)}`);
-                } else {
-                  console.log(`[parser] LLM enhancement did not improve confidence (${llmConfidence.toFixed(2)} vs ${adjustedConfidence.toFixed(2)}), using original result`);
-                }
-              } catch (llmError) {
-                console.warn('[parser] LLM enhancement failed, using original result:', llmError);
-              }
+            // Step 2: Always use LLM verification to check and correct extracted data
+            let finalValidation = initialValidation;
+            console.log('[parser] Starting LLM verification and correction process...');
+            try {
+              const llmResult = await llmEnhancer.enhanceInvoiceData(
+                ocrResponse.text,
+                enhancedResult.extracted,
+                adjustedConfidence
+              );
+              
+              // Validate LLM corrected results
+              finalValidation = invoiceValidator.validateInvoice(llmResult.enhanced);
+              const llmConfidence = invoiceValidator.adjustConfidenceByValidation(
+                llmResult.confidence,
+                finalValidation
+              );
+              
+              // Always use LLM verified result as it has checked for correctness
+              finalData = llmResult.enhanced;
+              adjustedConfidence = llmConfidence;
+              improvements = llmResult.improvements;
+              usedLLM = true;
+              
+              console.log(`[parser] LLM verification completed with confidence ${adjustedConfidence.toFixed(2)}`);
+              console.log(`[parser] Improvements made: ${improvements.length > 0 ? improvements.join(', ') : 'None'}`);
+              
+            } catch (llmError) {
+              console.warn('[parser] LLM verification failed, using original extracted data:', llmError);
+              // Fall back to original data with initial validation adjustments
+              adjustedConfidence = invoiceValidator.adjustConfidenceByValidation(
+                enhancedResult.confidence, 
+                initialValidation
+              );
             }
             
             return res.json({
@@ -233,10 +226,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               ocr_similarity_score: ocrSimilarityScore,
               fallback_used: false,
               llm_enhanced: usedLLM,
-              action: generateActionMessage(adjustedConfidence, validation, usedLLM, improvements),
+              action: generateActionMessage(adjustedConfidence, finalValidation, usedLLM, improvements),
               field_confidences: enhancedResult.field_confidences,
               extraction_details: enhancedResult.extraction_details,
-              validation_results: validation,
+              validation_results: finalValidation,
               improvements: improvements
             });
           } catch (enhancedError) {

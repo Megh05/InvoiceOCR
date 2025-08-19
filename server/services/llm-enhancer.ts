@@ -54,7 +54,7 @@ export class LLMEnhancerService {
     console.log(`[llm-enhancer] Current extracted invoice_number: "${extractedData.invoice_number}"`);
     console.log(`[llm-enhancer] Current extracted vendor_name: "${extractedData.vendor_name}"`);
 
-    const prompt = this.buildEnhancementPrompt(ocrText, extractedData);
+    const prompt = this.buildVerificationPrompt(ocrText, extractedData);
     
     try {
       const response = await this.retryWithBackoff(async () => {
@@ -260,6 +260,58 @@ export class LLMEnhancerService {
       // If there's a discrepancy, trust the total and adjust subtotal
       invoice.subtotal = Math.max(0, invoice.total - invoice.tax - invoice.shipping);
     }
+  }
+
+  private buildVerificationPrompt(ocrText: string, extractedData: CanonicalInvoice): string {
+    return `You are an expert invoice data verification specialist. Your task is to carefully review the extracted invoice data against the original OCR text and correct any errors, fill missing information, and ensure accuracy.
+
+ORIGINAL OCR TEXT:
+${ocrText}
+
+CURRENTLY EXTRACTED DATA:
+${JSON.stringify(extractedData, null, 2)}
+
+VERIFICATION INSTRUCTIONS:
+1. Compare each extracted field against the OCR text
+2. Identify any missing critical information (vendor name, invoice number, date, amounts)
+3. Correct any extraction errors (wrong amounts, dates, names)
+4. Look for line items that may have been missed
+5. Ensure mathematical consistency (line items sum to subtotal/total)
+6. Fill in any empty fields if the information exists in the OCR text
+7. Fix OCR character errors (0 instead of O, 1 instead of I, etc.)
+
+RESPONSE FORMAT (JSON only):
+{
+  "enhanced_data": {
+    "invoice_number": "corrected invoice number",
+    "invoice_date": "YYYY-MM-DD format",
+    "vendor_name": "full vendor name",
+    "vendor_address": "complete address if available",
+    "bill_to": "billing information",
+    "ship_to": "shipping information",
+    "currency": "USD",
+    "subtotal": numeric_value,
+    "tax": numeric_value,
+    "shipping": numeric_value,
+    "total": numeric_value,
+    "line_items": [
+      {
+        "line_number": 1,
+        "sku": "product code if available",
+        "description": "item description",
+        "qty": numeric_quantity,
+        "unit_price": numeric_price,
+        "amount": numeric_total,
+        "tax": numeric_tax_if_any
+      }
+    ]
+  },
+  "confidence": 0.95,
+  "improvements": ["list of corrections made", "missing data filled", "errors fixed"],
+  "validation_errors": ["any remaining issues found"]
+}
+
+Focus on accuracy and completeness. Only make changes where you're confident based on the OCR text.`;
   }
 
   private buildEnhancementPrompt(ocrText: string, extractedData: CanonicalInvoice): string {

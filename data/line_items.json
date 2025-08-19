@@ -64,5 +64,16 @@
     "unit_price": 2500,
     "amount": 2500,
     "tax": 0
+  },
+  {
+    "id": "15d562d5-d2fc-4f6a-928a-40166ad2554d",
+    "invoice_id": "1447dc14-cf53-4fc7-9365-3fd15ae4d035",
+    "line_number": 1,
+    "sku": null,
+    "description": "Web Development",
+    "qty": 1,
+    "unit_price": 2500,
+    "amount": 2500,
+    "tax": 0
   }
 ]
