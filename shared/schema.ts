@@ -77,7 +77,7 @@ export const canonicalInvoiceSchema = z.object({
   total: z.number().default(0),
   line_items: z.array(z.object({
     line_number: z.number(),
-    sku: z.string().optional(),
+    sku: z.string().nullable().optional(),
     description: z.string(),
     qty: z.number().default(1),
     unit_price: z.number().default(0),

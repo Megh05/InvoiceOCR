@@ -133,7 +133,7 @@ export class DeterministicParser {
       total: totals.total,
       line_items: lineItems.value.map(item => ({
         ...item,
-        sku: item.sku || undefined
+        sku: item.sku ?? null
       })),
       raw_ocr_text: ocrText,
       mistral_ocr_text: mistralOcrText,

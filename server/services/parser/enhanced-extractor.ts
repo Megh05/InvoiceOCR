@@ -96,12 +96,20 @@ export class EnhancedKeyValueExtractor {
     ],
     
     line_items: [
-      // Service/product line with date and amount: "DESCRIPTION 1-18-19 25.00"
-      { pattern: /([A-Z][A-Z\s]{10,50})\s+(\d{1,2}-\d{1,2}-\d{2,4})\s+([0-9]+\.\d{2})/gim, confidence: 0.9, context: 'service_with_date' },
-      // Description followed by amount: "Service description 25.00"
-      { pattern: /([A-Z][A-Z\s]{5,40})\s+([0-9]+\.\d{2})/gim, confidence: 0.8, context: 'description_amount' },
-      // Table-like structure with qty and amounts
-      { pattern: /(\d+)\s+([A-Z][A-Z\s]{5,30})\s+([0-9]+\.\d{2})\s+([0-9]+\.\d{2})/gim, confidence: 0.95, context: 'qty_desc_price_total' }
+      // Enhanced line item patterns with intelligent structure detection
+      { pattern: /^\s*(\d+)\s+([A-Za-z][A-Za-z\s\-\.]{5,50})\s+(\d+(?:\.\d{2})?)\s+(\d+(?:\.\d{2})?)\s+([\$€£¥]?\s*\d+[\.,]\d{2})\s*$/gm, confidence: 0.95, context: 'full_table_row' },
+      
+      // Service with date patterns (various date formats)
+      { pattern: /([A-Za-z][A-Za-z\s\-\.]{8,60})\s+(\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4})\s+([\$€£¥]?\s*\d+[\.,]\d{2})/gim, confidence: 0.9, context: 'service_with_date' },
+      
+      // Description with amount (improved pattern)
+      { pattern: /^\s*([A-Za-z][A-Za-z\s\-\.\(\)]{8,80})\s+([\$€£¥]?\s*\d+[\.,]\d{2})\s*$/gm, confidence: 0.85, context: 'description_amount' },
+      
+      // Multi-currency line items
+      { pattern: /([A-Za-z][A-Za-z\s\-\.]{5,50}).*?(\d+).*?([\$€£¥])\s*(\d+[\.,]\d{2})/gim, confidence: 0.8, context: 'multi_currency_item' },
+      
+      // Detailed service descriptions with codes
+      { pattern: /([A-Z0-9\-]+)\s+([A-Za-z][A-Za-z\s\-\.]{5,50})\s+([\$€£¥]?\s*\d+[\.,]\d{2})/gim, confidence: 0.87, context: 'coded_service' }
     ]
   };
 
@@ -278,45 +286,31 @@ export class EnhancedKeyValueExtractor {
   private extractUsingSpatialAnalysis(context: ExtractionContext): KeyValuePair[] {
     const pairs: KeyValuePair[] = [];
     
-    // Look for key-value pairs based on spatial relationships
+    // Enhanced spatial analysis with intelligent context detection
     for (let i = 0; i < context.lines.length; i++) {
       const line = context.lines[i];
       
-      // Pattern: "Key: Value" or "Key Value" on same line
-      const colonMatch = line.match(/([^:]+):\s*(.+)/);
-      if (colonMatch) {
-        const key = colonMatch[1].trim().toLowerCase();
-        const value = colonMatch[2].trim();
-        const fieldName = this.mapKeyToFieldName(key);
-        
-        if (fieldName && this.isValidValue(value, fieldName)) {
-          pairs.push({
-            key: fieldName,
-            value: this.cleanExtractedValue(value, fieldName),
-            confidence: 0.8,
-            position: { line: i, column: 0 },
-            context: 'colon_separated',
-            extraction_method: 'spatial_analysis'
-          });
-        }
+      // Enhanced colon-separated pattern detection
+      const colonMatches = this.findColonSeparatedPairs(line, i);
+      pairs.push(...colonMatches);
+      
+      // Tab or multi-space separated key-value pairs
+      const tabMatches = this.findTabSeparatedPairs(line, i);
+      pairs.push(...tabMatches);
+      
+      // Adjacent line relationships (key on one line, value on next)
+      if (i < context.lines.length - 1) {
+        const adjacentPairs = this.findAdjacentLinePairs(context.lines, i);
+        pairs.push(...adjacentPairs);
       }
       
-      // Pattern: Key on one line, value on next line
-      if (i < context.lines.length - 1) {
-        const nextLine = context.lines[i + 1];
-        const fieldName = this.mapKeyToFieldName(line.toLowerCase());
-        
-        if (fieldName && this.isValidValue(nextLine, fieldName)) {
-          pairs.push({
-            key: fieldName,
-            value: this.cleanExtractedValue(nextLine, fieldName),
-            confidence: 0.7,
-            position: { line: i + 1, column: 0 },
-            context: 'adjacent_lines',
-            extraction_method: 'spatial_analysis'
-          });
-        }
-      }
+      // Table-like structures detection
+      const tablePairs = this.extractFromTableStructure(context.lines, i);
+      pairs.push(...tablePairs);
+      
+      // Proximity-based field detection (value near field names)
+      const proximityPairs = this.findProximityBasedPairs(context.lines, i);
+      pairs.push(...proximityPairs);
     }
     
     return pairs;
@@ -386,6 +380,169 @@ export class EnhancedKeyValueExtractor {
     }
     
     return null;
+  }
+
+  // Enhanced spatial analysis helper methods
+  private findColonSeparatedPairs(line: string, lineIndex: number): KeyValuePair[] {
+    const pairs: KeyValuePair[] = [];
+    
+    // Enhanced colon pattern matching with better key detection
+    const colonMatches = line.match(/([^:]{2,40}):\s*([^:]{1,100})(?=\s*$|\s*\||\s*;)/g);
+    
+    if (colonMatches) {
+      for (const match of colonMatches) {
+        const [, key, value] = match.match(/([^:]+):\s*(.+)/) || [];
+        if (key && value) {
+          const cleanKey = key.trim();
+          const cleanValue = value.trim();
+          const fieldName = this.mapKeyToFieldName(cleanKey);
+          
+          if (fieldName && this.isValidValue(cleanValue, fieldName)) {
+            pairs.push({
+              key: fieldName,
+              value: this.cleanExtractedValue(cleanValue, fieldName),
+              confidence: 0.85,
+              position: { line: lineIndex, column: line.indexOf(key) },
+              context: 'colon_separated_enhanced',
+              extraction_method: 'spatial_analysis'
+            });
+          }
+        }
+      }
+    }
+    
+    return pairs;
+  }
+
+  private findTabSeparatedPairs(line: string, lineIndex: number): KeyValuePair[] {
+    const pairs: KeyValuePair[] = [];
+    
+    // Detect tab or multi-space separated values
+    const parts = line.split(/\t|\s{3,}/).filter(part => part.trim().length > 0);
+    
+    if (parts.length === 2) {
+      const [potentialKey, potentialValue] = parts;
+      const fieldName = this.mapKeyToFieldName(potentialKey.trim());
+      
+      if (fieldName && this.isValidValue(potentialValue.trim(), fieldName)) {
+        pairs.push({
+          key: fieldName,
+          value: this.cleanExtractedValue(potentialValue.trim(), fieldName),
+          confidence: 0.8,
+          position: { line: lineIndex, column: 0 },
+          context: 'tab_separated',
+          extraction_method: 'spatial_analysis'
+        });
+      }
+    }
+    
+    return pairs;
+  }
+
+  private findAdjacentLinePairs(lines: string[], lineIndex: number): KeyValuePair[] {
+    const pairs: KeyValuePair[] = [];
+    
+    if (lineIndex < lines.length - 1) {
+      const currentLine = lines[lineIndex].trim();
+      const nextLine = lines[lineIndex + 1].trim();
+      
+      // Check if current line looks like a field label
+      const fieldName = this.mapKeyToFieldName(currentLine);
+      
+      if (fieldName && this.isValidValue(nextLine, fieldName) && !this.mapKeyToFieldName(nextLine)) {
+        pairs.push({
+          key: fieldName,
+          value: this.cleanExtractedValue(nextLine, fieldName),
+          confidence: 0.75,
+          position: { line: lineIndex + 1, column: 0 },
+          context: 'adjacent_lines_enhanced',
+          extraction_method: 'spatial_analysis'
+        });
+      }
+    }
+    
+    return pairs;
+  }
+
+  private extractFromTableStructure(lines: string[], lineIndex: number): KeyValuePair[] {
+    const pairs: KeyValuePair[] = [];
+    
+    // Look for table-like structures with consistent column spacing
+    const line = lines[lineIndex];
+    
+    // Detect lines that might be table rows (multiple values separated by consistent spacing)
+    const tablePattern = /^\s*([A-Za-z][\w\s]{3,30})\s{3,}([\d.,]+)\s{3,}([\d.,]+)\s*$/;
+    const match = line.match(tablePattern);
+    
+    if (match) {
+      const [, description, value1, value2] = match;
+      
+      // Try to determine what these values represent based on context
+      if (this.looksLikeAmount(value1) || this.looksLikeAmount(value2)) {
+        const amount = this.looksLikeAmount(value2) ? value2 : value1;
+        
+        pairs.push({
+          key: 'line_items',
+          value: JSON.stringify({ description: description.trim(), amount: amount }),
+          confidence: 0.8,
+          position: { line: lineIndex, column: 0 },
+          context: 'table_structure',
+          extraction_method: 'spatial_analysis'
+        });
+      }
+    }
+    
+    return pairs;
+  }
+
+  private findProximityBasedPairs(lines: string[], lineIndex: number): KeyValuePair[] {
+    const pairs: KeyValuePair[] = [];
+    
+    const line = lines[lineIndex];
+    
+    // Look for values that appear near known field keywords
+    const proximityPatterns = [
+      { keywords: ['total', 'amount', 'due'], field: 'total_amount', pattern: /([\$€£¥]?\s*[\d,]+\.d{2})/ },
+      { keywords: ['date'], field: 'invoice_date', pattern: /(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/ },
+      { keywords: ['invoice', 'bill', 'ref'], field: 'invoice_number', pattern: /([A-Z0-9\-]{4,15})/ }
+    ];
+    
+    for (const { keywords, field, pattern } of proximityPatterns) {
+      const hasKeyword = keywords.some(keyword => 
+        line.toLowerCase().includes(keyword.toLowerCase())
+      );
+      
+      if (hasKeyword) {
+        const matches = line.match(pattern);
+        if (matches) {
+          pairs.push({
+            key: field,
+            value: this.cleanExtractedValue(matches[1], field),
+            confidence: 0.7,
+            position: { line: lineIndex, column: matches.index || 0 },
+            context: 'proximity_based',
+            extraction_method: 'spatial_analysis'
+          });
+        }
+      }
+    }
+    
+    return pairs;
+  }
+
+  // Utility methods
+  private calculateSimilarity(str1: string, str2: string): number {
+    const longer = str1.length > str2.length ? str1 : str2;
+    const shorter = str1.length > str2.length ? str2 : str1;
+    
+    if (longer.length === 0) return 1.0;
+    
+    const editDistance = this.calculateEditDistance(shorter, longer);
+    return (longer.length - editDistance) / longer.length;
+  }
+
+  private looksLikeAmount(value: string): boolean {
+    return /^[\$€£¥]?\s*[\d,]+\.\d{2}$/.test(value.trim());
   }
 
   // Helper methods for document structure analysis
@@ -503,48 +660,86 @@ export class EnhancedKeyValueExtractor {
     return regions;
   }
 
-  // Field mapping and validation
+  // Enhanced field mapping with fuzzy matching and context awareness
   private mapKeyToFieldName(key: string): string | null {
+    const cleanKey = key.toLowerCase().trim().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ');
+    
+    // Comprehensive field mappings with fuzzy matching
     const keyMappings: { [key: string]: string } = {
-      'invoice number': 'invoice_number',
-      'invoice #': 'invoice_number',
-      'inv no': 'invoice_number',
-      'number': 'invoice_number',
-      'reference': 'invoice_number',
-      'ref': 'invoice_number',
+      // Invoice number variants
+      'invoice number': 'invoice_number', 'invoice no': 'invoice_number', 'invoice num': 'invoice_number',
+      'inv number': 'invoice_number', 'inv no': 'invoice_number', 'inv num': 'invoice_number',
+      'bill number': 'invoice_number', 'bill no': 'invoice_number', 'document number': 'invoice_number',
+      'doc number': 'invoice_number', 'doc no': 'invoice_number', 'reference number': 'invoice_number',
+      'ref number': 'invoice_number', 'ref no': 'invoice_number', 'reference': 'invoice_number', 'ref': 'invoice_number',
+      'order number': 'invoice_number', 'order no': 'invoice_number', 'po number': 'invoice_number',
+      'statement number': 'invoice_number', 'account number': 'invoice_number', 'transaction id': 'invoice_number',
       
-      'invoice date': 'invoice_date',
-      'date': 'invoice_date',
-      'bill date': 'invoice_date',
+      // Date variants
+      'invoice date': 'invoice_date', 'bill date': 'invoice_date', 'statement date': 'invoice_date',
+      'date': 'invoice_date', 'issue date': 'invoice_date', 'created date': 'invoice_date',
+      'transaction date': 'invoice_date', 'service date': 'invoice_date',
       
-      'vendor': 'vendor_name',
-      'company': 'vendor_name',
-      'from': 'vendor_name',
-      'business': 'vendor_name',
+      // Vendor/company variants
+      'vendor': 'vendor_name', 'vendor name': 'vendor_name', 'company': 'vendor_name', 'company name': 'vendor_name',
+      'business': 'vendor_name', 'business name': 'vendor_name', 'supplier': 'vendor_name', 'provider': 'vendor_name',
+      'merchant': 'vendor_name', 'seller': 'vendor_name', 'from': 'vendor_name', 'billed by': 'vendor_name',
+      'organization': 'vendor_name', 'firm': 'vendor_name', 'enterprise': 'vendor_name',
       
-      'total': 'total_amount',
-      'amount due': 'total_amount',
-      'grand total': 'total_amount',
-      'balance': 'total_amount',
+      // Amount variants
+      'total': 'total_amount', 'total amount': 'total_amount', 'grand total': 'total_amount',
+      'amount due': 'total_amount', 'balance due': 'total_amount', 'amount payable': 'total_amount',
+      'final amount': 'total_amount', 'balance': 'total_amount', 'payable amount': 'total_amount',
+      'total due': 'total_amount', 'amount owing': 'total_amount',
       
-      'subtotal': 'subtotal',
-      'sub total': 'subtotal',
-      'net amount': 'subtotal',
+      // Subtotal variants
+      'subtotal': 'subtotal', 'sub total': 'subtotal', 'net amount': 'subtotal',
+      'net total': 'subtotal', 'base amount': 'subtotal', 'before tax': 'subtotal',
       
-      'tax': 'tax',
-      'vat': 'tax',
-      'gst': 'tax',
+      // Tax variants
+      'tax': 'tax', 'vat': 'tax', 'gst': 'tax', 'hst': 'tax', 'sales tax': 'tax',
+      'tax amount': 'tax', 'vat amount': 'tax', 'gst amount': 'tax',
       
-      'shipping': 'shipping',
-      'freight': 'shipping',
-      'delivery': 'shipping',
+      // Shipping variants
+      'shipping': 'shipping', 'shipping cost': 'shipping', 'shipping fee': 'shipping',
+      'freight': 'shipping', 'delivery': 'shipping', 'delivery fee': 'shipping',
+      'handling': 'shipping', 'postage': 'shipping',
       
-      'bill to': 'bill_to',
-      'billed to': 'bill_to',
-      'customer': 'bill_to'
+      // Bill to variants
+      'bill to': 'bill_to', 'billed to': 'bill_to', 'customer': 'bill_to',
+      'client': 'bill_to', 'buyer': 'bill_to', 'purchaser': 'bill_to', 'to': 'bill_to'
     };
     
-    return keyMappings[key.toLowerCase()] || null;
+    // Direct mapping first
+    if (keyMappings[cleanKey]) {
+      return keyMappings[cleanKey];
+    }
+    
+    // Fuzzy matching for partial matches
+    for (const [pattern, fieldName] of Object.entries(keyMappings)) {
+      if (this.calculateSimilarity(cleanKey, pattern) > 0.8) {
+        return fieldName;
+      }
+    }
+    
+    // Partial word matching
+    for (const [pattern, fieldName] of Object.entries(keyMappings)) {
+      const patternWords = pattern.split(' ');
+      const keyWords = cleanKey.split(' ');
+      
+      let matchCount = 0;
+      for (const patternWord of patternWords) {
+        if (keyWords.some(keyWord => keyWord.includes(patternWord) || patternWord.includes(keyWord))) {
+          matchCount++;
+        }
+      }
+      
+      if (matchCount / patternWords.length > 0.6) {
+        return fieldName;
+      }
+    }
+    
+    return null;
   }
 
   private isValidValue(value: string, fieldName: string): boolean {
