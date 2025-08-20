@@ -250,35 +250,38 @@ export default function AllInvoices() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto p-6 space-y-6">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/30 relative">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(99,102,241,0.05)_0%,transparent_25%)] pointer-events-none"></div>
+        <div className="relative max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
           {/* Header */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-gray-900 rounded-lg">
-                  <FileText className="w-5 h-5 text-white" />
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/60 to-blue-50/40 rounded-2xl blur-xl"></div>
+            <div className="relative bg-white/80 backdrop-blur-sm border border-white/50 rounded-2xl shadow-lg p-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-gradient-to-br from-blue-600 to-purple-700 rounded-lg shadow-lg">
+                    <FileText className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-semibold text-gray-900">All Invoices</h1>
+                    <p className="text-gray-600 text-sm">
+                      {isLoading ? "Loading..." : `${invoices?.length || 0} invoices processed`}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h1 className="text-2xl font-semibold text-gray-900">All Invoices</h1>
-                  <p className="text-gray-600 text-sm">
-                    {isLoading ? "Loading..." : `${invoices?.length || 0} invoices processed`}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      disabled={!invoices || invoices.length === 0}
-                      className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                    >
-                      <Download className="mr-2 h-4 w-4" />
-                      Export
-                      <ChevronDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
+                <div className="flex items-center space-x-3">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        disabled={!invoices || invoices.length === 0}
+                        className="border-white/50 bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-white/80 transition-all duration-200 shadow-sm"
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        Export
+                        <ChevronDown className="ml-2 h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem onClick={handleExportCSV}>
                       <FileText className="mr-2 h-4 w-4" />
@@ -294,211 +297,254 @@ export default function AllInvoices() {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </div>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Summary Cards */}
           {!isLoading && invoices && (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="border border-gray-200 hover:border-gray-300 transition-colors">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">Total Invoices</CardTitle>
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <FileText className="h-4 w-4 text-gray-600" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-gray-900 mb-1">{invoices.length}</div>
-                  <p className="text-xs text-gray-500">Total processed</p>
-                </CardContent>
-              </Card>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-2xl blur-xl"></div>
+                <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium text-gray-600">Total Invoices</CardTitle>
+                    <div className="p-2 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg">
+                      <FileText className="h-4 w-4 text-blue-600" />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-gray-900 mb-1">{invoices.length}</div>
+                    <p className="text-xs text-gray-500">Total processed</p>
+                  </CardContent>
+                </Card>
+              </div>
 
-              <Card className="border border-gray-200 hover:border-gray-300 transition-colors">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">Total Amount</CardTitle>
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <DollarSign className="h-4 w-4 text-gray-600" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-gray-900 mb-1">
-                    {formatCurrency(invoices.reduce((sum, inv) => sum + inv.total, 0))}
-                  </div>
-                  <p className="text-xs text-gray-500">Combined value</p>
-                </CardContent>
-              </Card>
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-600/10 rounded-2xl blur-xl"></div>
+                <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium text-gray-600">Total Amount</CardTitle>
+                    <div className="p-2 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg">
+                      <DollarSign className="h-4 w-4 text-green-600" />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-gray-900 mb-1">
+                      {formatCurrency(invoices.reduce((sum, inv) => sum + inv.total, 0))}
+                    </div>
+                    <p className="text-xs text-gray-500">Combined value</p>
+                  </CardContent>
+                </Card>
+              </div>
 
-              <Card className="border border-gray-200 hover:border-gray-300 transition-colors">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">Average Amount</CardTitle>
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <Building2 className="h-4 w-4 text-gray-600" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-gray-900 mb-1">
-                    {formatCurrency(invoices.length > 0 ? invoices.reduce((sum, inv) => sum + inv.total, 0) / invoices.length : 0)}
-                  </div>
-                  <p className="text-xs text-gray-500">Average amount</p>
-                </CardContent>
-              </Card>
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-orange-600/10 rounded-2xl blur-xl"></div>
+                <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium text-gray-600">Average Amount</CardTitle>
+                    <div className="p-2 bg-gradient-to-br from-amber-100 to-orange-100 rounded-lg">
+                      <Building2 className="h-4 w-4 text-amber-600" />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-gray-900 mb-1">
+                      {formatCurrency(invoices.length > 0 ? invoices.reduce((sum, inv) => sum + inv.total, 0) / invoices.length : 0)}
+                    </div>
+                    <p className="text-xs text-gray-500">Average amount</p>
+                  </CardContent>
+                </Card>
+              </div>
 
-              <Card className="border border-gray-200 hover:border-gray-300 transition-colors">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">High Confidence</CardTitle>
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <Calendar className="h-4 w-4 text-gray-600" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-gray-900 mb-1">
-                    {Math.round((invoices.filter(inv => inv.confidence >= 0.8).length / invoices.length) * 100)}%
-                  </div>
-                  <p className="text-xs text-gray-500">Quality score</p>
-                </CardContent>
-              </Card>
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-600/10 rounded-2xl blur-xl"></div>
+                <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium text-gray-600">High Confidence</CardTitle>
+                    <div className="p-2 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg">
+                      <Calendar className="h-4 w-4 text-purple-600" />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-gray-900 mb-1">
+                      {Math.round((invoices.filter(inv => inv.confidence >= 0.8).length / invoices.length) * 100)}%
+                    </div>
+                    <p className="text-xs text-gray-500">Quality score</p>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           )}
 
-        {/* Invoices List */}
-        <div className="space-y-4">
+        {/* Invoices Grid */}
+        <div className="space-y-6">
           {isLoading ? (
             // Loading skeleton
-            <div className="space-y-4">
-              {[...Array(5)].map((_, i) => (
-                <Card key={i} className="animate-pulse">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-200/50 to-gray-300/50 rounded-2xl blur-xl"></div>
+                  <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg animate-pulse h-80">
+                    <CardContent className="p-4 space-y-3">
+                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                      <div className="h-16 bg-gray-200 rounded"></div>
                       <div className="space-y-2">
-                        <div className="h-4 bg-gray-200 rounded w-32"></div>
-                        <div className="h-3 bg-gray-200 rounded w-48"></div>
+                        <div className="h-3 bg-gray-200 rounded w-full"></div>
+                        <div className="h-3 bg-gray-200 rounded w-2/3"></div>
                       </div>
-                      <div className="h-6 bg-gray-200 rounded w-16"></div>
-                    </div>
-                  </CardContent>
-                </Card>
+                      <div className="h-8 bg-gray-200 rounded w-full"></div>
+                    </CardContent>
+                  </Card>
+                </div>
               ))}
             </div>
           ) : invoices && invoices.length > 0 ? (
-            invoices.map((invoice) => (
-              <div key={invoice.id} className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-gray-500/5 to-slate-500/5 rounded-2xl blur-xl"></div>
-                <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] h-64">
-                <CardContent className="p-6 h-full flex flex-col">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-4">
-                        <div>
-                          <h3 className="font-semibold text-lg">
-                            {invoice.invoice_number || `Invoice ${invoice.id.slice(0, 8)}`}
-                          </h3>
-                          <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
-                            <span className="flex items-center">
-                              <Calendar className="mr-1 h-3 w-3" />
-                              {formatDate(invoice.invoice_date)}
-                            </span>
-                            <span className="flex items-center">
-                              <Building2 className="mr-1 h-3 w-3" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {invoices.map((invoice, index) => {
+                const gradientColors = [
+                  'from-blue-500/10 to-purple-600/10',
+                  'from-green-500/10 to-emerald-600/10',
+                  'from-amber-500/10 to-orange-600/10',
+                  'from-purple-500/10 to-pink-600/10',
+                  'from-indigo-500/10 to-blue-600/10',
+                  'from-rose-500/10 to-red-600/10',
+                ];
+                const gradientColor = gradientColors[index % gradientColors.length];
+                
+                return (
+                  <div key={invoice.id} className="relative group">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${gradientColor} rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300`}></div>
+                    <Card className="relative bg-white/80 backdrop-blur-sm border border-white/50 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] h-80">
+                      <CardContent className="p-4 h-full flex flex-col">
+                        {/* Header */}
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-sm text-gray-900 truncate">
+                              {invoice.invoice_number || `Invoice ${invoice.id.slice(0, 8)}`}
+                            </h3>
+                            <p className="text-xs text-gray-600 mt-1 truncate">
                               {invoice.vendor_name || "Unknown Vendor"}
-                            </span>
-                            <span className="flex items-center">
-                              <DollarSign className="mr-1 h-3 w-3" />
+                            </p>
+                          </div>
+                          <Badge className={`text-xs ${getConfidenceColor(invoice.confidence)}`}>
+                            {Math.round(invoice.confidence * 100)}%
+                          </Badge>
+                        </div>
+
+                        {/* Amount Display */}
+                        <div className="bg-gray-50/50 rounded-lg p-3 mb-3">
+                          <div className="text-center">
+                            <div className="text-lg font-bold text-gray-900">
                               {formatCurrency(invoice.total, invoice.currency || "USD")}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {formatDate(invoice.invoice_date)}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Invoice Details */}
+                        <div className="flex-1 space-y-2 text-xs">
+                          <div className="flex justify-between">
+                            <span className="text-gray-500">Subtotal:</span>
+                            <span className="font-medium text-gray-700">
+                              {formatCurrency(invoice.subtotal, invoice.currency || "USD")}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-500">Tax:</span>
+                            <span className="font-medium text-gray-700">
+                              {formatCurrency(invoice.tax, invoice.currency || "USD")}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-500">Shipping:</span>
+                            <span className="font-medium text-gray-700">
+                              {formatCurrency(invoice.shipping, invoice.currency || "USD")}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-500">Processed:</span>
+                            <span className="font-medium text-gray-700">
+                              {formatDate(invoice.created_at)}
                             </span>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center space-x-3">
-                      <Badge className={getConfidenceColor(invoice.confidence)}>
-                        {Math.round(invoice.confidence * 100)}% confidence
-                      </Badge>
-                      
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleViewDetails(invoice.id)}
-                          data-testid={`button-view-${invoice.id}`}
-                        >
-                          <Eye className="mr-2 h-4 w-4" />
-                          View Details
-                        </Button>
-                        
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" data-testid={`button-export-${invoice.id}`}>
-                              <Download className="mr-2 h-4 w-4" />
-                              Export
-                              <ChevronDown className="ml-2 h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem 
-                              onClick={() => handleExport(invoice.id, 'json')}
-                              data-testid={`export-json-${invoice.id}`}
-                            >
-                              <FileText className="w-4 h-4 mr-2" />
-                              Export as JSON
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => handleExport(invoice.id, 'csv')}
-                              data-testid={`export-csv-${invoice.id}`}
-                            >
-                              <FileText className="w-4 h-4 mr-2" />
-                              Export as CSV
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => handleExport(invoice.id, 'pdf')}
-                              data-testid={`export-pdf-${invoice.id}`}
-                            >
-                              <FileText className="w-4 h-4 mr-2" />
-                              Export as PDF
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </div>
+
+                        {/* Action Buttons */}
+                        <div className="mt-4 space-y-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewDetails(invoice.id)}
+                            data-testid={`button-view-${invoice.id}`}
+                            className="w-full text-xs h-8 border-gray-200 hover:bg-gray-50"
+                          >
+                            <Eye className="mr-1 h-3 w-3" />
+                            View Details
+                          </Button>
+                          
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                data-testid={`button-export-${invoice.id}`}
+                                className="w-full text-xs h-8 border-gray-200 hover:bg-gray-50"
+                              >
+                                <Download className="mr-1 h-3 w-3" />
+                                Export
+                                <ChevronDown className="ml-1 h-3 w-3" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem 
+                                onClick={() => handleExport(invoice.id, 'json')}
+                                data-testid={`export-json-${invoice.id}`}
+                              >
+                                <FileText className="w-3 h-3 mr-2" />
+                                JSON
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleExport(invoice.id, 'csv')}
+                                data-testid={`export-csv-${invoice.id}`}
+                              >
+                                <FileText className="w-3 h-3 mr-2" />
+                                CSV
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleExport(invoice.id, 'pdf')}
+                                data-testid={`export-pdf-${invoice.id}`}
+                              >
+                                <FileText className="w-3 h-3 mr-2" />
+                                PDF
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
-                  
-                  <Separator className="my-4" />
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div>
-                      <span className="font-medium text-gray-500">Subtotal</span>
-                      <p className="mt-1">{formatCurrency(invoice.subtotal, invoice.currency || "USD")}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-500">Tax</span>
-                      <p className="mt-1">{formatCurrency(invoice.tax, invoice.currency || "USD")}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-500">Shipping</span>
-                      <p className="mt-1">{formatCurrency(invoice.shipping, invoice.currency || "USD")}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-500">Processed</span>
-                      <p className="mt-1">{formatDate(invoice.created_at)}</p>
-                    </div>
-                  </div>
-                </CardContent>
-                </Card>
-              </div>
-            ))
+                );
+              })}
+            </div>
           ) : (
-            <Card>
-              <CardContent className="p-12 text-center">
-                <FileText className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No invoices yet</h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  Start by processing your first invoice document.
-                </p>
-              </CardContent>
-            </Card>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-500/10 to-slate-500/10 rounded-2xl blur-xl"></div>
+              <Card className="relative bg-white/80 backdrop-blur-sm border border-white/50 rounded-2xl shadow-lg">
+                <CardContent className="p-12 text-center">
+                  <FileText className="mx-auto h-12 w-12 text-gray-400" />
+                  <h3 className="mt-2 text-sm font-medium text-gray-900">No invoices yet</h3>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Start by processing your first invoice document.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
           )}
+        </div>
         </div>
       </div>
     </Layout>

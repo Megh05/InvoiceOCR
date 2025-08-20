@@ -104,37 +104,40 @@ export default function Analytics() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto p-6 space-y-6">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/30 relative">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(99,102,241,0.05)_0%,transparent_25%)] pointer-events-none"></div>
+        <div className="relative max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
           {/* Header */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-gray-900 rounded-lg">
-                  <Activity className="w-5 h-5 text-white" />
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/60 to-blue-50/40 rounded-2xl blur-xl"></div>
+            <div className="relative bg-white/80 backdrop-blur-sm border border-white/50 rounded-2xl shadow-lg p-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-gradient-to-br from-blue-600 to-purple-700 rounded-lg shadow-lg">
+                    <Activity className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-semibold text-gray-900">Analytics Dashboard</h1>
+                    <p className="text-gray-600 text-sm">
+                      {analytics.total_invoices} invoices analyzed
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h1 className="text-2xl font-semibold text-gray-900">Analytics Dashboard</h1>
-                  <p className="text-gray-600 text-sm">
-                    {analytics.total_invoices} invoices analyzed
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setShowDetails(!showDetails)}
-                  className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                >
-                  {showDetails ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
-                  {showDetails ? 'Hide Details' : 'Show Details'}
-                </Button>
-                
-                <Button variant="outline" size="sm" className="border-gray-300 text-gray-700 hover:bg-gray-50">
-                  <Download className="w-4 h-4 mr-2" />
-                  Export
-                </Button>
+                <div className="flex items-center space-x-3">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setShowDetails(!showDetails)}
+                    className="border-white/50 bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-white/80 transition-all duration-200"
+                  >
+                    {showDetails ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
+                    {showDetails ? 'Hide Details' : 'Show Details'}
+                  </Button>
+                  
+                  <Button variant="outline" size="sm" className="border-white/50 bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-white/80 transition-all duration-200">
+                    <Download className="w-4 h-4 mr-2" />
+                    Export
+                  </Button>
                 
                 <div className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-md border border-gray-200">
                   <span className="w-2 h-2 bg-green-500 rounded-full inline-block mr-2"></span>
@@ -514,6 +517,7 @@ export default function Analytics() {
               </div>
             </CardContent>
           </Card>
+        </div>
         </div>
       </div>
     </Layout>

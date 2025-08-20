@@ -153,30 +153,36 @@ export default function Settings() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-6xl mx-auto p-6">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/30 relative">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(99,102,241,0.05)_0%,transparent_25%)] pointer-events-none"></div>
+        <div className="relative max-w-6xl mx-auto p-4 sm:p-6">
           {/* Header */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
-            <div className="flex items-center space-x-4">
-              <div className="p-2 bg-gray-900 rounded-lg">
-                <SettingsIcon className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-semibold text-gray-900">
-                  Settings
-                </h1>
-                <p className="text-gray-600 text-sm">Manage your application configuration and preferences</p>
+          <div className="relative mb-8">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/60 to-purple-50/40 rounded-2xl blur-xl"></div>
+            <div className="relative bg-white/80 backdrop-blur-sm border border-white/50 rounded-2xl shadow-lg p-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-2 bg-gradient-to-br from-purple-600 to-indigo-700 rounded-lg shadow-lg">
+                  <SettingsIcon className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-semibold text-gray-900">
+                    Settings
+                  </h1>
+                  <p className="text-gray-600 text-sm">Manage your application configuration and preferences</p>
+                </div>
               </div>
             </div>
           </div>
 
           <div className="grid gap-6">
             {/* API Configuration */}
-            <Card className="border border-gray-200">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-2xl blur-xl"></div>
+              <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-900">
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <Key className="h-4 w-4 text-gray-600" />
+                  <div className="p-2 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg">
+                    <Key className="h-4 w-4 text-blue-600" />
                   </div>
                   API Configuration
                 </CardTitle>
@@ -255,13 +261,16 @@ export default function Settings() {
                 </div>
               </CardContent>
             </Card>
+            </div>
 
             {/* Processing Settings */}
-            <Card className="border border-gray-200">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-600/10 rounded-2xl blur-xl"></div>
+              <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-900">
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <Zap className="h-4 w-4 text-gray-600" />
+                  <div className="p-2 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg">
+                    <Zap className="h-4 w-4 text-green-600" />
                   </div>
                   Processing Settings
                 </CardTitle>
@@ -313,13 +322,16 @@ export default function Settings() {
                 </div>
               </CardContent>
             </Card>
+            </div>
 
             {/* Data Management */}
-            <Card className="border border-gray-200">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-orange-600/10 rounded-2xl blur-xl"></div>
+              <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-900">
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <Database className="h-4 w-4 text-gray-600" />
+                  <div className="p-2 bg-gradient-to-br from-amber-100 to-orange-100 rounded-lg">
+                    <Database className="h-4 w-4 text-amber-600" />
                   </div>
                   Data Management
                 </CardTitle>
@@ -346,13 +358,16 @@ export default function Settings() {
                 </div>
               </CardContent>
             </Card>
+            </div>
 
             {/* Security */}
-            <Card className="border border-gray-200">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-rose-500/10 to-pink-600/10 rounded-2xl blur-xl"></div>
+              <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-900">
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <Shield className="h-4 w-4 text-gray-600" />
+                  <div className="p-2 bg-gradient-to-br from-rose-100 to-pink-100 rounded-lg">
+                    <Shield className="h-4 w-4 text-rose-600" />
                   </div>
                   Security
                 </CardTitle>
@@ -390,21 +405,25 @@ export default function Settings() {
                 </div>
               </CardContent>
             </Card>
+            </div>
 
             {/* Save Settings */}
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <div className="flex justify-end gap-4">
-                <Button 
-                  variant="outline" 
-                  className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-3"
-                >
-                  Reset to Defaults
-                </Button>
-                <Button 
-                  className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 font-semibold"
-                >
-                  Save Settings
-                </Button>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-500/10 to-slate-500/10 rounded-2xl blur-xl"></div>
+              <div className="relative bg-white/80 backdrop-blur-sm border border-white/50 rounded-2xl shadow-lg p-6">
+                <div className="flex justify-end gap-4">
+                  <Button 
+                    variant="outline" 
+                    className="border-white/50 bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-white/80 transition-all duration-200 px-6 py-3"
+                  >
+                    Reset to Defaults
+                  </Button>
+                  <Button 
+                    className="bg-gradient-to-r from-gray-900 to-gray-800 hover:from-gray-800 hover:to-gray-700 text-white px-8 py-3 font-semibold shadow-lg transition-all duration-200"
+                  >
+                    Save Settings
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

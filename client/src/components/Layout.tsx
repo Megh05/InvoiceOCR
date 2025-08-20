@@ -47,13 +47,13 @@ export default function Layout({ children }: LayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-blue-50/20 to-indigo-50/20">
       {/* Sidebar */}
       <div className="w-64 fixed h-full z-10">
-        <div className="bg-white border-r border-gray-200 h-full">
+        <div className="bg-white/80 backdrop-blur-xl border-r border-white/50 h-full shadow-xl">
           <div className="p-6">
             <div className="flex items-center space-x-3 mb-8">
-              <div className="p-2 bg-gray-900 rounded-lg">
+              <div className="p-2 bg-gradient-to-br from-blue-600 to-purple-700 rounded-lg shadow-lg">
                 <Receipt className="w-6 h-6 text-white" />
               </div>
               <h1 className="text-2xl font-semibold text-gray-900">
