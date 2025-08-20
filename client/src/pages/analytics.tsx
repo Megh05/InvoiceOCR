@@ -94,18 +94,18 @@ export default function Analytics() {
           {/* Enhanced Header */}
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-3xl blur-3xl"></div>
-            <div className="relative bg-white/80 backdrop-blur-sm border border-white/20 rounded-3xl p-6 shadow-xl">
+            <div className="relative bg-white/80 backdrop-blur-sm border border-white/20 rounded-3xl p-4 shadow-xl">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
                   <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-                      <Activity className="w-5 h-5 text-white" />
+                    <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-lg">
+                      <Activity className="w-4 h-4 text-white" />
                     </div>
                     <div>
-                      <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                      <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
                         Invoice Analytics
                       </h1>
-                      <p className="text-gray-600 text-sm">Insights and patterns from your processed invoices</p>
+                      <p className="text-gray-600 text-xs">Insights and patterns from your processed invoices</p>
                     </div>
                   </div>
                 </div>
@@ -136,7 +136,7 @@ export default function Analytics() {
           </div>
 
           {/* Enhanced Key Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card 
               className={`group relative overflow-hidden bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-200/50 hover:border-blue-300/80 transition-all duration-500 hover:shadow-xl hover:-translate-y-1 ${
                 hoveredCard === 'invoices' ? 'shadow-2xl -translate-y-1' : ''
@@ -145,16 +145,16 @@ export default function Analytics() {
               onMouseLeave={() => setHoveredCard(null)}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative">
-                <CardTitle className="text-sm font-semibold text-gray-700 group-hover:text-blue-700 transition-colors">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
+                <CardTitle className="text-xs font-medium text-gray-700 group-hover:text-blue-700 transition-colors">
                   Total Invoices
                 </CardTitle>
-                <div className="p-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300">
-                  <FileText className="h-5 w-5 text-white" />
+                <div className="p-1.5 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg group-hover:shadow-xl transition-all duration-300">
+                  <FileText className="h-4 w-4 text-white" />
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-blue-700 transition-colors">
+                <div className="text-xl font-bold text-gray-900 mb-1 group-hover:text-blue-700 transition-colors">
                   {analytics.total_invoices.toLocaleString()}
                 </div>
                 <div className="flex items-center space-x-2">
@@ -166,7 +166,7 @@ export default function Analytics() {
                       }}
                     />
                   </div>
-                  <p className="text-xs font-medium text-blue-600">
+                  <p className="text-xs text-blue-600">
                     {analytics.recognition_stats.template_recognized} recognized
                   </p>
                 </div>
@@ -181,19 +181,19 @@ export default function Analytics() {
               onMouseLeave={() => setHoveredCard(null)}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative">
-                <CardTitle className="text-sm font-semibold text-gray-700 group-hover:text-green-700 transition-colors">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
+                <CardTitle className="text-xs font-medium text-gray-700 group-hover:text-green-700 transition-colors">
                   Total Amount
                 </CardTitle>
-                <div className="p-2 bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300">
-                  <DollarSign className="h-5 w-5 text-white" />
+                <div className="p-1.5 bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg group-hover:shadow-xl transition-all duration-300">
+                  <DollarSign className="h-4 w-4 text-white" />
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-3xl font-bold text-gray-900 mb-2 group-hover:text-green-700 transition-colors">
+                <div className="text-xl font-bold text-gray-900 mb-1 group-hover:text-green-700 transition-colors">
                   ${analytics.total_amount.toLocaleString()}
                 </div>
-                <p className="text-sm text-green-600 font-medium">
+                <p className="text-xs text-green-600">
                   Avg: ${analytics.average_amount.toLocaleString()}
                 </p>
               </CardContent>
@@ -207,22 +207,22 @@ export default function Analytics() {
               onMouseLeave={() => setHoveredCard(null)}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative">
-                <CardTitle className="text-sm font-semibold text-gray-700 group-hover:text-orange-700 transition-colors">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
+                <CardTitle className="text-xs font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
                   Recognition Rate
                 </CardTitle>
-                <div className="p-2 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300">
-                  <Target className="h-5 w-5 text-white" />
+                <div className="p-1.5 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg shadow-lg group-hover:shadow-xl transition-all duration-300">
+                  <Target className="h-4 w-4 text-white" />
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-3xl font-bold text-gray-900 mb-2 group-hover:text-orange-700 transition-colors">
+                <div className="text-xl font-bold text-gray-900 mb-1 group-hover:text-orange-700 transition-colors">
                   {analytics.recognition_stats.total_processed > 0 
                     ? Math.round((analytics.recognition_stats.template_recognized / analytics.recognition_stats.total_processed) * 100)
                     : 0}%
                 </div>
-                <p className="text-sm text-orange-600 font-medium">
-                  Template detection success
+                <p className="text-xs text-orange-600">
+                  Template detection
                 </p>
               </CardContent>
             </Card>
@@ -235,22 +235,22 @@ export default function Analytics() {
               onMouseLeave={() => setHoveredCard(null)}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative">
-                <CardTitle className="text-sm font-semibold text-gray-700 group-hover:text-purple-700 transition-colors">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
+                <CardTitle className="text-xs font-medium text-gray-700 group-hover:text-purple-700 transition-colors">
                   Data Quality
                 </CardTitle>
-                <div className="p-2 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300">
-                  <TrendingUp className="h-5 w-5 text-white" />
+                <div className="p-1.5 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-lg group-hover:shadow-xl transition-all duration-300">
+                  <TrendingUp className="h-4 w-4 text-white" />
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-3xl font-bold text-gray-900 mb-2 group-hover:text-purple-700 transition-colors">
+                <div className="text-xl font-bold text-gray-900 mb-1 group-hover:text-purple-700 transition-colors">
                   {analytics.recognition_stats.total_processed > 0 
                     ? Math.round((analytics.recognition_stats.high_confidence / analytics.recognition_stats.total_processed) * 100)
                     : 0}%
                 </div>
-                <p className="text-sm text-purple-600 font-medium">
-                  High confidence extractions
+                <p className="text-xs text-purple-600">
+                  High confidence
                 </p>
               </CardContent>
             </Card>
