@@ -17,19 +17,19 @@ export default function OCRStep() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-        <div className="text-center mb-8">
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">Step 2: OCR & AI Verification</h3>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="text-center mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Step 2: OCR & AI Verification</h3>
           <p className="text-gray-600">
             {currentStage === 'ocr' ? 'Extracting text from your document...' : 'Verifying data accuracy with AI...'}
           </p>
         </div>
 
         {/* Processing Animation */}
-        <div className="flex flex-col items-center justify-center py-12">
-          <Loader2 className="w-16 h-16 text-blue-500 animate-spin mb-6" />
+        <div className="flex flex-col items-center justify-center py-8">
+          <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
           <div className="text-center">
-            <p className="text-lg font-medium text-gray-900 mb-2">
+            <p className="text-sm font-medium text-gray-900 mb-2">
               {currentStage === 'ocr' ? 'Running OCR Extraction' : 'AI Verification in Progress'}
             </p>
             <p className="text-gray-600 mb-4">

@@ -15,10 +15,10 @@ const stepLabels: Record<WizardStep, string> = {
 
 export default function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
   return (
-    <div className="mb-12">
+    <div className="mb-8">
       <div className="relative max-w-5xl mx-auto">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-3xl blur-2xl"></div>
-        <div className="relative bg-white/80 backdrop-blur-sm border border-white/40 rounded-3xl p-8 shadow-lg">
+        <div className="relative bg-white/80 backdrop-blur-sm border border-white/40 rounded-3xl p-4 shadow-lg">
           <div className="flex items-center justify-between">
             {Array.from({ length: totalSteps }, (_, i) => {
               const step = (i + 1) as WizardStep;
@@ -29,7 +29,7 @@ export default function StepIndicator({ currentStep, totalSteps }: StepIndicator
                 <div key={step} className="flex items-center flex-1">
                   <div className="flex flex-col items-center">
                     <div
-                      className={`w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-bold transition-all duration-300 shadow-lg ${
+                      className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm font-semibold transition-all duration-300 shadow-lg ${
                         isCurrent
                           ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white scale-110 shadow-blue-500/50"
                           : isActive
@@ -40,7 +40,7 @@ export default function StepIndicator({ currentStep, totalSteps }: StepIndicator
                       {step}
                     </div>
                     <span
-                      className={`mt-3 text-sm font-semibold transition-colors ${
+                      className={`mt-2 text-xs font-medium transition-colors ${
                         isCurrent 
                           ? "text-blue-700 font-bold" 
                           : isActive 

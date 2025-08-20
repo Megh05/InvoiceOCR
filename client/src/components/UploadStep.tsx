@@ -83,19 +83,19 @@ export default function UploadStep({
     <div className="max-w-4xl mx-auto">
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-3xl blur-3xl"></div>
-        <div className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl p-12 shadow-xl">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-4">
+        <div className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl p-6 shadow-xl">
+          <div className="text-center mb-8">
+            <h3 className="text-xl font-semibold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-3">
               Upload Invoice or Paste OCR Text
             </h3>
-            <p className="text-gray-600 text-lg">Choose your preferred method to input invoice data for processing</p>
+            <p className="text-gray-600 text-sm">Choose your preferred method to input invoice data for processing</p>
           </div>
 
         {/* Enhanced Upload Options */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {/* Image Upload */}
           <div
-            className={`relative group border-2 border-dashed rounded-3xl p-8 text-center transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
+            className={`relative group border-2 border-dashed rounded-2xl p-6 text-center transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
               state.inputType === 'file'
                 ? "border-blue-400 bg-gradient-to-br from-blue-50/80 to-indigo-50/80 shadow-lg"
                 : dragActive
@@ -108,10 +108,10 @@ export default function UploadStep({
             onDragOver={handleDrag}
             onDrop={handleDrop}
           >
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-all duration-300">
-              <Upload className="w-8 h-8 text-blue-600" />
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all duration-300">
+              <Upload className="w-5 h-5 text-blue-600" />
             </div>
-            <h4 className="font-bold text-gray-900 mb-3 text-lg">Upload PDF/Image</h4>
+            <h4 className="font-semibold text-gray-900 mb-2 text-sm">Upload PDF/Image</h4>
             <p className="text-sm text-gray-600 mb-2">Drop files here or click to browse</p>
             <p className="text-xs text-blue-600 font-medium">Supports: JPG, PNG, PDF</p>
             <input
@@ -125,18 +125,18 @@ export default function UploadStep({
 
           {/* Image URL */}
           <div
-            className={`relative group border-2 rounded-3xl p-8 text-center transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
+            className={`relative group border-2 rounded-2xl p-6 text-center transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
               state.inputType === 'url'
                 ? "border-green-400 bg-gradient-to-br from-green-50/80 to-emerald-50/80 shadow-lg"
                 : "border-gray-200 hover:border-green-400 hover:bg-gradient-to-br hover:from-green-50/50 hover:to-emerald-50/50"
             }`}
             onClick={() => onInputTypeChange('url')}
           >
-            <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-all duration-300">
-              <Link className="w-8 h-8 text-green-600" />
+            <div className="w-10 h-10 bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all duration-300">
+              <Link className="w-5 h-5 text-green-600" />
             </div>
-            <h4 className="font-bold text-gray-900 mb-3 text-lg">Image URL</h4>
-            <p className="text-sm text-gray-600 mb-6">Paste a direct link to your invoice image</p>
+            <h4 className="font-semibold text-gray-900 mb-2 text-sm">Image URL</h4>
+            <p className="text-xs text-gray-600 mb-4">Paste a direct link to your invoice image</p>
             <Input
               type="url"
               placeholder="https://example.com/invoice.jpg"
@@ -153,17 +153,17 @@ export default function UploadStep({
 
           {/* OCR Text */}
           <div
-            className={`relative group border-2 rounded-3xl p-8 text-center transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
+            className={`relative group border-2 rounded-2xl p-6 text-center transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
               state.inputType === 'text'
                 ? "border-purple-400 bg-gradient-to-br from-purple-50/80 to-violet-50/80 shadow-lg"
                 : "border-gray-200 hover:border-purple-400 hover:bg-gradient-to-br hover:from-purple-50/50 hover:to-violet-50/50"
             }`}
             onClick={() => onInputTypeChange('text')}
           >
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-violet-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-all duration-300">
-              <Keyboard className="w-8 h-8 text-purple-600" />
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-violet-100 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all duration-300">
+              <Keyboard className="w-5 h-5 text-purple-600" />
             </div>
-            <h4 className="font-bold text-gray-900 mb-3 text-lg">Paste OCR Text</h4>
+            <h4 className="font-semibold text-gray-900 mb-2 text-sm">Paste OCR Text</h4>
             <p className="text-sm text-gray-600 mb-2">Already have extracted text?</p>
             <p className="text-xs text-purple-600 font-medium">Will verify with Mistral OCR</p>
           </div>

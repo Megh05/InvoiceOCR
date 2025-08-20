@@ -9,15 +9,15 @@ export default function NotFound() {
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-orange-500/20 rounded-3xl blur-3xl"></div>
           <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-xl">
-            <CardContent className="p-12 text-center">
-              <div className="mb-8">
-                <div className="w-20 h-20 mx-auto mb-6 p-4 bg-gradient-to-r from-red-100 to-orange-100 rounded-2xl">
+            <CardContent className="p-8 text-center">
+              <div className="mb-6">
+                <div className="w-16 h-16 mx-auto mb-4 p-3 bg-gradient-to-r from-red-100 to-orange-100 rounded-xl">
                   <AlertCircle className="w-full h-full text-red-500" />
                 </div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-3">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-3">
                   404 - Page Not Found
                 </h1>
-                <p className="text-gray-600 text-lg">
+                <p className="text-gray-600 text-sm">
                   The page you're looking for doesn't exist or has been moved.
                 </p>
               </div>

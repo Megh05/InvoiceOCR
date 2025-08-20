@@ -94,18 +94,18 @@ export default function Analytics() {
           {/* Enhanced Header */}
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-3xl blur-3xl"></div>
-            <div className="relative bg-white/80 backdrop-blur-sm border border-white/20 rounded-3xl p-8 shadow-xl">
+            <div className="relative bg-white/80 backdrop-blur-sm border border-white/20 rounded-3xl p-6 shadow-xl">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
                   <div className="flex items-center space-x-3">
-                    <div className="p-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl shadow-lg">
-                      <Activity className="w-8 h-8 text-white" />
+                    <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+                      <Activity className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                      <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
                         Invoice Analytics
                       </h1>
-                      <p className="text-gray-600 text-lg">Insights and patterns from your processed invoices</p>
+                      <p className="text-gray-600 text-sm">Insights and patterns from your processed invoices</p>
                     </div>
                   </div>
                 </div>
@@ -154,7 +154,7 @@ export default function Analytics() {
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-3xl font-bold text-gray-900 mb-2 group-hover:text-blue-700 transition-colors">
+                <div className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-blue-700 transition-colors">
                   {analytics.total_invoices.toLocaleString()}
                 </div>
                 <div className="flex items-center space-x-2">
