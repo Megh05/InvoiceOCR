@@ -168,7 +168,7 @@ export default function Settings() {
                   <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
                     Settings
                   </h1>
-                  <p className="text-gray-600 text-xs">Manage your application configuration and preferences</p>
+                  <p className="text-gray-600 text-sm">Manage your application configuration and preferences</p>
                 </div>
               </div>
             </div>
@@ -180,13 +180,13 @@ export default function Settings() {
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-3xl blur-xl"></div>
               <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
                 <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center gap-3 text-xs font-medium text-gray-800">
+                  <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-800">
                     <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-md">
                       <Key className="h-4 w-4 text-white" />
                     </div>
                     API Configuration
                   </CardTitle>
-                  <CardDescription className="text-xs text-gray-600">
+                  <CardDescription className="text-sm text-gray-600">
                     Configure external service integrations for enhanced functionality
                   </CardDescription>
                 </CardHeader>
@@ -268,13 +268,13 @@ export default function Settings() {
               <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-3xl blur-xl"></div>
               <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
                 <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center gap-3 text-xs font-medium text-gray-800">
+                  <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-800">
                     <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg shadow-md">
                       <Zap className="h-4 w-4 text-white" />
                     </div>
                     Processing Settings
                   </CardTitle>
-                  <CardDescription className="text-xs text-gray-600">
+                  <CardDescription className="text-sm text-gray-600">
                     Configure invoice processing behavior and thresholds
                   </CardDescription>
                 </CardHeader>
@@ -329,13 +329,13 @@ export default function Settings() {
               <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-teal-500/10 rounded-3xl blur-xl"></div>
               <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
                 <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center gap-3 text-xs font-medium text-gray-800">
+                  <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-800">
                     <div className="p-2 bg-gradient-to-r from-green-500 to-teal-600 rounded-lg shadow-md">
                       <Database className="h-4 w-4 text-white" />
                     </div>
                     Data Management
                   </CardTitle>
-                  <CardDescription className="text-xs text-gray-600">
+                  <CardDescription className="text-sm text-gray-600">
                     Manage your invoice data, exports, and storage options
                   </CardDescription>
                 </CardHeader>
@@ -365,13 +365,13 @@ export default function Settings() {
               <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-3xl blur-xl"></div>
               <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
                 <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center gap-3 text-xs font-medium text-gray-800">
+                  <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-800">
                     <div className="p-2 bg-gradient-to-r from-red-500 to-orange-600 rounded-lg shadow-md">
                       <Shield className="h-4 w-4 text-white" />
                     </div>
                     Security
                   </CardTitle>
-                  <CardDescription className="text-xs text-gray-600">
+                  <CardDescription className="text-sm text-gray-600">
                     Security, privacy settings, and data retention controls
                   </CardDescription>
                 </CardHeader>

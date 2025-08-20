@@ -85,7 +85,7 @@ export default function UploadStep({
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-3xl blur-3xl"></div>
         <div className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl p-6 shadow-xl">
           <div className="text-center mb-8">
-            <h3 className="text-xl font-semibold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-3">
+            <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-3">
               Upload Invoice or Paste OCR Text
             </h3>
             <p className="text-gray-600 text-sm">Choose your preferred method to input invoice data for processing</p>

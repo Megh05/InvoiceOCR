@@ -105,7 +105,7 @@ export default function Analytics() {
                       <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
                         Invoice Analytics
                       </h1>
-                      <p className="text-gray-600 text-xs">Insights and patterns from your processed invoices</p>
+                      <p className="text-gray-600 text-sm">Insights and patterns from your processed invoices</p>
                     </div>
                   </div>
                 </div>
@@ -351,6 +351,7 @@ export default function Analytics() {
               </CardHeader>
               <CardContent className="relative">
                 <ResponsiveContainer width="100%" height={320}>
+                  <>
                   {activeChart === 'bar' && (
                     <BarChart data={analytics.monthly_trends}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -469,6 +470,7 @@ export default function Analytics() {
                       </defs>
                     </AreaChart>
                   )}
+                  </>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
