@@ -339,5 +339,27 @@
     "unit_price": 4.27,
     "amount": 4.27,
     "tax": 0
+  },
+  {
+    "id": "60d86918-14a8-427c-b919-7a23b41c9de9",
+    "invoice_id": "36ecfc6d-67f7-4cea-8769-7e399027ad2a",
+    "line_number": 1,
+    "sku": null,
+    "description": "Service Fee",
+    "qty": 1,
+    "unit_price": 200,
+    "amount": 200,
+    "tax": 0
+  },
+  {
+    "id": "5c2174e3-4e0e-4891-b55c-4984e5ab316f",
+    "invoice_id": "36ecfc6d-67f7-4cea-8769-7e399027ad2a",
+    "line_number": 2,
+    "sku": null,
+    "description": "Labor: 5 hours at $75/hr",
+    "qty": 5,
+    "unit_price": 75,
+    "amount": 375,
+    "tax": 0
   }
 ]

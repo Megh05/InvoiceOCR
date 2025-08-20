@@ -139,10 +139,10 @@ export default function Analytics() {
                     Export
                   </Button>
                 
-                <div className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-md border border-gray-200">
-                  <span className="w-2 h-2 bg-green-500 rounded-full inline-block mr-2"></span>
-                  Live Data
-                </div>
+                  <div className="px-3 py-1 bg-white/60 backdrop-blur-sm text-gray-700 text-sm rounded-lg border border-white/40 shadow-sm">
+                    <span className="w-2 h-2 bg-green-500 rounded-full inline-block mr-2"></span>
+                    Live Data
+                  </div>
               </div>
             </div>
           </div>
@@ -449,22 +449,24 @@ export default function Analytics() {
           </div>
 
           {/* Processing Quality */}
-          <Card className="border border-gray-200">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="p-2 bg-gray-100 rounded-lg mr-3">
-                    <Award className="w-4 h-4 text-gray-600" />
-                  </div>
-                  <span className="text-lg font-semibold text-gray-900">
-                    Processing Quality
-                  </span>
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-green-600/10 rounded-2xl blur-xl"></div>
+            <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="p-2 bg-gradient-to-br from-emerald-100 to-green-100 rounded-lg mr-3">
+                      <Award className="w-4 h-4 text-emerald-600" />
+                    </div>
+                    <span className="text-lg font-semibold text-gray-900">
+                      Processing Quality
+                    </span>
                 </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-4 border border-gray-200 rounded-lg">
+                <div className="p-4 border border-white/40 rounded-lg bg-white/30 backdrop-blur-sm">
                   <div className="flex justify-between items-center mb-3">
                     <span className="font-medium text-gray-900">Template Recognition</span>
                     <span className="font-semibold text-gray-900">
@@ -481,7 +483,7 @@ export default function Analytics() {
                   />
                 </div>
                 
-                <div className="p-4 border border-gray-200 rounded-lg">
+                <div className="p-4 border border-white/40 rounded-lg bg-white/30 backdrop-blur-sm">
                   <div className="flex justify-between items-center mb-3">
                     <span className="font-medium text-gray-900">Auto-Categorized</span>
                     <span className="font-semibold text-gray-900">
@@ -498,7 +500,7 @@ export default function Analytics() {
                   />
                 </div>
                 
-                <div className="p-4 border border-gray-200 rounded-lg">
+                <div className="p-4 border border-white/40 rounded-lg bg-white/30 backdrop-blur-sm">
                   <div className="flex justify-between items-center mb-3">
                     <span className="font-medium text-gray-900">High Confidence</span>
                     <span className="font-semibold text-gray-900">
@@ -517,6 +519,7 @@ export default function Analytics() {
               </div>
             </CardContent>
           </Card>
+          </div>
         </div>
         </div>
       </div>
