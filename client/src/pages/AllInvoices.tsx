@@ -250,16 +250,25 @@ export default function AllInvoices() {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">All Invoices</h1>
-            <p className="text-gray-600">
-              {isLoading ? "Loading..." : `${invoices?.length || 0} invoices processed`}
-            </p>
-          </div>
-          <div className="flex items-center space-x-3">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <div className="max-w-7xl mx-auto p-6 space-y-6">
+          {/* Enhanced Header */}
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-3xl blur-3xl"></div>
+            <div className="relative bg-white/80 backdrop-blur-sm border border-white/20 rounded-3xl p-6 shadow-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+                    <FileText className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">All Invoices</h1>
+                    <p className="text-gray-600 text-sm">
+                      {isLoading ? "Loading..." : `${invoices?.length || 0} invoices processed`}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
@@ -286,59 +295,73 @@ export default function AllInvoices() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Summary Cards */}
-        {!isLoading && invoices && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Invoices</CardTitle>
-                <FileText className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{invoices.length}</div>
-              </CardContent>
-            </Card>
+          {/* Enhanced Summary Cards */}
+          {!isLoading && invoices && (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-3xl blur-xl"></div>
+                <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Invoices</CardTitle>
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{invoices.length}</div>
+                  </CardContent>
+                </Card>
+              </div>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Amount</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {formatCurrency(invoices.reduce((sum, inv) => sum + inv.total, 0))}
-                </div>
-              </CardContent>
-            </Card>
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-3xl blur-xl"></div>
+                <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Amount</CardTitle>
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">
+                      {formatCurrency(invoices.reduce((sum, inv) => sum + inv.total, 0))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Average Amount</CardTitle>
-                <Building2 className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {formatCurrency(invoices.length > 0 ? invoices.reduce((sum, inv) => sum + inv.total, 0) / invoices.length : 0)}
-                </div>
-              </CardContent>
-            </Card>
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-violet-500/10 rounded-3xl blur-xl"></div>
+                <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Average Amount</CardTitle>
+                    <Building2 className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">
+                      {formatCurrency(invoices.length > 0 ? invoices.reduce((sum, inv) => sum + inv.total, 0) / invoices.length : 0)}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">High Confidence</CardTitle>
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {Math.round((invoices.filter(inv => inv.confidence >= 0.8).length / invoices.length) * 100)}%
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-3xl blur-xl"></div>
+                <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">High Confidence</CardTitle>
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">
+                      {Math.round((invoices.filter(inv => inv.confidence >= 0.8).length / invoices.length) * 100)}%
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
 
         {/* Invoices List */}
         <div className="space-y-4">
@@ -361,7 +384,9 @@ export default function AllInvoices() {
             </div>
           ) : invoices && invoices.length > 0 ? (
             invoices.map((invoice) => (
-              <Card key={invoice.id} className="hover:bg-gray-50 transition-colors">
+              <div key={invoice.id} className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-gray-500/5 to-slate-500/5 rounded-3xl blur-xl"></div>
+                <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
@@ -461,7 +486,8 @@ export default function AllInvoices() {
                     </div>
                   </div>
                 </CardContent>
-              </Card>
+                </Card>
+              </div>
             ))
           ) : (
             <Card>
@@ -476,6 +502,7 @@ export default function AllInvoices() {
           )}
         </div>
       </div>
+    </div>
     </Layout>
   );
 }

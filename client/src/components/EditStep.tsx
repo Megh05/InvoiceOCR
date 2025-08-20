@@ -33,9 +33,9 @@ export default function EditStep({
 
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-        <div className="text-center mb-8">
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="text-center mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
             Step 4: Review & Edit Extracted Fields
           </h3>
           <p className="text-gray-600">Verify and edit the extracted invoice data with side-by-side comparison</p>
@@ -51,7 +51,7 @@ export default function EditStep({
         />
 
         {/* Navigation */}
-        <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+        <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
           <Button variant="outline" onClick={onPrevious}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Previous

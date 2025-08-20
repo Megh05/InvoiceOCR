@@ -54,9 +54,9 @@ export default function SaveStep({
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-        <div className="text-center mb-8">
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">Step 5: Save & Export</h3>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="text-center mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Step 5: Save & Export</h3>
           <p className="text-gray-600">Finalize your invoice and choose export options</p>
         </div>
 
@@ -97,7 +97,7 @@ export default function SaveStep({
 
         {/* Save/Export Options */}
         {!saveSuccess && !isSaving && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             {/* Save to Database */}
             <div className="border border-gray-200 rounded-lg p-6">
               <div className="flex items-center mb-4">

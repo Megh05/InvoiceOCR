@@ -42,15 +42,15 @@ export default function ReviewStep({
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-        <div className="text-center mb-8">
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">Step 3: Review OCR Text</h3>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="text-center mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Step 3: Review OCR Text</h3>
           <p className="text-gray-600">Verify and edit the extracted text if needed</p>
         </div>
 
         {/* Validation Results */}
         {state.parseResult && (
-          <div className="mb-6">
+          <div className="mb-4">
             <ValidationResults
               validation={state.parseResult.validation_results}
               improvements={state.parseResult.improvements}
