@@ -148,14 +148,16 @@ export default function Analytics() {
           </div>
 
           {/* Key Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card className="border border-gray-200">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">
-                  Total Invoices
-                </CardTitle>
-                <div className="p-2 bg-gray-100 rounded-lg">
-                  <FileText className="h-4 w-4 text-gray-600" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-2xl blur-xl"></div>
+              <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Total Invoices
+                  </CardTitle>
+                  <div className="p-2 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg">
+                    <FileText className="h-4 w-4 text-blue-600" />
                 </div>
               </CardHeader>
               <CardContent>
@@ -167,84 +169,96 @@ export default function Analytics() {
                 </p>
               </CardContent>
             </Card>
+            </div>
 
-            <Card className="border border-gray-200">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">
-                  Total Amount
-                </CardTitle>
-                <div className="p-2 bg-gray-100 rounded-lg">
-                  <DollarSign className="h-4 w-4 text-gray-600" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-900 mb-1">
-                  ${analytics.total_amount.toLocaleString()}
-                </div>
-                <p className="text-xs text-gray-500">
-                  Avg: ${analytics.average_amount.toLocaleString()}
-                </p>
-              </CardContent>
-            </Card>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-600/10 rounded-2xl blur-xl"></div>
+              <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Total Amount
+                  </CardTitle>
+                  <div className="p-2 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg">
+                    <DollarSign className="h-4 w-4 text-green-600" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-900 mb-1">
+                    ${analytics.total_amount.toLocaleString()}
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Avg: ${analytics.average_amount.toLocaleString()}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
 
-            <Card className="border border-gray-200">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">
-                  Recognition Rate
-                </CardTitle>
-                <div className="p-2 bg-gray-100 rounded-lg">
-                  <Target className="h-4 w-4 text-gray-600" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-900 mb-1">
-                  {analytics.recognition_stats.total_processed > 0 
-                    ? Math.round((analytics.recognition_stats.template_recognized / analytics.recognition_stats.total_processed) * 100)
-                    : 0}%
-                </div>
-                <p className="text-xs text-gray-500">
-                  Template detection
-                </p>
-              </CardContent>
-            </Card>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-orange-600/10 rounded-2xl blur-xl"></div>
+              <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Recognition Rate
+                  </CardTitle>
+                  <div className="p-2 bg-gradient-to-br from-amber-100 to-orange-100 rounded-lg">
+                    <Target className="h-4 w-4 text-amber-600" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-900 mb-1">
+                    {analytics.recognition_stats.total_processed > 0 
+                      ? Math.round((analytics.recognition_stats.template_recognized / analytics.recognition_stats.total_processed) * 100)
+                      : 0}%
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Template detection
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
 
-            <Card className="border border-gray-200">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">
-                  Data Quality
-                </CardTitle>
-                <div className="p-2 bg-gray-100 rounded-lg">
-                  <TrendingUp className="h-4 w-4 text-gray-600" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-900 mb-1">
-                  {analytics.recognition_stats.total_processed > 0 
-                    ? Math.round((analytics.recognition_stats.high_confidence / analytics.recognition_stats.total_processed) * 100)
-                    : 0}%
-                </div>
-                <p className="text-xs text-gray-500">
-                  High confidence
-                </p>
-              </CardContent>
-            </Card>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-600/10 rounded-2xl blur-xl"></div>
+              <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Data Quality
+                  </CardTitle>
+                  <div className="p-2 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg">
+                    <TrendingUp className="h-4 w-4 text-purple-600" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-900 mb-1">
+                    {analytics.recognition_stats.total_processed > 0 
+                      ? Math.round((analytics.recognition_stats.high_confidence / analytics.recognition_stats.total_processed) * 100)
+                      : 0}%
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    High confidence
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
 
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Category Distribution */}
-            <Card className="border border-gray-200">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="p-2 bg-gray-100 rounded-lg mr-3">
-                      <Building2 className="w-4 h-4 text-gray-600" />
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-blue-600/10 rounded-2xl blur-xl"></div>
+              <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="p-2 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-lg mr-3">
+                        <Building2 className="w-4 h-4 text-indigo-600" />
+                      </div>
+                      <span className="text-lg font-semibold text-gray-900">
+                        Category Distribution
+                      </span>
                     </div>
-                    <span className="text-lg font-semibold text-gray-900">
-                      Category Distribution
-                    </span>
-                  </div>
-                </CardTitle>
+                  </CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={200}>
@@ -298,32 +312,35 @@ export default function Analytics() {
                 </div>
               </CardContent>
             </Card>
+            </div>
 
             {/* Monthly Trends */}
-            <Card className="border border-gray-200">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="p-2 bg-gray-100 rounded-lg mr-3">
-                      <Calendar className="w-4 h-4 text-gray-600" />
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-cyan-600/10 rounded-2xl blur-xl"></div>
+              <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="p-2 bg-gradient-to-br from-teal-100 to-cyan-100 rounded-lg mr-3">
+                        <Calendar className="w-4 h-4 text-teal-600" />
+                      </div>
+                      <span className="text-lg font-semibold text-gray-900">
+                        Monthly Trends
+                      </span>
                     </div>
-                    <span className="text-lg font-semibold text-gray-900">
-                      Monthly Trends
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <div className="flex bg-gray-100 rounded-lg p-1">
-                      {(['bar', 'line', 'area'] as const).map((type) => (
-                        <Button
-                          key={type}
-                          size="sm"
-                          variant={activeChart === type ? "default" : "ghost"}
-                          onClick={() => setActiveChart(type)}
-                          className={`px-3 py-1 text-xs ${
-                            activeChart === type 
-                              ? 'bg-gray-900 text-white' 
-                              : 'text-gray-600 hover:text-gray-900'
-                          }`}
+                    <div className="flex items-center space-x-1">
+                      <div className="flex bg-white/60 backdrop-blur-sm rounded-lg p-1 border border-white/40">
+                        {(['bar', 'line', 'area'] as const).map((type) => (
+                          <Button
+                            key={type}
+                            size="sm"
+                            variant={activeChart === type ? "default" : "ghost"}
+                            onClick={() => setActiveChart(type)}
+                            className={`px-3 py-1 text-xs ${
+                              activeChart === type 
+                                ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-sm' 
+                                : 'bg-transparent text-gray-600 hover:bg-white/50'
+                            }`}
                         >
                           {type.charAt(0).toUpperCase() + type.slice(1)}
                         </Button>
@@ -446,6 +463,7 @@ export default function Analytics() {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
+            </div>
           </div>
 
           {/* Processing Quality */}
