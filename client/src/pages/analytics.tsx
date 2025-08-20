@@ -315,15 +315,20 @@ export default function Analytics() {
                 </ResponsiveContainer>
                 
                 {/* Custom Legend */}
-                <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+                <div className="mt-4 space-y-1 text-xs">
                   {categoryData.map((entry, index) => (
-                    <div key={entry.name} className="flex items-center space-x-2">
-                      <div 
-                        className="w-3 h-3 rounded-sm flex-shrink-0"
-                        style={{ backgroundColor: GRADIENT_COLORS[index % GRADIENT_COLORS.length] }}
-                      />
-                      <span className="text-gray-600 truncate" title={entry.name}>
-                        {entry.name} ({Math.round((entry.value / categoryData.reduce((sum, item) => sum + item.value, 0)) * 100)}%)
+                    <div key={entry.name} className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2 min-w-0 flex-1">
+                        <div 
+                          className="w-2 h-2 rounded-sm flex-shrink-0"
+                          style={{ backgroundColor: GRADIENT_COLORS[index % GRADIENT_COLORS.length] }}
+                        />
+                        <span className="text-gray-600 truncate text-xs" title={entry.name}>
+                          {entry.name.length > 12 ? entry.name.substring(0, 12) + '...' : entry.name}
+                        </span>
+                      </div>
+                      <span className="text-gray-500 font-mono text-xs ml-2 flex-shrink-0">
+                        {Math.round((entry.value / categoryData.reduce((sum, item) => sum + item.value, 0)) * 100)}%
                       </span>
                     </div>
                   ))}
