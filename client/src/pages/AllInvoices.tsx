@@ -262,7 +262,7 @@ export default function AllInvoices() {
                     <FileText className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <h1 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">All Invoices</h1>
+                    <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">All Invoices</h1>
                     <p className="text-gray-600 text-xs">
                       {isLoading ? "Loading..." : `${invoices?.length || 0} invoices processed`}
                     </p>

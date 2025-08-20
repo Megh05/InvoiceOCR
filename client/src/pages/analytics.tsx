@@ -102,7 +102,7 @@ export default function Analytics() {
                       <Activity className="w-4 h-4 text-white" />
                     </div>
                     <div>
-                      <h1 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                      <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
                         Invoice Analytics
                       </h1>
                       <p className="text-gray-600 text-xs">Insights and patterns from your processed invoices</p>
@@ -265,9 +265,9 @@ export default function Analytics() {
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg mr-3 shadow-lg">
-                      <Building2 className="w-5 h-5 text-white" />
+                      <Building2 className="w-4 h-4 text-white" />
                     </div>
-                    <span className="text-xl font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                    <span className="text-lg font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
                       Category Distribution
                     </span>
                   </div>
@@ -322,9 +322,9 @@ export default function Analytics() {
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="p-2 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-lg mr-3 shadow-lg">
-                      <Calendar className="w-5 h-5 text-white" />
+                      <Calendar className="w-4 h-4 text-white" />
                     </div>
-                    <span className="text-xl font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                    <span className="text-lg font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
                       Monthly Trends
                     </span>
                   </div>
@@ -480,10 +480,10 @@ export default function Analytics() {
             <CardHeader className="relative">
               <CardTitle className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <div className="p-3 bg-gradient-to-r from-violet-500 to-pink-600 rounded-xl mr-3 shadow-lg">
-                    <Target className="w-6 h-6 text-white" />
+                  <div className="p-2 bg-gradient-to-r from-violet-500 to-pink-600 rounded-lg mr-3 shadow-lg">
+                    <Target className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-2xl font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                  <span className="text-lg font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
                     Template Recognition Performance
                   </span>
                 </div>
@@ -575,10 +575,10 @@ export default function Analytics() {
               <CardHeader className="relative">
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="p-3 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl mr-3 shadow-lg">
-                      <Building2 className="w-6 h-6 text-white" />
+                    <div className="p-2 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg mr-3 shadow-lg">
+                      <Building2 className="w-4 h-4 text-white" />
                     </div>
-                    <span className="text-xl font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                    <span className="text-lg font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
                       Top Vendors by Volume
                     </span>
                   </div>
@@ -645,10 +645,10 @@ export default function Analytics() {
               <CardHeader className="relative">
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="p-3 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl mr-3 shadow-lg">
-                      <FileText className="w-6 h-6 text-white" />
+                    <div className="p-2 bg-gradient-to-r from-amber-500 to-orange-600 rounded-lg mr-3 shadow-lg">
+                      <FileText className="w-4 h-4 text-white" />
                     </div>
-                    <span className="text-xl font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                    <span className="text-lg font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
                       Processing Statistics
                     </span>
                   </div>

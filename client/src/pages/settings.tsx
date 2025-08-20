@@ -165,7 +165,7 @@ export default function Settings() {
                   <SettingsIcon className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
                     Settings
                   </h1>
                   <p className="text-gray-600 text-xs">Manage your application configuration and preferences</p>
