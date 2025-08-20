@@ -138,7 +138,7 @@ export default function Analytics() {
           {/* Enhanced Key Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card 
-              className={`group relative overflow-hidden bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-200/50 hover:border-blue-300/80 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 rounded-2xl h-24 ${
+              className={`group relative overflow-hidden bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-200/50 hover:border-blue-300/80 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 rounded-2xl h-28 ${
                 hoveredCard === 'invoices' ? 'shadow-lg -translate-y-1' : ''
               }`}
               onMouseEnter={() => setHoveredCard('invoices')}
@@ -154,7 +154,7 @@ export default function Analytics() {
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-lg font-bold text-gray-900 mb-1 group-hover:text-blue-700 transition-colors">
+                <div className="text-xl font-bold text-gray-900 mb-1 group-hover:text-blue-700 transition-colors">
                   {analytics.total_invoices.toLocaleString()}
                 </div>
                 <div className="flex items-center space-x-2">
@@ -174,7 +174,7 @@ export default function Analytics() {
             </Card>
 
             <Card 
-              className={`group relative overflow-hidden bg-gradient-to-br from-green-500/10 to-green-600/10 border-green-200/50 hover:border-green-300/80 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 rounded-2xl h-24 ${
+              className={`group relative overflow-hidden bg-gradient-to-br from-green-500/10 to-green-600/10 border-green-200/50 hover:border-green-300/80 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 rounded-2xl h-28 ${
                 hoveredCard === 'amount' ? 'shadow-lg -translate-y-1' : ''
               }`}
               onMouseEnter={() => setHoveredCard('amount')}
@@ -200,7 +200,7 @@ export default function Analytics() {
             </Card>
 
             <Card 
-              className={`group relative overflow-hidden bg-gradient-to-br from-orange-500/10 to-orange-600/10 border-orange-200/50 hover:border-orange-300/80 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 rounded-2xl h-24 ${
+              className={`group relative overflow-hidden bg-gradient-to-br from-orange-500/10 to-orange-600/10 border-orange-200/50 hover:border-orange-300/80 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 rounded-2xl h-28 ${
                 hoveredCard === 'recognition' ? 'shadow-lg -translate-y-1' : ''
               }`}
               onMouseEnter={() => setHoveredCard('recognition')}
@@ -228,7 +228,7 @@ export default function Analytics() {
             </Card>
 
             <Card 
-              className={`group relative overflow-hidden bg-gradient-to-br from-purple-500/10 to-purple-600/10 border-purple-200/50 hover:border-purple-300/80 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 rounded-2xl h-24 ${
+              className={`group relative overflow-hidden bg-gradient-to-br from-purple-500/10 to-purple-600/10 border-purple-200/50 hover:border-purple-300/80 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 rounded-2xl h-28 ${
                 hoveredCard === 'quality' ? 'shadow-lg -translate-y-1' : ''
               }`}
               onMouseEnter={() => setHoveredCard('quality')}
@@ -284,9 +284,9 @@ export default function Analytics() {
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percentage }) => `${name} (${percentage}%)`}
-                      outerRadius={100}
-                      innerRadius={40}
+                      label={false}
+                      outerRadius={80}
+                      innerRadius={30}
                       fill="#8884d8"
                       dataKey="value"
                       animationBegin={0}
@@ -304,14 +304,30 @@ export default function Analytics() {
                       formatter={(value, name) => [value, "Count"]} 
                       contentStyle={{
                         backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                        backdropFilter: 'blur(12px)',
+                        backdropFilter: 'blur(8px)',
                         border: 'none',
-                        borderRadius: '12px',
-                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+                        fontSize: '12px'
                       }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
+                
+                {/* Custom Legend */}
+                <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+                  {categoryData.map((entry, index) => (
+                    <div key={entry.name} className="flex items-center space-x-2">
+                      <div 
+                        className="w-3 h-3 rounded-sm flex-shrink-0"
+                        style={{ backgroundColor: GRADIENT_COLORS[index % GRADIENT_COLORS.length] }}
+                      />
+                      <span className="text-gray-600 truncate" title={entry.name}>
+                        {entry.name} ({Math.round((entry.value / categoryData.reduce((sum, item) => sum + item.value, 0)) * 100)}%)
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
 
@@ -350,7 +366,7 @@ export default function Analytics() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="relative">
-                <ResponsiveContainer width="100%" height={280}>
+                <ResponsiveContainer width="100%" height={240}>
                   <>
                   {activeChart === 'bar' && (
                     <BarChart data={analytics.monthly_trends}>
@@ -358,23 +374,26 @@ export default function Analytics() {
                       <XAxis 
                         dataKey="month" 
                         stroke="#64748b"
-                        fontSize={12}
+                        fontSize={10}
                         tickLine={false}
                         axisLine={false}
+                        height={40}
                       />
                       <YAxis 
                         stroke="#64748b"
-                        fontSize={12}
+                        fontSize={10}
                         tickLine={false}
                         axisLine={false}
+                        width={40}
                       />
                       <Tooltip 
                         contentStyle={{
                           backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                          backdropFilter: 'blur(12px)',
+                          backdropFilter: 'blur(8px)',
                           border: 'none',
-                          borderRadius: '12px',
-                          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+                          fontSize: '12px'
                         }}
                       />
                       <Bar 
@@ -399,23 +418,26 @@ export default function Analytics() {
                       <XAxis 
                         dataKey="month" 
                         stroke="#64748b"
-                        fontSize={12}
+                        fontSize={10}
                         tickLine={false}
                         axisLine={false}
+                        height={40}
                       />
                       <YAxis 
                         stroke="#64748b"
-                        fontSize={12}
+                        fontSize={10}
                         tickLine={false}
                         axisLine={false}
+                        width={40}
                       />
                       <Tooltip 
                         contentStyle={{
                           backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                          backdropFilter: 'blur(12px)',
+                          backdropFilter: 'blur(8px)',
                           border: 'none',
-                          borderRadius: '12px',
-                          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+                          fontSize: '12px'
                         }}
                       />
                       <Line 
@@ -435,23 +457,26 @@ export default function Analytics() {
                       <XAxis 
                         dataKey="month" 
                         stroke="#64748b"
-                        fontSize={12}
+                        fontSize={10}
                         tickLine={false}
                         axisLine={false}
+                        height={40}
                       />
                       <YAxis 
                         stroke="#64748b"
-                        fontSize={12}
+                        fontSize={10}
                         tickLine={false}
                         axisLine={false}
+                        width={40}
                       />
                       <Tooltip 
                         contentStyle={{
                           backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                          backdropFilter: 'blur(12px)',
+                          backdropFilter: 'blur(8px)',
                           border: 'none',
-                          borderRadius: '12px',
-                          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+                          fontSize: '12px'
                         }}
                       />
                       <Area 
