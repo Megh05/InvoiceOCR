@@ -177,8 +177,8 @@ export default function Settings() {
           <div className="grid gap-8">
             {/* Enhanced API Configuration */}
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-3xl blur-xl"></div>
-              <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-2xl blur-xl"></div>
+              <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 h-auto">
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-800">
                     <div className="p-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-sm">
@@ -265,8 +265,8 @@ export default function Settings() {
 
             {/* Enhanced Processing Settings */}
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-3xl blur-xl"></div>
-              <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-2xl blur-xl"></div>
+              <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 h-auto">
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-800">
                     <div className="p-1.5 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg shadow-sm">
@@ -326,8 +326,8 @@ export default function Settings() {
 
             {/* Enhanced Data Management */}
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-teal-500/10 rounded-3xl blur-xl"></div>
-              <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-teal-500/10 rounded-2xl blur-xl"></div>
+              <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 h-auto">
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-800">
                     <div className="p-1.5 bg-gradient-to-r from-green-500 to-teal-600 rounded-lg shadow-sm">
@@ -362,8 +362,8 @@ export default function Settings() {
 
             {/* Enhanced Security */}
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-3xl blur-xl"></div>
-              <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-2xl blur-xl"></div>
+              <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 h-auto">
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-800">
                     <div className="p-1.5 bg-gradient-to-r from-red-500 to-orange-600 rounded-lg shadow-sm">
@@ -409,8 +409,8 @@ export default function Settings() {
 
             {/* Enhanced Save Settings */}
             <div className="relative pt-6">
-              <div className="absolute inset-0 bg-gradient-to-r from-gray-500/10 to-slate-500/10 rounded-3xl blur-xl"></div>
-              <div className="relative bg-white/80 backdrop-blur-sm border border-white/40 rounded-3xl p-6 shadow-lg">
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-500/10 to-slate-500/10 rounded-2xl blur-xl"></div>
+              <div className="relative bg-white/80 backdrop-blur-sm border border-white/40 rounded-2xl p-6 shadow-lg">
                 <div className="flex justify-end gap-4">
                   <Button 
                     variant="outline" 

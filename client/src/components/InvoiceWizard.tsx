@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { WizardState, CanonicalInvoice } from "@/types/invoice";
+import { WizardState, CanonicalInvoice, ParseRequest, WizardStep } from "@/types/invoice";
 import { api } from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
 
@@ -127,7 +127,7 @@ export default function InvoiceWizard() {
     } else if (state.inputType === 'url' && state.imageUrl) {
       parseMutation.mutate({ image_url: state.imageUrl });
     } else if (state.inputType === 'text' && state.ocrText) {
-      parseMutation.mutate({ ocr_text: state.ocrText });
+      parseMutation.mutate({ text_input: state.ocrText });
     }
   }, [state.inputType, state.imageFile, state.imageUrl, state.ocrText, parseMutation]);
 
@@ -148,7 +148,7 @@ export default function InvoiceWizard() {
   const handleRerunOCR = useCallback(() => {
     if (state.parseResult) {
       updateState({ step: 2 });
-      const parseRequest: ParseRequest = { ocr_text: state.parseResult.raw_ocr_text };
+      const parseRequest: ParseRequest = { text_input: state.parseResult.raw_ocr_text };
       parseMutation.mutate(parseRequest);
     }
   }, [state.parseResult, parseMutation]);

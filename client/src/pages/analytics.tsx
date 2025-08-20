@@ -138,8 +138,8 @@ export default function Analytics() {
           {/* Enhanced Key Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card 
-              className={`group relative overflow-hidden bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-200/50 hover:border-blue-300/80 transition-all duration-500 hover:shadow-xl hover:-translate-y-1 ${
-                hoveredCard === 'invoices' ? 'shadow-2xl -translate-y-1' : ''
+              className={`group relative overflow-hidden bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-200/50 hover:border-blue-300/80 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 rounded-2xl h-24 ${
+                hoveredCard === 'invoices' ? 'shadow-lg -translate-y-1' : ''
               }`}
               onMouseEnter={() => setHoveredCard('invoices')}
               onMouseLeave={() => setHoveredCard(null)}
@@ -174,8 +174,8 @@ export default function Analytics() {
             </Card>
 
             <Card 
-              className={`group relative overflow-hidden bg-gradient-to-br from-green-500/10 to-green-600/10 border-green-200/50 hover:border-green-300/80 transition-all duration-500 hover:shadow-xl hover:-translate-y-1 ${
-                hoveredCard === 'amount' ? 'shadow-2xl -translate-y-1' : ''
+              className={`group relative overflow-hidden bg-gradient-to-br from-green-500/10 to-green-600/10 border-green-200/50 hover:border-green-300/80 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 rounded-2xl h-24 ${
+                hoveredCard === 'amount' ? 'shadow-lg -translate-y-1' : ''
               }`}
               onMouseEnter={() => setHoveredCard('amount')}
               onMouseLeave={() => setHoveredCard(null)}
@@ -200,8 +200,8 @@ export default function Analytics() {
             </Card>
 
             <Card 
-              className={`group relative overflow-hidden bg-gradient-to-br from-orange-500/10 to-orange-600/10 border-orange-200/50 hover:border-orange-300/80 transition-all duration-500 hover:shadow-xl hover:-translate-y-1 ${
-                hoveredCard === 'recognition' ? 'shadow-2xl -translate-y-1' : ''
+              className={`group relative overflow-hidden bg-gradient-to-br from-orange-500/10 to-orange-600/10 border-orange-200/50 hover:border-orange-300/80 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 rounded-2xl h-24 ${
+                hoveredCard === 'recognition' ? 'shadow-lg -translate-y-1' : ''
               }`}
               onMouseEnter={() => setHoveredCard('recognition')}
               onMouseLeave={() => setHoveredCard(null)}
@@ -228,8 +228,8 @@ export default function Analytics() {
             </Card>
 
             <Card 
-              className={`group relative overflow-hidden bg-gradient-to-br from-purple-500/10 to-purple-600/10 border-purple-200/50 hover:border-purple-300/80 transition-all duration-500 hover:shadow-xl hover:-translate-y-1 ${
-                hoveredCard === 'quality' ? 'shadow-2xl -translate-y-1' : ''
+              className={`group relative overflow-hidden bg-gradient-to-br from-purple-500/10 to-purple-600/10 border-purple-200/50 hover:border-purple-300/80 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 rounded-2xl h-24 ${
+                hoveredCard === 'quality' ? 'shadow-lg -translate-y-1' : ''
               }`}
               onMouseEnter={() => setHoveredCard('quality')}
               onMouseLeave={() => setHoveredCard(null)}
@@ -259,7 +259,7 @@ export default function Analytics() {
           {/* Interactive Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Enhanced Category Distribution */}
-            <Card className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-500">
+            <Card className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl h-96">
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <CardHeader className="relative">
                 <CardTitle className="flex items-center justify-between">
@@ -316,7 +316,7 @@ export default function Analytics() {
             </Card>
 
             {/* Enhanced Monthly Trends with Chart Type Toggle */}
-            <Card className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-500">
+            <Card className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl h-96">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <CardHeader className="relative">
                 <CardTitle className="flex items-center justify-between">
@@ -572,7 +572,7 @@ export default function Analytics() {
           {/* Enhanced Bottom Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Enhanced Top Vendors */}
-            <Card className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-500">
+            <Card className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl h-96">
               <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <CardHeader className="relative">
                 <CardTitle className="flex items-center justify-between">
@@ -642,7 +642,7 @@ export default function Analytics() {
             </Card>
 
             {/* Enhanced Processing Statistics */}
-            <Card className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-500">
+            <Card className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl h-96">
               <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <CardHeader className="relative">
                 <CardTitle className="flex items-center justify-between">

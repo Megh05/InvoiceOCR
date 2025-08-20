@@ -209,7 +209,7 @@ export default function Invoices() {
               {filteredInvoices.map((invoice: any) => (
                 <div key={invoice.id} className="relative group">
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 group-hover:scale-[1.02] overflow-hidden">
+                  <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] overflow-hidden h-80">
                     {/* Confidence Indicator Bar */}
                     <div className={`absolute top-0 left-0 right-0 h-1 ${
                       (invoice.confidence || 0) >= 0.85 
@@ -219,7 +219,7 @@ export default function Invoices() {
                           : 'bg-gradient-to-r from-red-400 to-red-600'
                     }`}></div>
                     
-                    <CardHeader className="pb-4">
+                    <CardHeader className="pb-3 h-20">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center space-x-3 mb-2">
@@ -240,8 +240,8 @@ export default function Invoices() {
                       </div>
                     </CardHeader>
                     
-                    <CardContent className="space-y-6">
-                      <div className="grid grid-cols-2 gap-4">
+                    <CardContent className="space-y-4 flex-1 flex flex-col justify-between">
+                      <div className="grid grid-cols-2 gap-3">
                         <div className="group/item">
                           <p className="text-gray-500 text-sm font-medium mb-1">Date</p>
                           <p className="font-semibold text-gray-800 text-lg">
@@ -268,7 +268,7 @@ export default function Invoices() {
                         </div>
                       </div>
 
-                      <div className="flex space-x-3 pt-4 border-t border-gray-100">
+                      <div className="flex space-x-2 pt-3 border-t border-gray-100 mt-auto">
                         <Button 
                           variant="outline" 
                           size="sm" 

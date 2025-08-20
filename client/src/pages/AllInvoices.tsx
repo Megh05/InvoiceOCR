@@ -303,7 +303,7 @@ export default function AllInvoices() {
           {/* Enhanced Summary Cards */}
           {!isLoading && invoices && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-200/50 hover:border-blue-300/80 transition-all duration-300 hover:shadow-lg">
+              <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-200/50 hover:border-blue-300/80 transition-all duration-300 hover:shadow-lg rounded-2xl h-24">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-xs font-medium text-gray-700">Total Invoices</CardTitle>
                   <div className="p-1.5 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-sm">
@@ -315,7 +315,7 @@ export default function AllInvoices() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-green-500/10 to-green-600/10 border-green-200/50 hover:border-green-300/80 transition-all duration-300 hover:shadow-lg">
+              <Card className="bg-gradient-to-br from-green-500/10 to-green-600/10 border-green-200/50 hover:border-green-300/80 transition-all duration-300 hover:shadow-lg rounded-2xl h-24">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-xs font-medium text-gray-700">Total Amount</CardTitle>
                   <div className="p-1.5 bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-sm">
@@ -329,7 +329,7 @@ export default function AllInvoices() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 border-purple-200/50 hover:border-purple-300/80 transition-all duration-300 hover:shadow-lg">
+              <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 border-purple-200/50 hover:border-purple-300/80 transition-all duration-300 hover:shadow-lg rounded-2xl h-24">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-xs font-medium text-gray-700">Average Amount</CardTitle>
                   <div className="p-1.5 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-sm">
@@ -343,7 +343,7 @@ export default function AllInvoices() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-orange-500/10 to-red-600/10 border-orange-200/50 hover:border-orange-300/80 transition-all duration-300 hover:shadow-lg">
+              <Card className="bg-gradient-to-br from-orange-500/10 to-red-600/10 border-orange-200/50 hover:border-orange-300/80 transition-all duration-300 hover:shadow-lg rounded-2xl h-24">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-xs font-medium text-gray-700">High Confidence</CardTitle>
                   <div className="p-1.5 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg shadow-sm">
@@ -381,9 +381,9 @@ export default function AllInvoices() {
           ) : invoices && invoices.length > 0 ? (
             invoices.map((invoice) => (
               <div key={invoice.id} className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-gray-500/5 to-slate-500/5 rounded-3xl blur-xl"></div>
-                <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-                <CardContent className="p-6">
+                <div className="absolute inset-0 bg-gradient-to-r from-gray-500/5 to-slate-500/5 rounded-2xl blur-xl"></div>
+                <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] h-64">
+                <CardContent className="p-6 h-full flex flex-col">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-4">

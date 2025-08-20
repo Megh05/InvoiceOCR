@@ -86,8 +86,16 @@ export interface InvoiceTemplate {
   confidence_threshold: number;
 }
 
+export interface ParseRequest {
+  image_base64?: string;
+  image_url?: string;
+  text_input?: string;
+}
+
+export type WizardStep = 1 | 2 | 3 | 4 | 5;
+
 export interface WizardState {
-  step: number;
+  step: WizardStep;
   inputType?: 'file' | 'url' | 'text' | null;
   imageFile?: File | null;
   imageUrl?: string;
