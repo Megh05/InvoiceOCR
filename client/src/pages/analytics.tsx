@@ -154,7 +154,7 @@ export default function Analytics() {
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-3xl font-bold text-gray-900 mb-2 group-hover:text-blue-700 transition-colors">
+                <div className="text-2xl font-bold text-gray-900 mb-1 group-hover:text-blue-700 transition-colors">
                   {analytics.total_invoices.toLocaleString()}
                 </div>
                 <div className="flex items-center space-x-2">
@@ -166,7 +166,7 @@ export default function Analytics() {
                       }}
                     />
                   </div>
-                  <p className="text-sm text-blue-600 font-medium">
+                  <p className="text-xs text-blue-600">
                     {analytics.recognition_stats.template_recognized} recognized
                   </p>
                 </div>
@@ -190,10 +190,10 @@ export default function Analytics() {
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-3xl font-bold text-gray-900 mb-2 group-hover:text-green-700 transition-colors">
+                <div className="text-2xl font-bold text-gray-900 mb-1 group-hover:text-green-700 transition-colors">
                   ${analytics.total_amount.toLocaleString()}
                 </div>
-                <p className="text-sm text-green-600 font-medium">
+                <p className="text-xs text-green-600">
                   Avg: ${analytics.average_amount.toLocaleString()}
                 </p>
               </CardContent>
@@ -216,12 +216,12 @@ export default function Analytics() {
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-3xl font-bold text-gray-900 mb-2 group-hover:text-orange-700 transition-colors">
+                <div className="text-2xl font-bold text-gray-900 mb-1 group-hover:text-orange-700 transition-colors">
                   {analytics.recognition_stats.total_processed > 0 
                     ? Math.round((analytics.recognition_stats.template_recognized / analytics.recognition_stats.total_processed) * 100)
                     : 0}%
                 </div>
-                <p className="text-sm text-orange-600 font-medium">
+                <p className="text-xs text-orange-600">
                   Template detection
                 </p>
               </CardContent>
@@ -244,12 +244,12 @@ export default function Analytics() {
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-3xl font-bold text-gray-900 mb-2 group-hover:text-purple-700 transition-colors">
+                <div className="text-2xl font-bold text-gray-900 mb-1 group-hover:text-purple-700 transition-colors">
                   {analytics.recognition_stats.total_processed > 0 
                     ? Math.round((analytics.recognition_stats.high_confidence / analytics.recognition_stats.total_processed) * 100)
                     : 0}%
                 </div>
-                <p className="text-sm text-purple-600 font-medium">
+                <p className="text-xs text-purple-600">
                   High confidence
                 </p>
               </CardContent>
