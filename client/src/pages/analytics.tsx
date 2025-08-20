@@ -277,7 +277,7 @@ export default function Analytics() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="relative">
-                <ResponsiveContainer width="100%" height={280}>
+                <ResponsiveContainer width="100%" height={200}>
                   <PieChart>
                     <Pie
                       data={categoryData}
@@ -315,20 +315,15 @@ export default function Analytics() {
                 </ResponsiveContainer>
                 
                 {/* Custom Legend */}
-                <div className="mt-4 space-y-1 text-xs">
+                <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
                   {categoryData.map((entry, index) => (
-                    <div key={entry.name} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2 min-w-0 flex-1">
-                        <div 
-                          className="w-2 h-2 rounded-sm flex-shrink-0"
-                          style={{ backgroundColor: GRADIENT_COLORS[index % GRADIENT_COLORS.length] }}
-                        />
-                        <span className="text-gray-600 truncate text-xs" title={entry.name}>
-                          {entry.name.length > 12 ? entry.name.substring(0, 12) + '...' : entry.name}
-                        </span>
-                      </div>
-                      <span className="text-gray-500 font-mono text-xs ml-2 flex-shrink-0">
-                        {Math.round((entry.value / categoryData.reduce((sum, item) => sum + item.value, 0)) * 100)}%
+                    <div key={entry.name} className="flex items-center space-x-1">
+                      <div 
+                        className="w-2 h-2 rounded-sm flex-shrink-0"
+                        style={{ backgroundColor: GRADIENT_COLORS[index % GRADIENT_COLORS.length] }}
+                      />
+                      <span className="text-gray-600 text-xs truncate" title={`${entry.name} (${Math.round((entry.value / categoryData.reduce((sum, item) => sum + item.value, 0)) * 100)}%)`}>
+                        {entry.name.length > 8 ? entry.name.substring(0, 8) + '...' : entry.name} {Math.round((entry.value / categoryData.reduce((sum, item) => sum + item.value, 0)) * 100)}%
                       </span>
                     </div>
                   ))}
@@ -403,17 +398,11 @@ export default function Analytics() {
                       />
                       <Bar 
                         dataKey="count" 
-                        fill="url(#blueGradient)" 
+                        fill="#3B82F6" 
                         name="Invoice Count" 
-                        radius={[6, 6, 0, 0]}
+                        radius={[4, 4, 0, 0]}
                         className="drop-shadow-sm"
                       />
-                      <defs>
-                        <linearGradient id="blueGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#3B82F6" />
-                          <stop offset="100%" stopColor="#1E40AF" />
-                        </linearGradient>
-                      </defs>
                     </BarChart>
                   )}
                   
