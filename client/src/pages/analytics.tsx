@@ -98,7 +98,7 @@ export default function Analytics() {
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
                   <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-lg">
+                    <div className="p-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-sm">
                       <Activity className="w-4 h-4 text-white" />
                     </div>
                     <div>
@@ -149,7 +149,7 @@ export default function Analytics() {
                 <CardTitle className="text-xs font-medium text-gray-700 group-hover:text-blue-700 transition-colors">
                   Total Invoices
                 </CardTitle>
-                <div className="p-1.5 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg group-hover:shadow-xl transition-all duration-300">
+                <div className="p-1.5 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-sm group-hover:shadow-xl transition-all duration-300">
                   <FileText className="h-4 w-4 text-white" />
                 </div>
               </CardHeader>
@@ -185,12 +185,12 @@ export default function Analytics() {
                 <CardTitle className="text-xs font-medium text-gray-700 group-hover:text-green-700 transition-colors">
                   Total Amount
                 </CardTitle>
-                <div className="p-1.5 bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg group-hover:shadow-xl transition-all duration-300">
+                <div className="p-1.5 bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-sm group-hover:shadow-sm transition-all duration-300">
                   <DollarSign className="h-4 w-4 text-white" />
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-lg font-bold text-gray-900 mb-1 group-hover:text-green-700 transition-colors">
+                <div className="text-lg font-bold text-gray-900 group-hover:text-green-700 transition-colors">
                   ${analytics.total_amount.toLocaleString()}
                 </div>
                 <p className="text-xs text-green-600">
@@ -211,12 +211,12 @@ export default function Analytics() {
                 <CardTitle className="text-xs font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
                   Recognition Rate
                 </CardTitle>
-                <div className="p-1.5 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg shadow-lg group-hover:shadow-xl transition-all duration-300">
+                <div className="p-1.5 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg shadow-sm group-hover:shadow-sm transition-all duration-300">
                   <Target className="h-4 w-4 text-white" />
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-lg font-bold text-gray-900 mb-1 group-hover:text-orange-700 transition-colors">
+                <div className="text-lg font-bold text-gray-900 group-hover:text-orange-700 transition-colors">
                   {analytics.recognition_stats.total_processed > 0 
                     ? Math.round((analytics.recognition_stats.template_recognized / analytics.recognition_stats.total_processed) * 100)
                     : 0}%
@@ -239,12 +239,12 @@ export default function Analytics() {
                 <CardTitle className="text-xs font-medium text-gray-700 group-hover:text-purple-700 transition-colors">
                   Data Quality
                 </CardTitle>
-                <div className="p-1.5 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-lg group-hover:shadow-xl transition-all duration-300">
+                <div className="p-1.5 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-sm group-hover:shadow-sm transition-all duration-300">
                   <TrendingUp className="h-4 w-4 text-white" />
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-lg font-bold text-gray-900 mb-1 group-hover:text-purple-700 transition-colors">
+                <div className="text-lg font-bold text-gray-900 group-hover:text-purple-700 transition-colors">
                   {analytics.recognition_stats.total_processed > 0 
                     ? Math.round((analytics.recognition_stats.high_confidence / analytics.recognition_stats.total_processed) * 100)
                     : 0}%
@@ -264,7 +264,7 @@ export default function Analytics() {
               <CardHeader className="relative">
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg mr-3 shadow-lg">
+                    <div className="p-1.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg mr-3 shadow-sm">
                       <Building2 className="w-4 h-4 text-white" />
                     </div>
                     <span className="text-lg font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
@@ -277,7 +277,7 @@ export default function Analytics() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="relative">
-                <ResponsiveContainer width="100%" height={320}>
+                <ResponsiveContainer width="100%" height={280}>
                   <PieChart>
                     <Pie
                       data={categoryData}
@@ -296,7 +296,7 @@ export default function Analytics() {
                         <Cell 
                           key={`cell-${index}`} 
                           fill={GRADIENT_COLORS[index % GRADIENT_COLORS.length]}
-                          className="drop-shadow-lg hover:opacity-80 transition-opacity cursor-pointer"
+                          className="drop-shadow-sm hover:opacity-80 transition-opacity cursor-pointer"
                         />
                       ))}
                     </Pie>
@@ -321,7 +321,7 @@ export default function Analytics() {
               <CardHeader className="relative">
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="p-2 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-lg mr-3 shadow-lg">
+                    <div className="p-1.5 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-lg mr-3 shadow-sm">
                       <Calendar className="w-4 h-4 text-white" />
                     </div>
                     <span className="text-lg font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
@@ -350,7 +350,7 @@ export default function Analytics() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="relative">
-                <ResponsiveContainer width="100%" height={320}>
+                <ResponsiveContainer width="100%" height={280}>
                   <>
                   {activeChart === 'bar' && (
                     <BarChart data={analytics.monthly_trends}>
@@ -482,7 +482,7 @@ export default function Analytics() {
             <CardHeader className="relative">
               <CardTitle className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <div className="p-2 bg-gradient-to-r from-violet-500 to-pink-600 rounded-lg mr-3 shadow-lg">
+                  <div className="p-1.5 bg-gradient-to-r from-violet-500 to-pink-600 rounded-lg mr-3 shadow-sm">
                     <Target className="w-4 h-4 text-white" />
                   </div>
                   <span className="text-lg font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
@@ -501,12 +501,12 @@ export default function Analytics() {
                 {analytics.templates.map((template, index) => (
                   <div 
                     key={template.template_name} 
-                    className="group/item relative p-4 rounded-2xl bg-gradient-to-r from-white/50 to-white/30 backdrop-blur-sm border border-white/40 hover:border-white/60 transition-all duration-300 hover:shadow-lg"
+                    className="group/item relative p-4 rounded-2xl bg-gradient-to-r from-white/50 to-white/30 backdrop-blur-sm border border-white/40 hover:border-white/60 transition-all duration-300 hover:shadow-sm"
                   >
                     <div className="flex justify-between items-center mb-3">
                       <div className="flex items-center space-x-3">
                         <div 
-                          className="w-4 h-4 rounded-full shadow-lg"
+                          className="w-4 h-4 rounded-full shadow-sm"
                           style={{ backgroundColor: GRADIENT_COLORS[index % GRADIENT_COLORS.length] }}
                         />
                         <Badge 
@@ -559,7 +559,7 @@ export default function Analytics() {
                     </div>
                     
                     {template.confidence_avg >= 0.8 && (
-                      <div className="absolute -top-1 -right-1 bg-green-500 text-white text-xs px-2 py-1 rounded-full shadow-lg font-semibold">
+                      <div className="absolute -top-1 -right-1 bg-green-500 text-white text-xs px-2 py-1 rounded-full shadow-sm font-semibold">
                         High
                       </div>
                     )}
@@ -577,7 +577,7 @@ export default function Analytics() {
               <CardHeader className="relative">
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="p-2 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg mr-3 shadow-lg">
+                    <div className="p-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg mr-3 shadow-sm">
                       <Building2 className="w-4 h-4 text-white" />
                     </div>
                     <span className="text-lg font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
@@ -596,11 +596,11 @@ export default function Analytics() {
                   {analytics.top_vendors.slice(0, 5).map((vendor, index) => (
                     <div 
                       key={vendor.vendor_name} 
-                      className="group/item relative p-4 rounded-2xl bg-gradient-to-r from-emerald-50/50 to-teal-50/30 backdrop-blur-sm border border-emerald-100/40 hover:border-emerald-200/60 transition-all duration-300 hover:shadow-lg"
+                      className="group/item relative p-4 rounded-2xl bg-gradient-to-r from-emerald-50/50 to-teal-50/30 backdrop-blur-sm border border-emerald-100/40 hover:border-emerald-200/60 transition-all duration-300 hover:shadow-sm"
                     >
                       <div className="flex justify-between items-center">
                         <div className="flex items-center space-x-3">
-                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-sm shadow-lg">
+                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-sm shadow-sm">
                             {index + 1}
                           </div>
                           <div>
@@ -647,7 +647,7 @@ export default function Analytics() {
               <CardHeader className="relative">
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="p-2 bg-gradient-to-r from-amber-500 to-orange-600 rounded-lg mr-3 shadow-lg">
+                    <div className="p-1.5 bg-gradient-to-r from-amber-500 to-orange-600 rounded-lg mr-3 shadow-sm">
                       <FileText className="w-4 h-4 text-white" />
                     </div>
                     <span className="text-lg font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">

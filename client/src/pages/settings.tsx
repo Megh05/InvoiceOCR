@@ -161,7 +161,7 @@ export default function Settings() {
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-3xl blur-3xl"></div>
             <div className="relative bg-white/80 backdrop-blur-sm border border-white/20 rounded-3xl p-4 shadow-xl">
               <div className="flex items-center space-x-4">
-                <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-lg">
+                <div className="p-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-lg">
                   <SettingsIcon className="w-4 h-4 text-white" />
                 </div>
                 <div>
@@ -179,9 +179,9 @@ export default function Settings() {
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-3xl blur-xl"></div>
               <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
-                <CardHeader className="pb-4">
+                <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-800">
-                    <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-md">
+                    <div className="p-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-sm">
                       <Key className="h-4 w-4 text-white" />
                     </div>
                     API Configuration
@@ -190,7 +190,7 @@ export default function Settings() {
                     Configure external service integrations for enhanced functionality
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3">
                 <div className="space-y-3">
                   <Label htmlFor="mistral-api">Mistral OCR API Key</Label>
                   <div className="flex items-center gap-2">
@@ -267,9 +267,9 @@ export default function Settings() {
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-3xl blur-xl"></div>
               <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
-                <CardHeader className="pb-4">
+                <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-800">
-                    <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg shadow-md">
+                    <div className="p-1.5 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg shadow-sm">
                       <Zap className="h-4 w-4 text-white" />
                     </div>
                     Processing Settings
@@ -278,7 +278,7 @@ export default function Settings() {
                     Configure invoice processing behavior and thresholds
                   </CardDescription>
                 </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="auto-save">Auto-save processed invoices</Label>
@@ -328,9 +328,9 @@ export default function Settings() {
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-teal-500/10 rounded-3xl blur-xl"></div>
               <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
-                <CardHeader className="pb-4">
+                <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-800">
-                    <div className="p-2 bg-gradient-to-r from-green-500 to-teal-600 rounded-lg shadow-md">
+                    <div className="p-1.5 bg-gradient-to-r from-green-500 to-teal-600 rounded-lg shadow-sm">
                       <Database className="h-4 w-4 text-white" />
                     </div>
                     Data Management
@@ -339,7 +339,7 @@ export default function Settings() {
                     Manage your invoice data, exports, and storage options
                   </CardDescription>
                 </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Export All Data</Label>
@@ -364,9 +364,9 @@ export default function Settings() {
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-3xl blur-xl"></div>
               <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
-                <CardHeader className="pb-4">
+                <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-800">
-                    <div className="p-2 bg-gradient-to-r from-red-500 to-orange-600 rounded-lg shadow-md">
+                    <div className="p-1.5 bg-gradient-to-r from-red-500 to-orange-600 rounded-lg shadow-sm">
                       <Shield className="h-4 w-4 text-white" />
                     </div>
                     Security
@@ -375,7 +375,7 @@ export default function Settings() {
                     Security, privacy settings, and data retention controls
                   </CardDescription>
                 </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="log-requests">Log API requests</Label>

@@ -303,63 +303,59 @@ export default function AllInvoices() {
           {/* Enhanced Summary Cards */}
           {!isLoading && invoices && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-3xl blur-xl"></div>
-                <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-xs font-medium">Total Invoices</CardTitle>
-                    <FileText className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent className="relative">
-                    <div className="text-lg font-bold text-gray-900 mb-1">{invoices.length}</div>
-                  </CardContent>
-                </Card>
-              </div>
+              <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-200/50 hover:border-blue-300/80 transition-all duration-300 hover:shadow-lg">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-xs font-medium text-gray-700">Total Invoices</CardTitle>
+                  <div className="p-1.5 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-sm">
+                    <FileText className="h-4 w-4 text-white" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-lg font-bold text-gray-900">{invoices.length}</div>
+                </CardContent>
+              </Card>
 
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-3xl blur-xl"></div>
-                <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-xs font-medium">Total Amount</CardTitle>
-                    <DollarSign className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent className="relative">
-                    <div className="text-lg font-bold text-gray-900 mb-1">
-                      {formatCurrency(invoices.reduce((sum, inv) => sum + inv.total, 0))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+              <Card className="bg-gradient-to-br from-green-500/10 to-green-600/10 border-green-200/50 hover:border-green-300/80 transition-all duration-300 hover:shadow-lg">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-xs font-medium text-gray-700">Total Amount</CardTitle>
+                  <div className="p-1.5 bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-sm">
+                    <DollarSign className="h-4 w-4 text-white" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-lg font-bold text-gray-900">
+                    {formatCurrency(invoices.reduce((sum, inv) => sum + inv.total, 0))}
+                  </div>
+                </CardContent>
+              </Card>
 
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-violet-500/10 rounded-3xl blur-xl"></div>
-                <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-xs font-medium">Average Amount</CardTitle>
-                    <Building2 className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent className="relative">
-                    <div className="text-lg font-bold text-gray-900 mb-1">
-                      {formatCurrency(invoices.length > 0 ? invoices.reduce((sum, inv) => sum + inv.total, 0) / invoices.length : 0)}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+              <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 border-purple-200/50 hover:border-purple-300/80 transition-all duration-300 hover:shadow-lg">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-xs font-medium text-gray-700">Average Amount</CardTitle>
+                  <div className="p-1.5 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-sm">
+                    <Building2 className="h-4 w-4 text-white" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-lg font-bold text-gray-900">
+                    {formatCurrency(invoices.length > 0 ? invoices.reduce((sum, inv) => sum + inv.total, 0) / invoices.length : 0)}
+                  </div>
+                </CardContent>
+              </Card>
 
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-3xl blur-xl"></div>
-                <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-xs font-medium">High Confidence</CardTitle>
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent className="relative">
-                    <div className="text-lg font-bold text-gray-900 mb-1">
-                      {Math.round((invoices.filter(inv => inv.confidence >= 0.8).length / invoices.length) * 100)}%
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+              <Card className="bg-gradient-to-br from-orange-500/10 to-red-600/10 border-orange-200/50 hover:border-orange-300/80 transition-all duration-300 hover:shadow-lg">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-xs font-medium text-gray-700">High Confidence</CardTitle>
+                  <div className="p-1.5 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg shadow-sm">
+                    <Calendar className="h-4 w-4 text-white" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-lg font-bold text-gray-900">
+                    {Math.round((invoices.filter(inv => inv.confidence >= 0.8).length / invoices.length) * 100)}%
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           )}
 
