@@ -10,7 +10,6 @@ import { Settings as SettingsIcon, Key, Database, Zap, Shield, CheckCircle, Aler
 import Layout from "@/components/Layout";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 
 export default function Settings() {
   const [apiKey, setApiKey] = useState("");
@@ -154,43 +153,38 @@ export default function Settings() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div className="min-h-screen bg-gray-50">
         <div className="max-w-6xl mx-auto p-6">
-          {/* Enhanced Header */}
-          <div className="relative mb-8">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-3xl blur-3xl"></div>
-            <div className="relative bg-white/80 backdrop-blur-sm border border-white/20 rounded-3xl p-4 shadow-xl">
-              <div className="flex items-center space-x-4">
-                <div className="p-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-lg">
-                  <SettingsIcon className="w-4 h-4 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                    Settings
-                  </h1>
-                  <p className="text-gray-600 text-sm">Manage your application configuration and preferences</p>
-                </div>
+          {/* Header */}
+          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+            <div className="flex items-center space-x-4">
+              <div className="p-2 bg-gray-900 rounded-lg">
+                <SettingsIcon className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-semibold text-gray-900">
+                  Settings
+                </h1>
+                <p className="text-gray-600 text-sm">Manage your application configuration and preferences</p>
               </div>
             </div>
           </div>
 
-          <div className="grid gap-8">
-            {/* Enhanced API Configuration */}
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-2xl blur-xl"></div>
-              <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 h-auto">
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-800">
-                    <div className="p-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-sm">
-                      <Key className="h-4 w-4 text-white" />
-                    </div>
-                    API Configuration
-                  </CardTitle>
-                  <CardDescription className="text-sm text-gray-600">
-                    Configure external service integrations for enhanced functionality
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
+          <div className="grid gap-6">
+            {/* API Configuration */}
+            <Card className="border border-gray-200">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-900">
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <Key className="h-4 w-4 text-gray-600" />
+                  </div>
+                  API Configuration
+                </CardTitle>
+                <CardDescription className="text-sm text-gray-600">
+                  Configure external service integrations for enhanced functionality
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
                 <div className="space-y-3">
                   <Label htmlFor="mistral-api">Mistral OCR API Key</Label>
                   <div className="flex items-center gap-2">
@@ -260,24 +254,21 @@ export default function Settings() {
                   </p>
                 </div>
               </CardContent>
-              </Card>
-            </div>
+            </Card>
 
-            {/* Enhanced Processing Settings */}
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-2xl blur-xl"></div>
-              <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 h-auto">
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-800">
-                    <div className="p-1.5 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg shadow-sm">
-                      <Zap className="h-4 w-4 text-white" />
-                    </div>
-                    Processing Settings
-                  </CardTitle>
-                  <CardDescription className="text-sm text-gray-600">
-                    Configure invoice processing behavior and thresholds
-                  </CardDescription>
-                </CardHeader>
+            {/* Processing Settings */}
+            <Card className="border border-gray-200">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-900">
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <Zap className="h-4 w-4 text-gray-600" />
+                  </div>
+                  Processing Settings
+                </CardTitle>
+                <CardDescription className="text-sm text-gray-600">
+                  Configure invoice processing behavior and thresholds
+                </CardDescription>
+              </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
@@ -321,24 +312,21 @@ export default function Settings() {
                   <Switch id="fallback-parsing" defaultChecked />
                 </div>
               </CardContent>
-              </Card>
-            </div>
+            </Card>
 
-            {/* Enhanced Data Management */}
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-teal-500/10 rounded-2xl blur-xl"></div>
-              <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 h-auto">
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-800">
-                    <div className="p-1.5 bg-gradient-to-r from-green-500 to-teal-600 rounded-lg shadow-sm">
-                      <Database className="h-4 w-4 text-white" />
-                    </div>
-                    Data Management
-                  </CardTitle>
-                  <CardDescription className="text-sm text-gray-600">
-                    Manage your invoice data, exports, and storage options
-                  </CardDescription>
-                </CardHeader>
+            {/* Data Management */}
+            <Card className="border border-gray-200">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-900">
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <Database className="h-4 w-4 text-gray-600" />
+                  </div>
+                  Data Management
+                </CardTitle>
+                <CardDescription className="text-sm text-gray-600">
+                  Manage your invoice data, exports, and storage options
+                </CardDescription>
+              </CardHeader>
               <CardContent className="space-y-3">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -357,24 +345,21 @@ export default function Settings() {
                   </div>
                 </div>
               </CardContent>
-              </Card>
-            </div>
+            </Card>
 
-            {/* Enhanced Security */}
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-2xl blur-xl"></div>
-              <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 h-auto">
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-800">
-                    <div className="p-1.5 bg-gradient-to-r from-red-500 to-orange-600 rounded-lg shadow-sm">
-                      <Shield className="h-4 w-4 text-white" />
-                    </div>
-                    Security
-                  </CardTitle>
-                  <CardDescription className="text-sm text-gray-600">
-                    Security, privacy settings, and data retention controls
-                  </CardDescription>
-                </CardHeader>
+            {/* Security */}
+            <Card className="border border-gray-200">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-900">
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <Shield className="h-4 w-4 text-gray-600" />
+                  </div>
+                  Security
+                </CardTitle>
+                <CardDescription className="text-sm text-gray-600">
+                  Security, privacy settings, and data retention controls
+                </CardDescription>
+              </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
@@ -404,26 +389,22 @@ export default function Settings() {
                   />
                 </div>
               </CardContent>
-              </Card>
-            </div>
+            </Card>
 
-            {/* Enhanced Save Settings */}
-            <div className="relative pt-6">
-              <div className="absolute inset-0 bg-gradient-to-r from-gray-500/10 to-slate-500/10 rounded-2xl blur-xl"></div>
-              <div className="relative bg-white/80 backdrop-blur-sm border border-white/40 rounded-2xl p-6 shadow-lg">
-                <div className="flex justify-end gap-4">
-                  <Button 
-                    variant="outline" 
-                    className="bg-white/80 backdrop-blur-sm hover:bg-gray-50 transition-all duration-300 rounded-xl px-6 py-3"
-                  >
-                    Reset to Defaults
-                  </Button>
-                  <Button 
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                  >
-                    Save Settings
-                  </Button>
-                </div>
+            {/* Save Settings */}
+            <div className="bg-white border border-gray-200 rounded-lg p-6">
+              <div className="flex justify-end gap-4">
+                <Button 
+                  variant="outline" 
+                  className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-3"
+                >
+                  Reset to Defaults
+                </Button>
+                <Button 
+                  className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 font-semibold"
+                >
+                  Save Settings
+                </Button>
               </div>
             </div>
           </div>

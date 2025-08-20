@@ -250,114 +250,113 @@ export default function AllInvoices() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto p-6 space-y-6">
-          {/* Enhanced Header */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-3xl blur-3xl"></div>
-            <div className="relative bg-white/80 backdrop-blur-sm border border-white/20 rounded-3xl p-4 shadow-xl">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-lg">
-                    <FileText className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">All Invoices</h1>
-                    <p className="text-gray-600 text-sm">
-                      {isLoading ? "Loading..." : `${invoices?.length || 0} invoices processed`}
-                    </p>
-                  </div>
+          {/* Header */}
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gray-900 rounded-lg">
+                  <FileText className="w-5 h-5 text-white" />
                 </div>
-                <div className="flex items-center space-x-3">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  disabled={!invoices || invoices.length === 0}
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Export
-                  <ChevronDown className="ml-2 h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={handleExportCSV}>
-                  <FileText className="mr-2 h-4 w-4" />
-                  Export as CSV
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleExportJSON}>
-                  <FileText className="mr-2 h-4 w-4" />
-                  Export as JSON
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleExportPDF}>
-                  <FileText className="mr-2 h-4 w-4" />
-                  Export as PDF
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                <div>
+                  <h1 className="text-2xl font-semibold text-gray-900">All Invoices</h1>
+                  <p className="text-gray-600 text-sm">
+                    {isLoading ? "Loading..." : `${invoices?.length || 0} invoices processed`}
+                  </p>
                 </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      disabled={!invoices || invoices.length === 0}
+                      className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Export
+                      <ChevronDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={handleExportCSV}>
+                      <FileText className="mr-2 h-4 w-4" />
+                      Export as CSV
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleExportJSON}>
+                      <FileText className="mr-2 h-4 w-4" />
+                      Export as JSON
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleExportPDF}>
+                      <FileText className="mr-2 h-4 w-4" />
+                      Export as PDF
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
               </div>
             </div>
           </div>
 
-          {/* Enhanced Summary Cards */}
+          {/* Summary Cards */}
           {!isLoading && invoices && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-200/50 hover:border-blue-300/80 transition-all duration-300 hover:shadow-lg rounded-2xl h-24">
+              <Card className="border border-gray-200 hover:border-gray-300 transition-colors">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-xs font-medium text-gray-700">Total Invoices</CardTitle>
-                  <div className="p-1.5 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-sm">
-                    <FileText className="h-4 w-4 text-white" />
+                  <CardTitle className="text-sm font-medium text-gray-600">Total Invoices</CardTitle>
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <FileText className="h-4 w-4 text-gray-600" />
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-gray-900 mb-1">{invoices.length}</div>
-                  <p className="text-xs text-gray-600">Total processed</p>
+                  <p className="text-xs text-gray-500">Total processed</p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-green-500/10 to-green-600/10 border-green-200/50 hover:border-green-300/80 transition-all duration-300 hover:shadow-lg rounded-2xl h-24">
+              <Card className="border border-gray-200 hover:border-gray-300 transition-colors">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-xs font-medium text-gray-700">Total Amount</CardTitle>
-                  <div className="p-1.5 bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-sm">
-                    <DollarSign className="h-4 w-4 text-white" />
+                  <CardTitle className="text-sm font-medium text-gray-600">Total Amount</CardTitle>
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <DollarSign className="h-4 w-4 text-gray-600" />
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-gray-900 mb-1">
                     {formatCurrency(invoices.reduce((sum, inv) => sum + inv.total, 0))}
                   </div>
-                  <p className="text-xs text-gray-600">Combined value</p>
+                  <p className="text-xs text-gray-500">Combined value</p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 border-purple-200/50 hover:border-purple-300/80 transition-all duration-300 hover:shadow-lg rounded-2xl h-24">
+              <Card className="border border-gray-200 hover:border-gray-300 transition-colors">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-xs font-medium text-gray-700">Average Amount</CardTitle>
-                  <div className="p-1.5 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-sm">
-                    <Building2 className="h-4 w-4 text-white" />
+                  <CardTitle className="text-sm font-medium text-gray-600">Average Amount</CardTitle>
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <Building2 className="h-4 w-4 text-gray-600" />
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-gray-900 mb-1">
                     {formatCurrency(invoices.length > 0 ? invoices.reduce((sum, inv) => sum + inv.total, 0) / invoices.length : 0)}
                   </div>
-                  <p className="text-xs text-gray-600">Average amount</p>
+                  <p className="text-xs text-gray-500">Average amount</p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-orange-500/10 to-red-600/10 border-orange-200/50 hover:border-orange-300/80 transition-all duration-300 hover:shadow-lg rounded-2xl h-24">
+              <Card className="border border-gray-200 hover:border-gray-300 transition-colors">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-xs font-medium text-gray-700">High Confidence</CardTitle>
-                  <div className="p-1.5 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg shadow-sm">
-                    <Calendar className="h-4 w-4 text-white" />
+                  <CardTitle className="text-sm font-medium text-gray-600">High Confidence</CardTitle>
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <Calendar className="h-4 w-4 text-gray-600" />
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-gray-900 mb-1">
                     {Math.round((invoices.filter(inv => inv.confidence >= 0.8).length / invoices.length) * 100)}%
                   </div>
-                  <p className="text-xs text-gray-600">Quality score</p>
+                  <p className="text-xs text-gray-500">Quality score</p>
                 </CardContent>
               </Card>
             </div>
@@ -502,7 +501,6 @@ export default function AllInvoices() {
           )}
         </div>
       </div>
-    </div>
     </Layout>
   );
 }

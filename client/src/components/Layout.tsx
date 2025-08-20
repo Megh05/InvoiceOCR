@@ -47,33 +47,32 @@ export default function Layout({ children }: LayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Enhanced Sidebar */}
+    <div className="min-h-screen flex bg-gray-50">
+      {/* Sidebar */}
       <div className="w-64 fixed h-full z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-indigo-500/10 backdrop-blur-xl"></div>
-        <div className="relative bg-white/80 backdrop-blur-sm border-r border-white/40 shadow-2xl h-full">
+        <div className="bg-white border-r border-gray-200 h-full">
           <div className="p-6">
             <div className="flex items-center space-x-3 mb-8">
-              <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+              <div className="p-2 bg-gray-900 rounded-lg">
                 <Receipt className="w-6 h-6 text-white" />
               </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-semibold text-gray-900">
                 InvoiceOCR
               </h1>
             </div>
           
-            <nav className="space-y-3">
+            <nav className="space-y-1">
               {navItems.map((item) => (
                 <Link key={item.href} href={item.href}>
                   <div
-                    className={`group flex items-center space-x-3 px-4 py-3 rounded-2xl font-semibold transition-all duration-300 cursor-pointer ${
+                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
                       item.active
-                        ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg scale-105"
-                        : "text-gray-700 hover:bg-white/60 hover:shadow-md hover:scale-102"
+                        ? "bg-gray-900 text-white"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                     }`}
                   >
-                    <item.icon className={`w-5 h-5 transition-transform duration-300 ${item.active ? 'text-white' : 'group-hover:scale-110'}`} />
-                    <span className="text-sm">{item.label}</span>
+                    <item.icon className="w-5 h-5" />
+                    <span>{item.label}</span>
                   </div>
                 </Link>
               ))}
@@ -82,17 +81,13 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </div>
 
-      {/* Enhanced Main Content */}
+      {/* Main Content */}
       <div className="flex-1 ml-64 min-h-screen">
-        {/* Enhanced OCR Status Bar */}
-        <div className="bg-white/60 backdrop-blur-sm border-b border-white/40 px-6 py-3">
+        {/* Status Bar */}
+        <div className="bg-white border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-end">
-            <div className="flex items-center space-x-3 text-sm">
-              <div className="px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-white/40 shadow-sm">
-                <div className="flex items-center space-x-2 text-gray-600">
-                  <OCRStatus />
-                </div>
-              </div>
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <OCRStatus />
             </div>
           </div>
         </div>

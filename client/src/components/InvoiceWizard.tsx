@@ -233,7 +233,9 @@ export default function InvoiceWizard() {
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
-      <StepIndicator currentStep={state.step} totalSteps={TOTAL_STEPS} />
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <StepIndicator currentStep={state.step} totalSteps={TOTAL_STEPS} />
+      </div>
       
       {state.step === 1 && (
         <UploadStep
