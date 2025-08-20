@@ -255,15 +255,15 @@ export default function AllInvoices() {
           {/* Enhanced Header */}
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-3xl blur-3xl"></div>
-            <div className="relative bg-white/80 backdrop-blur-sm border border-white/20 rounded-3xl p-6 shadow-xl">
+            <div className="relative bg-white/80 backdrop-blur-sm border border-white/20 rounded-3xl p-4 shadow-xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-                    <FileText className="w-5 h-5 text-white" />
+                  <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-lg">
+                    <FileText className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">All Invoices</h1>
-                    <p className="text-gray-600 text-sm">
+                    <h1 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">All Invoices</h1>
+                    <p className="text-gray-600 text-xs">
                       {isLoading ? "Loading..." : `${invoices?.length || 0} invoices processed`}
                     </p>
                   </div>
@@ -302,16 +302,16 @@ export default function AllInvoices() {
 
           {/* Enhanced Summary Cards */}
           {!isLoading && invoices && (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-3xl blur-xl"></div>
                 <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Invoices</CardTitle>
+                    <CardTitle className="text-xs font-medium">Total Invoices</CardTitle>
                     <FileText className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{invoices.length}</div>
+                    <div className="text-lg font-bold">{invoices.length}</div>
                   </CardContent>
                 </Card>
               </div>
@@ -320,11 +320,11 @@ export default function AllInvoices() {
                 <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-3xl blur-xl"></div>
                 <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Amount</CardTitle>
+                    <CardTitle className="text-xs font-medium">Total Amount</CardTitle>
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">
+                    <div className="text-lg font-bold">
                       {formatCurrency(invoices.reduce((sum, inv) => sum + inv.total, 0))}
                     </div>
                   </CardContent>
@@ -335,11 +335,11 @@ export default function AllInvoices() {
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-violet-500/10 rounded-3xl blur-xl"></div>
                 <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Average Amount</CardTitle>
+                    <CardTitle className="text-xs font-medium">Average Amount</CardTitle>
                     <Building2 className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">
+                    <div className="text-lg font-bold">
                       {formatCurrency(invoices.length > 0 ? invoices.reduce((sum, inv) => sum + inv.total, 0) / invoices.length : 0)}
                     </div>
                   </CardContent>
@@ -350,11 +350,11 @@ export default function AllInvoices() {
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-3xl blur-xl"></div>
                 <Card className="relative bg-white/90 backdrop-blur-sm border border-white/40 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">High Confidence</CardTitle>
+                    <CardTitle className="text-xs font-medium">High Confidence</CardTitle>
                     <Calendar className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">
+                    <div className="text-lg font-bold">
                       {Math.round((invoices.filter(inv => inv.confidence >= 0.8).length / invoices.length) * 100)}%
                     </div>
                   </CardContent>

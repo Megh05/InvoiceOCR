@@ -102,7 +102,7 @@ export default function Analytics() {
                       <Activity className="w-4 h-4 text-white" />
                     </div>
                     <div>
-                      <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                      <h1 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
                         Invoice Analytics
                       </h1>
                       <p className="text-gray-600 text-xs">Insights and patterns from your processed invoices</p>
@@ -154,7 +154,7 @@ export default function Analytics() {
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-xl font-bold text-gray-900 mb-1 group-hover:text-blue-700 transition-colors">
+                <div className="text-lg font-bold text-gray-900 mb-1 group-hover:text-blue-700 transition-colors">
                   {analytics.total_invoices.toLocaleString()}
                 </div>
                 <div className="flex items-center space-x-2">
@@ -190,7 +190,7 @@ export default function Analytics() {
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-xl font-bold text-gray-900 mb-1 group-hover:text-green-700 transition-colors">
+                <div className="text-lg font-bold text-gray-900 mb-1 group-hover:text-green-700 transition-colors">
                   ${analytics.total_amount.toLocaleString()}
                 </div>
                 <p className="text-xs text-green-600">
@@ -216,7 +216,7 @@ export default function Analytics() {
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-xl font-bold text-gray-900 mb-1 group-hover:text-orange-700 transition-colors">
+                <div className="text-lg font-bold text-gray-900 mb-1 group-hover:text-orange-700 transition-colors">
                   {analytics.recognition_stats.total_processed > 0 
                     ? Math.round((analytics.recognition_stats.template_recognized / analytics.recognition_stats.total_processed) * 100)
                     : 0}%
@@ -244,7 +244,7 @@ export default function Analytics() {
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-xl font-bold text-gray-900 mb-1 group-hover:text-purple-700 transition-colors">
+                <div className="text-lg font-bold text-gray-900 mb-1 group-hover:text-purple-700 transition-colors">
                   {analytics.recognition_stats.total_processed > 0 
                     ? Math.round((analytics.recognition_stats.high_confidence / analytics.recognition_stats.total_processed) * 100)
                     : 0}%
