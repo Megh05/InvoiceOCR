@@ -369,22 +369,20 @@ export default function Analytics() {
                 <ResponsiveContainer width="100%" height={240}>
                   <>
                   {activeChart === 'bar' && (
-                    <BarChart data={analytics.monthly_trends}>
+                    <BarChart data={analytics.monthly_trends} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                       <XAxis 
                         dataKey="month" 
                         stroke="#64748b"
-                        fontSize={10}
+                        fontSize={11}
                         tickLine={false}
                         axisLine={false}
-                        height={40}
                       />
                       <YAxis 
                         stroke="#64748b"
-                        fontSize={10}
+                        fontSize={11}
                         tickLine={false}
                         axisLine={false}
-                        width={40}
                       />
                       <Tooltip 
                         contentStyle={{
@@ -401,28 +399,25 @@ export default function Analytics() {
                         fill="#3B82F6" 
                         name="Invoice Count" 
                         radius={[4, 4, 0, 0]}
-                        className="drop-shadow-sm"
                       />
                     </BarChart>
                   )}
                   
                   {activeChart === 'line' && (
-                    <LineChart data={analytics.monthly_trends}>
+                    <LineChart data={analytics.monthly_trends} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                       <XAxis 
                         dataKey="month" 
                         stroke="#64748b"
-                        fontSize={10}
+                        fontSize={11}
                         tickLine={false}
                         axisLine={false}
-                        height={40}
                       />
                       <YAxis 
                         stroke="#64748b"
-                        fontSize={10}
+                        fontSize={11}
                         tickLine={false}
                         axisLine={false}
-                        width={40}
                       />
                       <Tooltip 
                         contentStyle={{
@@ -446,22 +441,20 @@ export default function Analytics() {
                   )}
                   
                   {activeChart === 'area' && (
-                    <AreaChart data={analytics.monthly_trends}>
+                    <AreaChart data={analytics.monthly_trends} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                       <XAxis 
                         dataKey="month" 
                         stroke="#64748b"
-                        fontSize={10}
+                        fontSize={11}
                         tickLine={false}
                         axisLine={false}
-                        height={40}
                       />
                       <YAxis 
                         stroke="#64748b"
-                        fontSize={10}
+                        fontSize={11}
                         tickLine={false}
                         axisLine={false}
-                        width={40}
                       />
                       <Tooltip 
                         contentStyle={{
@@ -478,15 +471,9 @@ export default function Analytics() {
                         dataKey="count" 
                         stroke="#3B82F6" 
                         fillOpacity={0.3}
-                        fill="url(#blueAreaGradient)"
+                        fill="#3B82F6"
                         strokeWidth={2}
                       />
-                      <defs>
-                        <linearGradient id="blueAreaGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.6} />
-                          <stop offset="100%" stopColor="#3B82F6" stopOpacity={0.1} />
-                        </linearGradient>
-                      </defs>
                     </AreaChart>
                   )}
                   </>
