@@ -48,6 +48,9 @@ export default function EditStep({
           rawOcrText={state.parseResult?.raw_ocr_text || state.ocrText}
           editable={true}
           templateMatch={state.parseResult?.template_match}
+          imageFile={state.imageFile}
+          imageUrl={state.imageUrl}
+          inputType={state.inputType}
         />
 
         {/* Navigation */}

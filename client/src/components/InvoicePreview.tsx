@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { CanonicalInvoice, LineItem, FieldConfidence, TemplateMatch } from "@/types/invoice";
-import { FileText, Edit3, Eye, Copy, Plus, Trash2 } from "lucide-react";
+import { FileText, Edit3, Eye, Copy, Plus, Trash2, File } from "lucide-react";
 import TemplateDisplay from "./TemplateDisplay";
 
 interface InvoicePreviewProps {
@@ -17,6 +17,9 @@ interface InvoicePreviewProps {
   rawOcrText?: string;
   editable?: boolean;
   templateMatch?: TemplateMatch;
+  imageFile?: File | null;
+  imageUrl?: string;
+  inputType?: 'file' | 'url' | 'text' | null;
 }
 
 export default function InvoicePreview({
@@ -25,9 +28,13 @@ export default function InvoicePreview({
   onInvoiceChange,
   rawOcrText,
   editable = true,
-  templateMatch
+  templateMatch,
+  imageFile,
+  imageUrl,
+  inputType
 }: InvoicePreviewProps) {
   const [isEditing, setIsEditing] = useState(editable);
+  const [viewMode, setViewMode] = useState<'ocr' | 'document'>('ocr');
 
   const getFieldConfidence = (fieldName: string): FieldConfidence | undefined => {
     return fieldConfidences.find(fc => fc.field === fieldName);
@@ -145,36 +152,96 @@ export default function InvoicePreview({
     </div>
   );
 
+  // Create URL for PDF preview
+  const documentUrl = imageFile ? URL.createObjectURL(imageFile) : imageUrl;
+  const canShowDocument = (inputType === 'file' && imageFile) || (inputType === 'url' && imageUrl);
+
   return (
     <div className="space-y-6">
       {/* Template Recognition Display */}
       <TemplateDisplay templateMatch={templateMatch} category={invoice.category} />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Original Text Preview */}
-        {rawOcrText && (
+        {/* Document/Text Preview */}
+        {(rawOcrText || canShowDocument) && (
         <Card className="h-fit">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center">
-              <FileText className="w-5 h-5 mr-2" />
-              Original OCR Text
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg flex items-center">
+                {viewMode === 'ocr' ? (
+                  <>
+                    <FileText className="w-5 h-5 mr-2" />
+                    Original OCR Text
+                  </>
+                ) : (
+                  <>
+                    <File className="w-5 h-5 mr-2" />
+                    Original Document
+                  </>
+                )}
+              </CardTitle>
+              {canShowDocument && (
+                <Select value={viewMode} onValueChange={(value: 'ocr' | 'document') => setViewMode(value)}>
+                  <SelectTrigger className="w-48">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ocr">OCR Text View</SelectItem>
+                    <SelectItem value="document">Original Document</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="bg-gray-50 p-4 rounded-lg border max-h-96 overflow-y-auto">
-              <pre className="text-xs whitespace-pre-wrap font-mono text-gray-700">
-                {rawOcrText}
-              </pre>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-3"
-              onClick={() => navigator.clipboard.writeText(rawOcrText)}
-            >
-              <Copy className="w-4 h-4 mr-2" />
-              Copy Text
-            </Button>
+            {viewMode === 'ocr' && rawOcrText ? (
+              <>
+                <div className="bg-gray-50 p-4 rounded-lg border max-h-96 overflow-y-auto">
+                  <pre className="text-xs whitespace-pre-wrap font-mono text-gray-700">
+                    {rawOcrText}
+                  </pre>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-3"
+                  onClick={() => navigator.clipboard.writeText(rawOcrText)}
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copy Text
+                </Button>
+              </>
+            ) : viewMode === 'document' && canShowDocument ? (
+              <div className="space-y-3">
+                <div className="border rounded-lg overflow-hidden bg-gray-50 max-h-96">
+                  <object
+                    data={documentUrl}
+                    type={inputType === 'file' && imageFile?.type.includes('pdf') ? 'application/pdf' : undefined}
+                    className="w-full h-80"
+                  >
+                    <div className="p-4 text-center">
+                      <p className="text-sm text-gray-600 mb-2">Cannot display document inline</p>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => window.open(documentUrl, '_blank')}
+                      >
+                        <File className="w-4 h-4 mr-2" />
+                        Open in New Tab
+                      </Button>
+                    </div>
+                  </object>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => window.open(documentUrl, '_blank')}
+                >
+                  <File className="w-4 h-4 mr-2" />
+                  Open in New Tab
+                </Button>
+              </div>
+            ) : null}
           </CardContent>
         </Card>
       )}

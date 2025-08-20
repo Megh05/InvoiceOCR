@@ -446,28 +446,22 @@ export default function AllInvoices() {
                         </div>
 
                         {/* Invoice Details */}
-                        <div className="flex-1 space-y-2 text-xs">
+                        <div className="flex-1 space-y-1.5 text-xs">
                           <div className="flex justify-between">
-                            <span className="text-gray-500">Subtotal:</span>
-                            <span className="font-medium text-gray-700">
+                            <span className="text-gray-500 truncate">Subtotal:</span>
+                            <span className="font-medium text-gray-700 text-right min-w-0">
                               {formatCurrency(invoice.subtotal, invoice.currency || "USD")}
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-gray-500">Tax:</span>
-                            <span className="font-medium text-gray-700">
+                            <span className="text-gray-500 truncate">Tax:</span>
+                            <span className="font-medium text-gray-700 text-right min-w-0">
                               {formatCurrency(invoice.tax, invoice.currency || "USD")}
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-gray-500">Shipping:</span>
-                            <span className="font-medium text-gray-700">
-                              {formatCurrency(invoice.shipping, invoice.currency || "USD")}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-500">Processed:</span>
-                            <span className="font-medium text-gray-700">
+                            <span className="text-gray-500 truncate">Processed:</span>
+                            <span className="font-medium text-gray-700 text-right text-[10px] min-w-0">
                               {formatDate(invoice.created_at)}
                             </span>
                           </div>
