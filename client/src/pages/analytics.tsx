@@ -200,18 +200,16 @@ export default function Analytics() {
               <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
               <div className="relative bg-white/80 backdrop-blur-sm border border-white/50 rounded-2xl p-6 hover:bg-white/90 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="p-2.5 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl">
-                    <FileText className="w-5 h-5 text-blue-600" />
+                  <div className="text-sm font-medium text-gray-600">Total Invoices</div>
+                  <div className="p-2 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl">
+                    <FileText className="w-4 h-4 text-blue-600" />
                   </div>
-                  <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
-                    Total
-                  </Badge>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-3xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-gray-900 mb-1">
                     {analytics.total_invoices.toLocaleString()}
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs text-gray-500">
                     {analytics.recognition_stats.template_recognized} recognized
                   </p>
                 </div>
@@ -223,18 +221,16 @@ export default function Analytics() {
               <div className="absolute -inset-0.5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
               <div className="relative bg-white/80 backdrop-blur-sm border border-white/50 rounded-2xl p-6 hover:bg-white/90 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="p-2.5 bg-gradient-to-br from-green-100 to-emerald-200 rounded-xl">
-                    <DollarSign className="w-5 h-5 text-green-600" />
+                  <div className="text-sm font-medium text-gray-600">Total Amount</div>
+                  <div className="p-2 bg-gradient-to-br from-green-100 to-emerald-200 rounded-xl">
+                    <DollarSign className="w-4 h-4 text-green-600" />
                   </div>
-                  <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200">
-                    Revenue
-                  </Badge>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-3xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-gray-900 mb-1">
                     ${analytics.total_amount.toLocaleString()}
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs text-gray-500">
                     Avg: ${analytics.average_amount.toLocaleString()}
                   </p>
                 </div>
@@ -246,20 +242,18 @@ export default function Analytics() {
               <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-600 to-orange-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
               <div className="relative bg-white/80 backdrop-blur-sm border border-white/50 rounded-2xl p-6 hover:bg-white/90 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="p-2.5 bg-gradient-to-br from-amber-100 to-orange-200 rounded-xl">
-                    <Target className="w-5 h-5 text-amber-600" />
+                  <div className="text-sm font-medium text-gray-600">Recognition Rate</div>
+                  <div className="p-2 bg-gradient-to-br from-amber-100 to-orange-200 rounded-xl">
+                    <Target className="w-4 h-4 text-amber-600" />
                   </div>
-                  <Badge variant="secondary" className="bg-amber-50 text-amber-700 border-amber-200">
-                    Accuracy
-                  </Badge>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-3xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-gray-900 mb-1">
                     {analytics.recognition_stats.total_processed > 0 
                       ? Math.round((analytics.recognition_stats.template_recognized / analytics.recognition_stats.total_processed) * 100)
                       : 0}%
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs text-gray-500">
                     Template detection
                   </p>
                 </div>
@@ -271,20 +265,18 @@ export default function Analytics() {
               <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
               <div className="relative bg-white/80 backdrop-blur-sm border border-white/50 rounded-2xl p-6 hover:bg-white/90 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="p-2.5 bg-gradient-to-br from-purple-100 to-pink-200 rounded-xl">
-                    <CheckCircle className="w-5 h-5 text-purple-600" />
+                  <div className="text-sm font-medium text-gray-600">Data Quality</div>
+                  <div className="p-2 bg-gradient-to-br from-purple-100 to-pink-200 rounded-xl">
+                    <CheckCircle className="w-4 h-4 text-purple-600" />
                   </div>
-                  <Badge variant="secondary" className="bg-purple-50 text-purple-700 border-purple-200">
-                    Quality
-                  </Badge>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-3xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-gray-900 mb-1">
                     {analytics.recognition_stats.total_processed > 0 
                       ? Math.round((analytics.recognition_stats.high_confidence / analytics.recognition_stats.total_processed) * 100)
                       : 0}%
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs text-gray-500">
                     High confidence
                   </p>
                 </div>
@@ -304,8 +296,8 @@ export default function Analytics() {
                         <Calendar className="w-5 h-5 text-teal-600" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-semibold text-gray-900">Monthly Trends</h2>
-                        <p className="text-sm text-gray-600">Invoice processing over time</p>
+                        <h2 className="text-lg font-semibold text-gray-900">Monthly Trends</h2>
+                        <p className="text-xs text-gray-500">Invoice processing over time</p>
                       </div>
                     </div>
                     <div className="flex bg-gray-100/80 backdrop-blur-sm rounded-xl p-1 border border-gray-200/50">
@@ -463,8 +455,8 @@ export default function Analytics() {
                       <Building2 className="w-5 h-5 text-indigo-600" />
                     </div>
                     <div>
-                      <h2 className="text-xl font-semibold text-gray-900">Categories</h2>
-                      <p className="text-sm text-gray-600">Distribution overview</p>
+                      <h2 className="text-lg font-semibold text-gray-900">Categories</h2>
+                      <p className="text-xs text-gray-500">Distribution overview</p>
                     </div>
                   </div>
                   
@@ -532,8 +524,8 @@ export default function Analytics() {
                   <Award className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900">Processing Quality Metrics</h2>
-                  <p className="text-sm text-gray-600">OCR and automation performance indicators</p>
+                  <h2 className="text-lg font-semibold text-gray-900">Processing Quality Metrics</h2>
+                  <p className="text-xs text-gray-500">OCR and automation performance indicators</p>
                 </div>
               </div>
               
@@ -541,8 +533,8 @@ export default function Analytics() {
                 {/* Template Recognition */}
                 <div className="group bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100 hover:shadow-lg transition-all duration-300">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold text-gray-900">Template Recognition</h3>
-                    <div className="text-2xl font-bold text-blue-600">
+                    <h3 className="font-semibold text-sm text-gray-900">Template Recognition</h3>
+                    <div className="text-lg font-bold text-blue-600">
                       {analytics.recognition_stats.total_processed > 0 
                         ? Math.round((analytics.recognition_stats.template_recognized / analytics.recognition_stats.total_processed) * 100)
                         : 0}%
@@ -562,8 +554,8 @@ export default function Analytics() {
                 {/* Auto-Categorized */}
                 <div className="group bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100 hover:shadow-lg transition-all duration-300">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold text-gray-900">Auto-Categorized</h3>
-                    <div className="text-2xl font-bold text-green-600">
+                    <h3 className="font-semibold text-sm text-gray-900">Auto-Categorized</h3>
+                    <div className="text-lg font-bold text-green-600">
                       {analytics.recognition_stats.total_processed > 0 
                         ? Math.round((analytics.recognition_stats.auto_categorized / analytics.recognition_stats.total_processed) * 100)
                         : 0}%
@@ -583,8 +575,8 @@ export default function Analytics() {
                 {/* High Confidence */}
                 <div className="group bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100 hover:shadow-lg transition-all duration-300">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold text-gray-900">High Confidence</h3>
-                    <div className="text-2xl font-bold text-purple-600">
+                    <h3 className="font-semibold text-sm text-gray-900">High Confidence</h3>
+                    <div className="text-lg font-bold text-purple-600">
                       {analytics.recognition_stats.total_processed > 0 
                         ? Math.round((analytics.recognition_stats.high_confidence / analytics.recognition_stats.total_processed) * 100)
                         : 0}%
