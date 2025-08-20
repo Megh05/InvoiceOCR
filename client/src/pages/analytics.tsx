@@ -10,7 +10,8 @@ import {
 } from 'recharts';
 import { 
   Activity, FileText, DollarSign, Target, TrendingUp, 
-  Building2, Calendar, Award, Download, Eye, EyeOff
+  Building2, Calendar, Award, Download, Eye, EyeOff, BarChart3,
+  Users, Zap, Clock, CheckCircle
 } from "lucide-react";
 import Layout from "@/components/Layout";
 
@@ -58,18 +59,41 @@ export default function Analytics() {
   if (isLoading) {
     return (
       <Layout>
-        <div className="min-h-screen bg-gray-50">
-          <div className="max-w-7xl mx-auto p-6 space-y-6">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-64 mb-4"></div>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="h-32 bg-gray-200 rounded"></div>
-                ))}
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* Loading Header */}
+            <div className="mb-8">
+              <div className="h-8 bg-gradient-to-r from-slate-200 to-slate-300 rounded-lg w-64 mb-2 animate-pulse"></div>
+              <div className="h-4 bg-slate-200 rounded w-40 animate-pulse"></div>
+            </div>
+            
+            {/* Loading Metrics */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-white/50 animate-pulse">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="h-4 bg-slate-200 rounded w-24"></div>
+                    <div className="h-10 w-10 bg-slate-200 rounded-xl"></div>
+                  </div>
+                  <div className="h-8 bg-slate-300 rounded w-20 mb-2"></div>
+                  <div className="h-3 bg-slate-200 rounded w-16"></div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Loading Charts */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+              <div className="xl:col-span-2">
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-white/50 animate-pulse">
+                  <div className="h-6 bg-slate-200 rounded w-48 mb-6"></div>
+                  <div className="h-80 bg-slate-100 rounded-xl"></div>
+                </div>
               </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="h-96 bg-gray-200 rounded"></div>
-                <div className="h-96 bg-gray-200 rounded"></div>
+              <div>
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-white/50 animate-pulse">
+                  <div className="h-6 bg-slate-200 rounded w-40 mb-6"></div>
+                  <div className="h-80 bg-slate-100 rounded-xl"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -81,15 +105,18 @@ export default function Analytics() {
   if (error || !analytics) {
     return (
       <Layout>
-        <div className="min-h-screen bg-gray-50">
-          <div className="max-w-7xl mx-auto p-6">
-            <div className="text-center py-12">
-              <Activity className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No analytics data</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                There was a problem loading analytics data.
-              </p>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40 flex items-center justify-center">
+          <div className="text-center py-12">
+            <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+              <Activity className="w-8 h-8 text-red-600" />
             </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Unable to Load Analytics</h3>
+            <p className="text-gray-600 max-w-md mx-auto">
+              There was an issue retrieving your analytics data. Please try refreshing the page or contact support.
+            </p>
+            <Button className="mt-4" onClick={() => window.location.reload()}>
+              Refresh Page
+            </Button>
           </div>
         </div>
       </Layout>
@@ -102,443 +129,480 @@ export default function Analytics() {
     amount: cat.total_amount
   }));
 
+  const pieColors = [
+    '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', 
+    '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6366F1'
+  ];
+
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/30 relative">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(99,102,241,0.05)_0%,transparent_25%)] pointer-events-none"></div>
-        <div className="relative max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
-          {/* Header */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/60 to-blue-50/40 rounded-2xl blur-xl"></div>
-            <div className="relative bg-white/80 backdrop-blur-sm border border-white/50 rounded-2xl shadow-lg p-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-gradient-to-br from-blue-600 to-purple-700 rounded-lg shadow-lg">
-                    <Activity className="w-5 h-5 text-white" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] [background-size:20px_20px] pointer-events-none"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Dashboard Header */}
+          <div className="mb-8">
+            <div className="bg-white/70 backdrop-blur-md rounded-2xl border border-white/50 shadow-xl p-6 lg:p-8">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl shadow-lg ring-4 ring-blue-100">
+                    <BarChart3 className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h1 className="text-2xl font-semibold text-gray-900">Analytics Dashboard</h1>
-                    <p className="text-gray-600 text-sm">
-                      {analytics.total_invoices} invoices analyzed
-                    </p>
+                    <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
+                      Analytics Dashboard
+                    </h1>
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <span>Live Data</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
+                        <span>{analytics.total_invoices} invoices processed</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        <span>Last updated: Now</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <Button 
                     variant="outline" 
                     size="sm"
                     onClick={() => setShowDetails(!showDetails)}
-                    className="border-white/50 bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-white/80 transition-all duration-200"
+                    className="bg-white/60 border-white/50 backdrop-blur-sm hover:bg-white/80 transition-all"
                   >
                     {showDetails ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
                     {showDetails ? 'Hide Details' : 'Show Details'}
                   </Button>
                   
-                  <Button variant="outline" size="sm" className="border-white/50 bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-white/80 transition-all duration-200">
+                  <Button 
+                    variant="default" 
+                    size="sm"
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg"
+                  >
                     <Download className="w-4 h-4 mr-2" />
-                    Export
+                    Export Report
                   </Button>
-                
-                  <div className="px-3 py-1 bg-white/60 backdrop-blur-sm text-gray-700 text-sm rounded-lg border border-white/40 shadow-sm">
-                    <span className="w-2 h-2 bg-green-500 rounded-full inline-block mr-2"></span>
-                    Live Data
-                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Key Metrics */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-2xl blur-xl"></div>
-              <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">
-                    Total Invoices
-                  </CardTitle>
-                  <div className="p-2 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg">
-                    <FileText className="h-4 w-4 text-blue-600" />
+          {/* Key Performance Metrics */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {/* Total Invoices */}
+            <div className="group relative">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
+              <div className="relative bg-white/80 backdrop-blur-sm border border-white/50 rounded-2xl p-6 hover:bg-white/90 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-2.5 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl">
+                    <FileText className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
+                    Total
+                  </Badge>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-900 mb-1">
-                  {analytics.total_invoices.toLocaleString()}
+                <div className="space-y-2">
+                  <p className="text-3xl font-bold text-gray-900">
+                    {analytics.total_invoices.toLocaleString()}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {analytics.recognition_stats.template_recognized} recognized
+                  </p>
                 </div>
-                <p className="text-xs text-gray-500">
-                  {analytics.recognition_stats.template_recognized} recognized
-                </p>
-              </CardContent>
-            </Card>
+              </div>
             </div>
 
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-600/10 rounded-2xl blur-xl"></div>
-              <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">
-                    Total Amount
-                  </CardTitle>
-                  <div className="p-2 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg">
-                    <DollarSign className="h-4 w-4 text-green-600" />
+            {/* Total Amount */}
+            <div className="group relative">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
+              <div className="relative bg-white/80 backdrop-blur-sm border border-white/50 rounded-2xl p-6 hover:bg-white/90 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-2.5 bg-gradient-to-br from-green-100 to-emerald-200 rounded-xl">
+                    <DollarSign className="w-5 h-5 text-green-600" />
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-gray-900 mb-1">
+                  <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200">
+                    Revenue
+                  </Badge>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-3xl font-bold text-gray-900">
                     ${analytics.total_amount.toLocaleString()}
-                  </div>
-                  <p className="text-xs text-gray-500">
+                  </p>
+                  <p className="text-sm text-gray-600">
                     Avg: ${analytics.average_amount.toLocaleString()}
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
 
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-orange-600/10 rounded-2xl blur-xl"></div>
-              <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">
-                    Recognition Rate
-                  </CardTitle>
-                  <div className="p-2 bg-gradient-to-br from-amber-100 to-orange-100 rounded-lg">
-                    <Target className="h-4 w-4 text-amber-600" />
+            {/* Recognition Rate */}
+            <div className="group relative">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-600 to-orange-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
+              <div className="relative bg-white/80 backdrop-blur-sm border border-white/50 rounded-2xl p-6 hover:bg-white/90 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-2.5 bg-gradient-to-br from-amber-100 to-orange-200 rounded-xl">
+                    <Target className="w-5 h-5 text-amber-600" />
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-gray-900 mb-1">
+                  <Badge variant="secondary" className="bg-amber-50 text-amber-700 border-amber-200">
+                    Accuracy
+                  </Badge>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-3xl font-bold text-gray-900">
                     {analytics.recognition_stats.total_processed > 0 
                       ? Math.round((analytics.recognition_stats.template_recognized / analytics.recognition_stats.total_processed) * 100)
                       : 0}%
-                  </div>
-                  <p className="text-xs text-gray-500">
+                  </p>
+                  <p className="text-sm text-gray-600">
                     Template detection
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
 
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-600/10 rounded-2xl blur-xl"></div>
-              <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">
-                    Data Quality
-                  </CardTitle>
-                  <div className="p-2 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg">
-                    <TrendingUp className="h-4 w-4 text-purple-600" />
+            {/* Data Quality */}
+            <div className="group relative">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
+              <div className="relative bg-white/80 backdrop-blur-sm border border-white/50 rounded-2xl p-6 hover:bg-white/90 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-2.5 bg-gradient-to-br from-purple-100 to-pink-200 rounded-xl">
+                    <CheckCircle className="w-5 h-5 text-purple-600" />
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-gray-900 mb-1">
+                  <Badge variant="secondary" className="bg-purple-50 text-purple-700 border-purple-200">
+                    Quality
+                  </Badge>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-3xl font-bold text-gray-900">
                     {analytics.recognition_stats.total_processed > 0 
                       ? Math.round((analytics.recognition_stats.high_confidence / analytics.recognition_stats.total_processed) * 100)
                       : 0}%
-                  </div>
-                  <p className="text-xs text-gray-500">
+                  </p>
+                  <p className="text-sm text-gray-600">
                     High confidence
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Category Distribution */}
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-blue-600/10 rounded-2xl blur-xl"></div>
-              <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="p-2 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-lg mr-3">
-                        <Building2 className="w-4 h-4 text-indigo-600" />
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
+            {/* Monthly Trends - Takes 2 columns on XL screens */}
+            <div className="xl:col-span-2">
+              <div className="bg-white/80 backdrop-blur-md border border-white/50 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300">
+                <div className="p-6 lg:p-8">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 bg-gradient-to-br from-teal-100 to-cyan-200 rounded-xl">
+                        <Calendar className="w-5 h-5 text-teal-600" />
                       </div>
-                      <span className="text-lg font-semibold text-gray-900">
-                        Category Distribution
-                      </span>
-                    </div>
-                  </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie
-                      data={categoryData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={false}
-                      outerRadius={80}
-                      innerRadius={30}
-                      fill="#6b7280"
-                      dataKey="value"
-                    >
-                      {categoryData.map((entry, index) => (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={['#374151', '#6b7280', '#9ca3af', '#d1d5db', '#e5e7eb'][index % 5]}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip 
-                      formatter={(value, name) => [value, "Count"]} 
-                      contentStyle={{
-                        backgroundColor: 'white',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '8px',
-                        fontSize: '12px'
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-                
-                {/* Legend */}
-                <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
-                  {categoryData.map((entry, index) => (
-                    <div key={entry.name} className="flex items-center space-x-2">
-                      <div 
-                        className="w-2 h-2 rounded-sm flex-shrink-0"
-                        style={{ backgroundColor: ['#374151', '#6b7280', '#9ca3af', '#d1d5db', '#e5e7eb'][index % 5] }}
-                      />
-                      <span className="text-gray-600 text-xs truncate">
-                        {entry.name.length > 10 ? entry.name.substring(0, 10) + '...' : entry.name} 
-                        <span className="text-gray-500">
-                          ({Math.round((entry.value / categoryData.reduce((sum, item) => sum + item.value, 0)) * 100)}%)
-                        </span>
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-            </div>
-
-            {/* Monthly Trends */}
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-cyan-600/10 rounded-2xl blur-xl"></div>
-              <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="p-2 bg-gradient-to-br from-teal-100 to-cyan-100 rounded-lg mr-3">
-                        <Calendar className="w-4 h-4 text-teal-600" />
+                      <div>
+                        <h2 className="text-xl font-semibold text-gray-900">Monthly Trends</h2>
+                        <p className="text-sm text-gray-600">Invoice processing over time</p>
                       </div>
-                      <span className="text-lg font-semibold text-gray-900">
-                        Monthly Trends
-                      </span>
                     </div>
-                    <div className="flex items-center space-x-1">
-                      <div className="flex bg-white/60 backdrop-blur-sm rounded-lg p-1 border border-white/40">
-                        {(['bar', 'line', 'area'] as const).map((type) => (
-                          <Button
-                            key={type}
-                            size="sm"
-                            variant={activeChart === type ? "default" : "ghost"}
-                            onClick={() => setActiveChart(type)}
-                            className={`px-3 py-1 text-xs ${
-                              activeChart === type 
-                                ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-sm' 
-                                : 'bg-transparent text-gray-600 hover:bg-white/50'
-                            }`}
+                    <div className="flex bg-gray-100/80 backdrop-blur-sm rounded-xl p-1 border border-gray-200/50">
+                      {(['bar', 'line', 'area'] as const).map((type) => (
+                        <Button
+                          key={type}
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setActiveChart(type)}
+                          className={`px-4 py-2 text-xs font-medium transition-all ${
+                            activeChart === type 
+                              ? 'bg-white shadow-sm text-gray-900 border border-gray-200' 
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
+                          }`}
                         >
                           {type.charAt(0).toUpperCase() + type.slice(1)}
                         </Button>
                       ))}
                     </div>
                   </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={240}>
-                  <>
-                  {activeChart === 'bar' && (
-                    <BarChart data={analytics.monthly_trends.filter(m => m.count > 0)} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis 
-                        dataKey="month" 
-                        stroke="#6b7280"
-                        fontSize={11}
-                        tickLine={false}
-                        axisLine={false}
-                      />
-                      <YAxis 
-                        stroke="#6b7280"
-                        fontSize={11}
-                        tickLine={false}
-                        axisLine={false}
-                        domain={[0, 'dataMax + 2']}
-                      />
-                      <Tooltip 
-                        contentStyle={{
-                          backgroundColor: 'white',
-                          border: '1px solid #e5e7eb',
-                          borderRadius: '8px',
-                          fontSize: '12px'
-                        }}
-                      />
-                      <Bar 
-                        dataKey="count" 
-                        fill="#374151" 
-                        name="Invoice Count" 
-                        radius={[2, 2, 0, 0]}
-                      />
-                    </BarChart>
-                  )}
                   
-                  {activeChart === 'line' && (
-                    <LineChart data={analytics.monthly_trends} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis 
-                        dataKey="month" 
-                        stroke="#6b7280"
-                        fontSize={11}
-                        tickLine={false}
-                        axisLine={false}
-                      />
-                      <YAxis 
-                        stroke="#6b7280"
-                        fontSize={11}
-                        tickLine={false}
-                        axisLine={false}
-                        domain={[0, 'dataMax + 2']}
-                      />
-                      <Tooltip 
-                        contentStyle={{
-                          backgroundColor: 'white',
-                          border: '1px solid #e5e7eb',
-                          borderRadius: '8px',
-                          fontSize: '12px'
-                        }}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="count" 
-                        stroke="#374151" 
-                        strokeWidth={2}
-                        dot={{ fill: '#374151', strokeWidth: 1, r: 4 }}
-                        activeDot={{ r: 6, stroke: '#374151', strokeWidth: 1, fill: 'white' }}
-                        connectNulls={false}
-                      />
-                    </LineChart>
-                  )}
+                  <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      {activeChart === 'bar' && (
+                        <BarChart data={analytics.monthly_trends.filter(m => m.count > 0)} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.6} />
+                          <XAxis 
+                            dataKey="month" 
+                            stroke="#64748b"
+                            fontSize={12}
+                            tickLine={false}
+                            axisLine={false}
+                          />
+                          <YAxis 
+                            stroke="#64748b"
+                            fontSize={12}
+                            tickLine={false}
+                            axisLine={false}
+                            domain={[0, 'dataMax + 2']}
+                          />
+                          <Tooltip 
+                            contentStyle={{
+                              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                              border: 'none',
+                              borderRadius: '12px',
+                              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+                              fontSize: '13px'
+                            }}
+                          />
+                          <Bar 
+                            dataKey="count" 
+                            fill="url(#barGradient)"
+                            name="Invoices" 
+                            radius={[4, 4, 0, 0]}
+                          />
+                          <defs>
+                            <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#3B82F6" />
+                              <stop offset="100%" stopColor="#1E40AF" />
+                            </linearGradient>
+                          </defs>
+                        </BarChart>
+                      )}
+                      
+                      {activeChart === 'line' && (
+                        <LineChart data={analytics.monthly_trends} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.6} />
+                          <XAxis 
+                            dataKey="month" 
+                            stroke="#64748b"
+                            fontSize={12}
+                            tickLine={false}
+                            axisLine={false}
+                          />
+                          <YAxis 
+                            stroke="#64748b"
+                            fontSize={12}
+                            tickLine={false}
+                            axisLine={false}
+                            domain={[0, 'dataMax + 2']}
+                          />
+                          <Tooltip 
+                            contentStyle={{
+                              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                              border: 'none',
+                              borderRadius: '12px',
+                              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+                              fontSize: '13px'
+                            }}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="count" 
+                            stroke="#3B82F6" 
+                            strokeWidth={3}
+                            dot={{ fill: '#3B82F6', strokeWidth: 2, r: 5 }}
+                            activeDot={{ r: 7, stroke: '#3B82F6', strokeWidth: 2, fill: 'white' }}
+                          />
+                        </LineChart>
+                      )}
+                      
+                      {activeChart === 'area' && (
+                        <AreaChart data={analytics.monthly_trends} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.6} />
+                          <XAxis 
+                            dataKey="month" 
+                            stroke="#64748b"
+                            fontSize={12}
+                            tickLine={false}
+                            axisLine={false}
+                          />
+                          <YAxis 
+                            stroke="#64748b"
+                            fontSize={12}
+                            tickLine={false}
+                            axisLine={false}
+                            domain={[0, 'dataMax + 2']}
+                          />
+                          <Tooltip 
+                            contentStyle={{
+                              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                              border: 'none',
+                              borderRadius: '12px',
+                              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+                              fontSize: '13px'
+                            }}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="count" 
+                            stroke="#3B82F6" 
+                            fill="url(#areaGradient)"
+                            strokeWidth={3}
+                          />
+                          <defs>
+                            <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.3} />
+                              <stop offset="100%" stopColor="#3B82F6" stopOpacity={0.05} />
+                            </linearGradient>
+                          </defs>
+                        </AreaChart>
+                      )}
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Category Distribution */}
+            <div className="xl:col-span-1">
+              <div className="bg-white/80 backdrop-blur-md border border-white/50 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 h-full">
+                <div className="p-6 lg:p-8">
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="p-2.5 bg-gradient-to-br from-indigo-100 to-blue-200 rounded-xl">
+                      <Building2 className="w-5 h-5 text-indigo-600" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900">Categories</h2>
+                      <p className="text-sm text-gray-600">Distribution overview</p>
+                    </div>
+                  </div>
                   
-                  {activeChart === 'area' && (
-                    <AreaChart data={analytics.monthly_trends} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis 
-                        dataKey="month" 
-                        stroke="#6b7280"
-                        fontSize={11}
-                        tickLine={false}
-                        axisLine={false}
-                      />
-                      <YAxis 
-                        stroke="#6b7280"
-                        fontSize={11}
-                        tickLine={false}
-                        axisLine={false}
-                        domain={[0, 'dataMax + 2']}
-                      />
-                      <Tooltip 
-                        contentStyle={{
-                          backgroundColor: 'white',
-                          border: '1px solid #e5e7eb',
-                          borderRadius: '8px',
-                          fontSize: '12px'
-                        }}
-                      />
-                      <Area 
-                        type="monotone" 
-                        dataKey="count" 
-                        stroke="#374151" 
-                        fillOpacity={0.2}
-                        fill="#374151"
-                        strokeWidth={2}
-                        connectNulls={false}
-                      />
-                    </AreaChart>
-                  )}
-                  </>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
+                  <div className="h-64 mb-6">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={categoryData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={false}
+                          outerRadius={90}
+                          innerRadius={35}
+                          paddingAngle={2}
+                          dataKey="value"
+                        >
+                          {categoryData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                          formatter={(value: any) => [value, "Invoices"]}
+                          contentStyle={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            border: 'none',
+                            borderRadius: '12px',
+                            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+                            fontSize: '13px'
+                          }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  
+                  {/* Legend */}
+                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                    {categoryData.slice(0, 5).map((entry, index) => (
+                      <div key={entry.name} className="flex items-center justify-between py-1">
+                        <div className="flex items-center gap-2">
+                          <div 
+                            className="w-3 h-3 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: pieColors[index % pieColors.length] }}
+                          />
+                          <span className="text-sm text-gray-700 font-medium truncate">
+                            {entry.name}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {entry.value} ({Math.round((entry.value / categoryData.reduce((sum, item) => sum + item.value, 0)) * 100)}%)
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Processing Quality */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-green-600/10 rounded-2xl blur-xl"></div>
-            <Card className="relative bg-white/70 backdrop-blur-sm border border-white/40 rounded-2xl shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="p-2 bg-gradient-to-br from-emerald-100 to-green-100 rounded-lg mr-3">
-                      <Award className="w-4 h-4 text-emerald-600" />
-                    </div>
-                    <span className="text-lg font-semibold text-gray-900">
-                      Processing Quality
-                    </span>
+          {/* Processing Quality Metrics */}
+          <div className="bg-white/80 backdrop-blur-md border border-white/50 rounded-2xl shadow-xl">
+            <div className="p-6 lg:p-8">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="p-2.5 bg-gradient-to-br from-emerald-100 to-green-200 rounded-xl">
+                  <Award className="w-5 h-5 text-emerald-600" />
                 </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">Processing Quality Metrics</h2>
+                  <p className="text-sm text-gray-600">OCR and automation performance indicators</p>
+                </div>
+              </div>
+              
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-4 border border-white/40 rounded-lg bg-white/30 backdrop-blur-sm">
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="font-medium text-gray-900">Template Recognition</span>
-                    <span className="font-semibold text-gray-900">
+                {/* Template Recognition */}
+                <div className="group bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100 hover:shadow-lg transition-all duration-300">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold text-gray-900">Template Recognition</h3>
+                    <div className="text-2xl font-bold text-blue-600">
                       {analytics.recognition_stats.total_processed > 0 
                         ? Math.round((analytics.recognition_stats.template_recognized / analytics.recognition_stats.total_processed) * 100)
                         : 0}%
-                    </span>
+                    </div>
                   </div>
                   <Progress 
                     value={analytics.recognition_stats.total_processed > 0 
                       ? (analytics.recognition_stats.template_recognized / analytics.recognition_stats.total_processed) * 100 
                       : 0} 
-                    className="h-2"
+                    className="h-2 bg-blue-100"
                   />
+                  <p className="text-xs text-gray-600 mt-2">
+                    {analytics.recognition_stats.template_recognized} / {analytics.recognition_stats.total_processed} processed
+                  </p>
                 </div>
-                
-                <div className="p-4 border border-white/40 rounded-lg bg-white/30 backdrop-blur-sm">
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="font-medium text-gray-900">Auto-Categorized</span>
-                    <span className="font-semibold text-gray-900">
+
+                {/* Auto-Categorized */}
+                <div className="group bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100 hover:shadow-lg transition-all duration-300">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold text-gray-900">Auto-Categorized</h3>
+                    <div className="text-2xl font-bold text-green-600">
                       {analytics.recognition_stats.total_processed > 0 
                         ? Math.round((analytics.recognition_stats.auto_categorized / analytics.recognition_stats.total_processed) * 100)
                         : 0}%
-                    </span>
+                    </div>
                   </div>
                   <Progress 
                     value={analytics.recognition_stats.total_processed > 0 
                       ? (analytics.recognition_stats.auto_categorized / analytics.recognition_stats.total_processed) * 100 
                       : 0} 
-                    className="h-2"
+                    className="h-2 bg-green-100"
                   />
+                  <p className="text-xs text-gray-600 mt-2">
+                    {analytics.recognition_stats.auto_categorized} / {analytics.recognition_stats.total_processed} automated
+                  </p>
                 </div>
-                
-                <div className="p-4 border border-white/40 rounded-lg bg-white/30 backdrop-blur-sm">
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="font-medium text-gray-900">High Confidence</span>
-                    <span className="font-semibold text-gray-900">
+
+                {/* High Confidence */}
+                <div className="group bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100 hover:shadow-lg transition-all duration-300">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold text-gray-900">High Confidence</h3>
+                    <div className="text-2xl font-bold text-purple-600">
                       {analytics.recognition_stats.total_processed > 0 
                         ? Math.round((analytics.recognition_stats.high_confidence / analytics.recognition_stats.total_processed) * 100)
                         : 0}%
-                    </span>
+                    </div>
                   </div>
                   <Progress 
                     value={analytics.recognition_stats.total_processed > 0 
                       ? (analytics.recognition_stats.high_confidence / analytics.recognition_stats.total_processed) * 100 
                       : 0} 
-                    className="h-2"
+                    className="h-2 bg-purple-100"
                   />
+                  <p className="text-xs text-gray-600 mt-2">
+                    {analytics.recognition_stats.high_confidence} / {analytics.recognition_stats.total_processed} high quality
+                  </p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
           </div>
-        </div>
         </div>
       </div>
     </Layout>
