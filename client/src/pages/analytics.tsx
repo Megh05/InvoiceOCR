@@ -285,9 +285,9 @@ export default function Analytics() {
           </div>
 
           {/* Charts Section */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
-            {/* Monthly Trends - Takes 2 columns on XL screens */}
-            <div className="xl:col-span-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* Monthly Trends */}
+            <div>
               <div className="bg-white/80 backdrop-blur-md border border-white/50 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300">
                 <div className="p-6 lg:p-8">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
@@ -447,7 +447,7 @@ export default function Analytics() {
             </div>
 
             {/* Category Distribution */}
-            <div className="xl:col-span-1">
+            <div>
               <div className="bg-white/80 backdrop-blur-md border border-white/50 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 h-full">
                 <div className="p-6 lg:p-8">
                   <div className="flex items-center gap-3 mb-8">
