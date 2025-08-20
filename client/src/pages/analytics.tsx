@@ -477,7 +477,7 @@ export default function Analytics() {
           </div>
 
           {/* Enhanced Template Recognition Performance */}
-          <Card className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-500">
+          <Card className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl h-auto">
             <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <CardHeader className="relative">
               <CardTitle className="flex items-center justify-between">
@@ -497,7 +497,7 @@ export default function Analytics() {
               </CardTitle>
             </CardHeader>
             <CardContent className="relative">
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {analytics.templates.map((template, index) => (
                   <div 
                     key={template.template_name} 
@@ -662,7 +662,7 @@ export default function Analytics() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="relative">
-                <div className="space-y-6">
+                <div className="space-y-4">
                   <div className="group/stat p-4 rounded-2xl bg-gradient-to-r from-blue-50/50 to-indigo-50/30 backdrop-blur-sm border border-blue-100/40 hover:border-blue-200/60 transition-all duration-300">
                     <div className="flex justify-between items-center mb-3">
                       <div className="flex items-center space-x-3">
