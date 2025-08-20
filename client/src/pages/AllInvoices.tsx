@@ -310,8 +310,8 @@ export default function AllInvoices() {
                     <CardTitle className="text-xs font-medium">Total Invoices</CardTitle>
                     <FileText className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-lg font-bold">{invoices.length}</div>
+                  <CardContent className="relative">
+                    <div className="text-lg font-bold text-gray-900 mb-1">{invoices.length}</div>
                   </CardContent>
                 </Card>
               </div>
@@ -323,8 +323,8 @@ export default function AllInvoices() {
                     <CardTitle className="text-xs font-medium">Total Amount</CardTitle>
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-lg font-bold">
+                  <CardContent className="relative">
+                    <div className="text-lg font-bold text-gray-900 mb-1">
                       {formatCurrency(invoices.reduce((sum, inv) => sum + inv.total, 0))}
                     </div>
                   </CardContent>
@@ -338,8 +338,8 @@ export default function AllInvoices() {
                     <CardTitle className="text-xs font-medium">Average Amount</CardTitle>
                     <Building2 className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-lg font-bold">
+                  <CardContent className="relative">
+                    <div className="text-lg font-bold text-gray-900 mb-1">
                       {formatCurrency(invoices.length > 0 ? invoices.reduce((sum, inv) => sum + inv.total, 0) / invoices.length : 0)}
                     </div>
                   </CardContent>
@@ -353,8 +353,8 @@ export default function AllInvoices() {
                     <CardTitle className="text-xs font-medium">High Confidence</CardTitle>
                     <Calendar className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-lg font-bold">
+                  <CardContent className="relative">
+                    <div className="text-lg font-bold text-gray-900 mb-1">
                       {Math.round((invoices.filter(inv => inv.confidence >= 0.8).length / invoices.length) * 100)}%
                     </div>
                   </CardContent>
