@@ -311,7 +311,8 @@ export default function AllInvoices() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-lg font-bold text-gray-900">{invoices.length}</div>
+                  <div className="text-3xl font-bold text-gray-900 mb-1">{invoices.length}</div>
+                  <p className="text-sm text-gray-600 font-medium">Total processed</p>
                 </CardContent>
               </Card>
 
@@ -323,9 +324,10 @@ export default function AllInvoices() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-lg font-bold text-gray-900">
+                  <div className="text-3xl font-bold text-gray-900 mb-1">
                     {formatCurrency(invoices.reduce((sum, inv) => sum + inv.total, 0))}
                   </div>
+                  <p className="text-sm text-gray-600 font-medium">Combined value</p>
                 </CardContent>
               </Card>
 
@@ -337,9 +339,10 @@ export default function AllInvoices() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-lg font-bold text-gray-900">
+                  <div className="text-3xl font-bold text-gray-900 mb-1">
                     {formatCurrency(invoices.length > 0 ? invoices.reduce((sum, inv) => sum + inv.total, 0) / invoices.length : 0)}
                   </div>
+                  <p className="text-sm text-gray-600 font-medium">Average amount</p>
                 </CardContent>
               </Card>
 
@@ -351,9 +354,10 @@ export default function AllInvoices() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-lg font-bold text-gray-900">
+                  <div className="text-3xl font-bold text-gray-900 mb-1">
                     {Math.round((invoices.filter(inv => inv.confidence >= 0.8).length / invoices.length) * 100)}%
                   </div>
+                  <p className="text-sm text-gray-600 font-medium">Quality score</p>
                 </CardContent>
               </Card>
             </div>

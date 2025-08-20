@@ -154,7 +154,7 @@ export default function Analytics() {
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-xl font-bold text-gray-900 mb-1 group-hover:text-blue-700 transition-colors">
+                <div className="text-3xl font-bold text-gray-900 mb-2 group-hover:text-blue-700 transition-colors">
                   {analytics.total_invoices.toLocaleString()}
                 </div>
                 <div className="flex items-center space-x-2">
@@ -166,7 +166,7 @@ export default function Analytics() {
                       }}
                     />
                   </div>
-                  <p className="text-xs text-blue-600">
+                  <p className="text-sm text-blue-600 font-medium">
                     {analytics.recognition_stats.template_recognized} recognized
                   </p>
                 </div>
@@ -190,10 +190,10 @@ export default function Analytics() {
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-lg font-bold text-gray-900 group-hover:text-green-700 transition-colors">
+                <div className="text-3xl font-bold text-gray-900 mb-2 group-hover:text-green-700 transition-colors">
                   ${analytics.total_amount.toLocaleString()}
                 </div>
-                <p className="text-xs text-green-600">
+                <p className="text-sm text-green-600 font-medium">
                   Avg: ${analytics.average_amount.toLocaleString()}
                 </p>
               </CardContent>
@@ -216,12 +216,12 @@ export default function Analytics() {
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-lg font-bold text-gray-900 group-hover:text-orange-700 transition-colors">
+                <div className="text-3xl font-bold text-gray-900 mb-2 group-hover:text-orange-700 transition-colors">
                   {analytics.recognition_stats.total_processed > 0 
                     ? Math.round((analytics.recognition_stats.template_recognized / analytics.recognition_stats.total_processed) * 100)
                     : 0}%
                 </div>
-                <p className="text-xs text-orange-600">
+                <p className="text-sm text-orange-600 font-medium">
                   Template detection
                 </p>
               </CardContent>
@@ -244,12 +244,12 @@ export default function Analytics() {
                 </div>
               </CardHeader>
               <CardContent className="relative">
-                <div className="text-lg font-bold text-gray-900 group-hover:text-purple-700 transition-colors">
+                <div className="text-3xl font-bold text-gray-900 mb-2 group-hover:text-purple-700 transition-colors">
                   {analytics.recognition_stats.total_processed > 0 
                     ? Math.round((analytics.recognition_stats.high_confidence / analytics.recognition_stats.total_processed) * 100)
                     : 0}%
                 </div>
-                <p className="text-xs text-purple-600">
+                <p className="text-sm text-purple-600 font-medium">
                   High confidence
                 </p>
               </CardContent>
@@ -369,7 +369,7 @@ export default function Analytics() {
                 <ResponsiveContainer width="100%" height={240}>
                   <>
                   {activeChart === 'bar' && (
-                    <BarChart data={analytics.monthly_trends} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                    <BarChart data={analytics.monthly_trends.filter(m => m.count > 0)} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                       <XAxis 
                         dataKey="month" 
@@ -383,6 +383,7 @@ export default function Analytics() {
                         fontSize={11}
                         tickLine={false}
                         axisLine={false}
+                        domain={[0, 'dataMax + 2']}
                       />
                       <Tooltip 
                         contentStyle={{
@@ -399,6 +400,7 @@ export default function Analytics() {
                         fill="#3B82F6" 
                         name="Invoice Count" 
                         radius={[4, 4, 0, 0]}
+                        minPointSize={20}
                       />
                     </BarChart>
                   )}
@@ -418,6 +420,7 @@ export default function Analytics() {
                         fontSize={11}
                         tickLine={false}
                         axisLine={false}
+                        domain={[0, 'dataMax + 2']}
                       />
                       <Tooltip 
                         contentStyle={{
@@ -434,8 +437,9 @@ export default function Analytics() {
                         dataKey="count" 
                         stroke="#3B82F6" 
                         strokeWidth={3}
-                        dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
-                        activeDot={{ r: 6, stroke: '#3B82F6', strokeWidth: 2, fill: 'white' }}
+                        dot={{ fill: '#3B82F6', strokeWidth: 2, r: 6 }}
+                        activeDot={{ r: 8, stroke: '#3B82F6', strokeWidth: 2, fill: 'white' }}
+                        connectNulls={false}
                       />
                     </LineChart>
                   )}
@@ -455,6 +459,7 @@ export default function Analytics() {
                         fontSize={11}
                         tickLine={false}
                         axisLine={false}
+                        domain={[0, 'dataMax + 2']}
                       />
                       <Tooltip 
                         contentStyle={{
@@ -470,9 +475,10 @@ export default function Analytics() {
                         type="monotone" 
                         dataKey="count" 
                         stroke="#3B82F6" 
-                        fillOpacity={0.3}
+                        fillOpacity={0.4}
                         fill="#3B82F6"
-                        strokeWidth={2}
+                        strokeWidth={3}
+                        connectNulls={false}
                       />
                     </AreaChart>
                   )}
