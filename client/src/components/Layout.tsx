@@ -9,6 +9,8 @@ interface LayoutProps {
 interface StatusResponse {
   mistralConfigured: boolean;
   ocrEnabled: boolean;
+  lastUpdated: string;
+  connectionStatus?: 'connected' | 'disconnected' | 'testing';
 }
 
 function OCRStatus() {
@@ -26,12 +28,35 @@ function OCRStatus() {
     );
   }
 
-  const isConnected = status?.mistralConfigured && status?.ocrEnabled;
+  // Use the actual connection status if available, fallback to old logic
+  const connectionStatus = status?.connectionStatus;
+  const isConfigured = status?.mistralConfigured && status?.ocrEnabled;
+  
+  let statusColor = 'bg-gray-400';
+  let statusText = 'Unknown';
+  
+  if (!isConfigured) {
+    statusColor = 'bg-red-400';
+    statusText = 'API Key Required';
+  } else if (connectionStatus === 'testing') {
+    statusColor = 'bg-yellow-400 animate-pulse';
+    statusText = 'Testing Connection...';
+  } else if (connectionStatus === 'connected') {
+    statusColor = 'bg-green-400';
+    statusText = 'Mistral OCR Connected';
+  } else if (connectionStatus === 'disconnected') {
+    statusColor = 'bg-red-400';
+    statusText = 'Connection Failed';
+  } else {
+    // Fallback to old logic if connectionStatus not available
+    statusColor = isConfigured ? 'bg-green-400' : 'bg-red-400';
+    statusText = isConfigured ? 'Mistral OCR Connected' : 'API Key Required';
+  }
 
   return (
     <>
-      <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`}></div>
-      <span>{isConnected ? 'Mistral OCR Connected' : 'API Key Required'}</span>
+      <div className={`w-2 h-2 rounded-full ${statusColor}`}></div>
+      <span>{statusText}</span>
     </>
   );
 }

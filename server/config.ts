@@ -55,18 +55,52 @@ export class ConfigService {
   static async getStatus(): Promise<{ 
     mistralConfigured: boolean; 
     ocrEnabled: boolean; 
-    lastUpdated: string 
+    lastUpdated: string;
+    connectionStatus?: 'connected' | 'disconnected' | 'testing'
   }> {
     const config = await this.loadConfig();
+    const hasApiKey = !!config.mistralApiKey;
+    
+    let connectionStatus: 'connected' | 'disconnected' | 'testing' | undefined;
+    
+    // If we have an API key, do a quick connection test
+    if (hasApiKey) {
+      try {
+        connectionStatus = await this.testMistralConnection(config.mistralApiKey!);
+      } catch (error) {
+        connectionStatus = 'disconnected';
+      }
+    }
+    
     return {
-      mistralConfigured: !!config.mistralApiKey,
+      mistralConfigured: hasApiKey,
       ocrEnabled: config.ocrEnabled,
-      lastUpdated: config.lastUpdated
+      lastUpdated: config.lastUpdated,
+      connectionStatus
     };
   }
 
   static async getMistralApiKey(): Promise<string | undefined> {
     const config = await this.loadConfig();
     return config.mistralApiKey;
+  }
+
+  private static async testMistralConnection(apiKey: string): Promise<'connected' | 'disconnected'> {
+    try {
+      // Quick health check with very short timeout
+      const response = await fetch('https://api.mistral.ai/v1/models', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        signal: AbortSignal.timeout(3000) // 3 second timeout
+      });
+      
+      return response.ok ? 'connected' : 'disconnected';
+    } catch (error) {
+      console.log('[config] Mistral connection test failed:', error instanceof Error ? error.message : 'Unknown error');
+      return 'disconnected';
+    }
   }
 }
