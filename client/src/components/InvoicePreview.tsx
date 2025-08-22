@@ -10,6 +10,30 @@ import { CanonicalInvoice, LineItem, FieldConfidence, TemplateMatch } from "@/ty
 import { FileText, Edit3, Eye, Copy, Plus, Trash2, File } from "lucide-react";
 import TemplateDisplay from "./TemplateDisplay";
 
+// Helper function to format customer information from JSON or string
+const formatCustomerInfo = (data: string | null | undefined): string => {
+  if (!data) return "";
+  
+  // Try to parse as JSON first
+  try {
+    const parsed = JSON.parse(data);
+    if (parsed && typeof parsed === 'object') {
+      const { name, address } = parsed;
+      if (name && address) {
+        return `${name}\n${address}`;
+      } else if (name) {
+        return name;
+      } else if (address) {
+        return address;
+      }
+    }
+  } catch (e) {
+    // If not JSON, return as is
+  }
+  
+  return data;
+};
+
 interface InvoicePreviewProps {
   invoice: CanonicalInvoice;
   fieldConfidences?: FieldConfidence[];
@@ -338,14 +362,14 @@ export default function InvoicePreview({
             <div className="space-y-4">
               <EditableField
                 label="Bill To"
-                value={invoice.bill_to}
+                value={formatCustomerInfo(invoice.bill_to)}
                 fieldName="bill_to"
                 multiline
                 placeholder="Enter billing address"
               />
               <EditableField
                 label="Ship To"
-                value={invoice.ship_to}
+                value={formatCustomerInfo(invoice.ship_to)}
                 fieldName="ship_to"
                 multiline
                 placeholder="Enter shipping address"

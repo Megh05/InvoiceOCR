@@ -7,6 +7,30 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { ArrowLeft, Download, Eye, Edit, FileText, Building, Calendar, DollarSign, ChevronDown } from "lucide-react";
 import Layout from "@/components/Layout";
 
+// Helper function to format customer information from JSON or string
+const formatCustomerInfo = (data: string | null | undefined): string => {
+  if (!data) return "N/A";
+  
+  // Try to parse as JSON first
+  try {
+    const parsed = JSON.parse(data);
+    if (parsed && typeof parsed === 'object') {
+      const { name, address } = parsed;
+      if (name && address) {
+        return `${name}\n${address}`;
+      } else if (name) {
+        return name;
+      } else if (address) {
+        return address;
+      }
+    }
+  } catch (e) {
+    // If not JSON, return as is
+  }
+  
+  return data;
+};
+
 interface Invoice {
   id: string;
   invoice_number: string;
@@ -229,7 +253,7 @@ export default function InvoiceDetail() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm whitespace-pre-line">{invoice.bill_to || 'N/A'}</p>
+              <p className="text-sm whitespace-pre-line">{formatCustomerInfo(invoice.bill_to)}</p>
             </CardContent>
           </Card>
 
