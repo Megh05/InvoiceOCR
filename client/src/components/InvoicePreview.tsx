@@ -406,73 +406,78 @@ export default function InvoicePreview({
               <div className="space-y-3">
                 {(invoice.line_items || []).map((item, index) => (
                   <Card key={index} className="p-3 overflow-hidden">
-                    <div className="space-y-3">
-                      {/* Description - Full Width */}
-                      <div className="w-full">
+                    {/* Side-by-side layout */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                      {/* Description */}
+                      <div className="md:col-span-5">
                         <label className="text-xs font-medium text-gray-700 mb-1 block">Description</label>
                         {isEditing ? (
                           <Input
                             value={item.description}
                             onChange={(e) => updateLineItem(index, { description: e.target.value })}
                             placeholder="Item description"
-                            className="text-sm w-full"
+                            className="text-sm"
                           />
                         ) : (
-                          <div className="p-2 bg-gray-50 rounded text-sm break-words w-full">{item.description}</div>
+                          <div className="p-2 bg-gray-50 rounded text-sm break-words">{item.description}</div>
                         )}
                       </div>
                       
-                      {/* Numbers Row - Responsive Grid */}
-                      <div className="grid grid-cols-4 gap-2 xl:grid-cols-5 xl:gap-4">
-                        <div>
-                          <label className="text-xs font-medium text-gray-700 mb-1 block">Qty</label>
-                          {isEditing ? (
-                            <Input
-                              type="number"
-                              min="1"
-                              value={item.qty}
-                              onChange={(e) => updateLineItem(index, { qty: Number(e.target.value) })}
-                              className="text-sm text-center"
-                            />
-                          ) : (
-                            <div className="p-2 bg-gray-50 rounded text-sm text-center">{item.qty}</div>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-gray-700 mb-1 block">Unit Price</label>
-                          {isEditing ? (
-                            <Input
-                              type="number"
-                              min="0"
-                              step="0.01"
-                              value={item.unit_price}
-                              onChange={(e) => updateLineItem(index, { unit_price: Number(e.target.value) })}
-                              className="text-sm text-right"
-                            />
-                          ) : (
-                            <div className="p-2 bg-gray-50 rounded text-sm text-right text-xs">
-                              {invoice.currency === "EUR" ? "€" : "$"}{item.unit_price.toFixed(2)}
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-gray-700 mb-1 block">Amount</label>
-                          <div className="p-2 bg-gray-100 rounded text-sm text-right font-medium text-xs">
-                            {invoice.currency === "EUR" ? "€" : "$"}{item.amount.toFixed(2)}
+                      {/* Quantity */}
+                      <div className="md:col-span-2">
+                        <label className="text-xs font-medium text-gray-700 mb-1 block">Qty</label>
+                        {isEditing ? (
+                          <Input
+                            type="number"
+                            min="1"
+                            value={item.qty}
+                            onChange={(e) => updateLineItem(index, { qty: Number(e.target.value) })}
+                            className="text-sm text-center"
+                          />
+                        ) : (
+                          <div className="p-2 bg-gray-50 rounded text-sm text-center">{item.qty}</div>
+                        )}
+                      </div>
+                      
+                      {/* Unit Price */}
+                      <div className="md:col-span-2">
+                        <label className="text-xs font-medium text-gray-700 mb-1 block">Unit Price</label>
+                        {isEditing ? (
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={item.unit_price}
+                            onChange={(e) => updateLineItem(index, { unit_price: Number(e.target.value) })}
+                            className="text-sm text-right"
+                          />
+                        ) : (
+                          <div className="p-2 bg-gray-50 rounded text-sm text-right">
+                            {invoice.currency === "EUR" ? "€" : "$"}{item.unit_price.toFixed(2)}
                           </div>
+                        )}
+                      </div>
+                      
+                      {/* Amount */}
+                      <div className="md:col-span-2">
+                        <label className="text-xs font-medium text-gray-700 mb-1 block">Amount</label>
+                        <div className="p-2 bg-gray-100 rounded text-sm text-right font-medium">
+                          {invoice.currency === "EUR" ? "€" : "$"}{item.amount.toFixed(2)}
                         </div>
-                        <div className="flex items-end justify-center xl:justify-start">
-                          {isEditing && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => removeLineItem(index)}
-                              className="text-red-600 hover:text-red-700 p-1 h-8 w-8 xl:w-10 xl:h-10"
-                            >
-                              <Trash2 className="w-3 h-3 xl:w-4 xl:h-4" />
-                            </Button>
-                          )}
-                        </div>
+                      </div>
+                      
+                      {/* Delete Button */}
+                      <div className="md:col-span-1 flex justify-center">
+                        {isEditing && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeLineItem(index)}
+                            className="text-red-600 hover:text-red-700 p-1 h-8 w-8"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </Card>
