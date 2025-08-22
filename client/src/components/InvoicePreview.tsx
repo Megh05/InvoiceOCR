@@ -185,13 +185,13 @@ export default function InvoicePreview({
       {/* Template Recognition Display */}
       <TemplateDisplay templateMatch={templateMatch} category={invoice.category} />
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Document/Text Preview */}
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+        {/* Document/Text Preview - Left Side */}
         {(rawOcrText || canShowDocument) && (
-        <Card className="h-fit">
-          <CardHeader className="pb-3">
+        <Card className="h-fit min-w-0">
+          <CardHeader className="pb-2 px-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg flex items-center">
+              <CardTitle className="text-sm sm:text-base lg:text-lg flex items-center">
                 {viewMode === 'ocr' ? (
                   <>
                     <FileText className="w-5 h-5 mr-2" />
@@ -206,7 +206,7 @@ export default function InvoicePreview({
               </CardTitle>
               {canShowDocument && (
                 <Select value={viewMode} onValueChange={(value: 'ocr' | 'document') => setViewMode(value)}>
-                  <SelectTrigger className="w-48">
+                  <SelectTrigger className="w-24 sm:w-32 lg:w-48 text-xs sm:text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -217,41 +217,42 @@ export default function InvoicePreview({
               )}
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-2 sm:px-3 lg:px-6">
             {viewMode === 'ocr' && rawOcrText ? (
               <>
-                <div className="bg-gray-50 p-4 rounded-lg border max-h-96 overflow-y-auto">
-                  <pre className="text-xs whitespace-pre-wrap font-mono text-gray-700">
+                <div className="bg-gray-50 p-2 sm:p-3 lg:p-4 rounded-lg border max-h-64 sm:max-h-80 lg:max-h-96 overflow-y-auto">
+                  <pre className="text-xs whitespace-pre-wrap font-mono text-gray-700 leading-tight">
                     {rawOcrText}
                   </pre>
                 </div>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="mt-3"
+                  className="mt-2 text-xs"
                   onClick={() => navigator.clipboard.writeText(rawOcrText)}
                 >
-                  <Copy className="w-4 h-4 mr-2" />
-                  Copy Text
+                  <Copy className="w-3 h-3 mr-1" />
+                  Copy
                 </Button>
               </>
             ) : viewMode === 'document' && canShowDocument ? (
-              <div className="space-y-3">
-                <div className="border rounded-lg overflow-hidden bg-gray-50 max-h-96">
+              <div className="space-y-2">
+                <div className="border rounded-lg overflow-hidden bg-gray-50 max-h-64 sm:max-h-80 lg:max-h-96">
                   <object
                     data={documentUrl}
                     type={inputType === 'file' && imageFile?.type.includes('pdf') ? 'application/pdf' : undefined}
-                    className="w-full h-80"
+                    className="w-full h-48 sm:h-64 lg:h-80"
                   >
-                    <div className="p-4 text-center">
-                      <p className="text-sm text-gray-600 mb-2">Cannot display document inline</p>
+                    <div className="p-2 sm:p-4 text-center">
+                      <p className="text-xs sm:text-sm text-gray-600 mb-2">Cannot display document inline</p>
                       <Button 
                         variant="outline" 
                         size="sm"
                         onClick={() => window.open(documentUrl, '_blank')}
+                        className="text-xs"
                       >
-                        <File className="w-4 h-4 mr-2" />
-                        Open in New Tab
+                        <File className="w-3 h-3 mr-1" />
+                        Open
                       </Button>
                     </div>
                   </object>
@@ -260,8 +261,9 @@ export default function InvoicePreview({
                   variant="outline" 
                   size="sm"
                   onClick={() => window.open(documentUrl, '_blank')}
+                  className="text-xs"
                 >
-                  <File className="w-4 h-4 mr-2" />
+                  <File className="w-3 h-3 mr-1" />
                   Open in New Tab
                 </Button>
               </div>
@@ -269,10 +271,9 @@ export default function InvoicePreview({
           </CardContent>
         </Card>
         )}
-      </div>
 
-      {/* Editable Invoice Preview */}
-      <Card>
+        {/* Editable Invoice Preview - Right Side */}
+        <Card className="min-w-0">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg flex items-center">
@@ -514,6 +515,7 @@ export default function InvoicePreview({
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
