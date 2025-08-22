@@ -422,8 +422,8 @@ export default function InvoicePreview({
                         )}
                       </div>
                       
-                      {/* Numbers Row */}
-                      <div className="grid grid-cols-4 gap-2 sm:gap-3">
+                      {/* Numbers Row - Responsive Grid */}
+                      <div className="grid grid-cols-4 gap-2 xl:grid-cols-5 xl:gap-4">
                         <div>
                           <label className="text-xs font-medium text-gray-700 mb-1 block">Qty</label>
                           {isEditing ? (
@@ -461,15 +461,15 @@ export default function InvoicePreview({
                             {invoice.currency === "EUR" ? "€" : "$"}{item.amount.toFixed(2)}
                           </div>
                         </div>
-                        <div className="flex items-end">
+                        <div className="flex items-end justify-center xl:justify-start">
                           {isEditing && (
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => removeLineItem(index)}
-                              className="text-red-600 hover:text-red-700 p-1 h-8 w-8"
+                              className="text-red-600 hover:text-red-700 p-1 h-8 w-8 xl:w-10 xl:h-10"
                             >
-                              <Trash2 className="w-3 h-3" />
+                              <Trash2 className="w-3 h-3 xl:w-4 xl:h-4" />
                             </Button>
                           )}
                         </div>
