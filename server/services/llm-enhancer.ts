@@ -446,15 +446,34 @@ RESPOND WITH VALID JSON ONLY (NO EXTRA FIELDS):
       try {
         return await fn();
       } catch (error) {
-        if (attempt === this.maxRetries - 1) throw error;
+        if (attempt === this.maxRetries - 1) {
+          // Add helpful context for rate limit errors
+          if (error instanceof Error && (error.message.includes('429') || error.message.includes('Service tier capacity exceeded'))) {
+            console.log(`[llm-enhancer] Rate limit exceeded after ${this.maxRetries} attempts. Falling back to deterministic extraction.`);
+          }
+          throw error;
+        }
         
         // Don't retry on auth errors
         if (error instanceof Error && error.message.includes('401')) {
           throw error;
         }
         
-        const delay = 1000 * Math.pow(2, attempt);
-        console.log(`[llm-enhancer] Attempt ${attempt + 1} failed, retrying in ${delay}ms...`);
+        // Check if it's a rate limit error for special handling
+        const isRateLimit = error instanceof Error && (error.message.includes('429') || error.message.includes('Service tier capacity exceeded'));
+        
+        // For rate limits, use longer delays
+        let delay;
+        if (isRateLimit) {
+          // For rate limits: 5s, 15s, 45s
+          delay = 5000 * Math.pow(3, attempt);
+          console.log(`[llm-enhancer] Rate limit detected (attempt ${attempt + 1}/${this.maxRetries}), waiting ${delay/1000}s before retry...`);
+        } else {
+          // Regular exponential backoff: 1s, 2s, 4s
+          delay = 1000 * Math.pow(2, attempt);
+          console.log(`[llm-enhancer] Attempt ${attempt + 1} failed, retrying in ${delay}ms...`);
+        }
+        
         await this.delay(delay);
       }
     }
